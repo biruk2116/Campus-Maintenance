@@ -1,41 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
-  /* SaaS Midnight Palette - Professional Dark */
-  --background: #09090b;
-  --surface: #18181b;
-  --surface-hover: #27272a;
+  /* Dynamic Variables - Changed via [data-bs-theme] */
   --primary: #3b82f6;
   --primary-dark: #2563eb;
   --primary-light: #60a5fa;
-  --secondary: #a1a1aa;
-  --accent: #f59e0b;
   --success: #10b981;
   --danger: #ef4444;
+  --warning: #f59e0b;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+  
+  /* Shared Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme (Default/SaaS Midnight) */
+[data-bs-theme='dark'] {
+  --background: #09090b;
+  --surface: #18181b;
+  --surface-hover: #27272a;
   --text-main: #fafafa;
   --text-muted: #a1a1aa;
   --border: #27272a;
   --glass: rgba(24, 24, 27, 0.8);
-  --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  --nav-bg: rgba(9, 9, 11, 0.8);
 }
 
+/* Light Theme (Clean Professional) */
 [data-bs-theme='light'] {
-  /* If light mode is ever needed, it will still looks like "Soft Dark" */
-  --background: #111111;
-  --surface: #1a1a1a;
+  --background: #fafafa;
+  --surface: #ffffff;
+  --surface-hover: #f4f4f5;
+  --text-main: #09090b;
+  --text-muted: #71717a;
+  --border: #e4e4e7;
+  --glass: rgba(255, 255, 255, 0.8);
+  --nav-bg: rgba(255, 255, 255, 0.8);
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--background);
   color: var(--text-main);
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: background-color var(--transition-normal), 
+              color var(--transition-normal);
   overflow-x: hidden;
+  height: 100vh;
 }
 
 h1, h2, h3, h4, .navbar-brand {
   font-family: 'Outfit', sans-serif;
-  color: var(--text-main);
   letter-spacing: -0.02em;
 }
 
@@ -46,72 +64,59 @@ h1, h2, h3, h4, .navbar-brand {
   background: var(--surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-premium);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
   position: relative;
+  overflow: hidden;
 }
 
 .premium-card:hover {
   border-color: var(--primary-light);
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+  box-shadow: var(--shadow-premium);
 }
 
-/* Button Refinement - SaaS Rounded */
+/* Button UI */
 .btn-primary {
   background: var(--primary);
   border: 1px solid var(--primary-dark);
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   color: white;
 }
 
 .btn-primary:hover {
   background: var(--primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
-.btn-secondary {
-  background: var(--surface-hover);
+.btn-surface {
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-main);
 }
 
-/* Dark Hero Section */
+/* Hero Section Adaptive */
 .hero-gradient {
-  background: linear-gradient(180deg, #09090b 0%, #17171e 100%);
+  background: linear-gradient(180deg, var(--background) 0%, var(--surface-hover) 100%);
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
 }
 
-/* Nav Styles - Pure Dark Glass */
+/* Navbar Glass */
 .nav-glass {
-  background: rgba(9, 9, 11, 0.8) !important;
+  background: var(--nav-bg) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   z-index: 1100;
 }
 
-/* Form Styles */
-.form-control, .form-select {
-  background-color: #0c0c0e !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text-main) !important;
-  border-radius: 8px;
-  padding: 12px;
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
-
-/* Status Badges - Dark Variants */
+/* Status Badges Adaptive */
 .status-badge {
   padding: 6px 14px;
   border-radius: 6px;
@@ -127,37 +132,50 @@ h1, h2, h3, h4, .navbar-brand {
 .status-in_progress { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
 .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
 
-/* Table Refinement */
-.table {
-  color: var(--text-main) !important;
+/* Main Content Area Visibility */
+.main-content-area {
+  margin-left: 280px; 
+  height: 100vh;
+  overflow-y: auto;
+  transition: all var(--transition-normal);
+  padding: 2rem;
 }
 
+@media (max-width: 991px) {
+  .main-content-area {
+    margin-left: 0;
+    padding: 1.5rem;
+  }
+}
+
+/* Table Refinement */
+.table { color: var(--text-main) !important; }
 .table thead th {
   background: transparent !important;
   border-bottom: 1px solid var(--border) !important;
   color: var(--text-muted) !important;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
 }
-
 .table tbody td {
   background: transparent !important;
   border-bottom: 1px solid var(--border) !important;
-  padding: 1.25rem 0.75rem;
 }
 
-/* Custom Scrollbar - Dark Stealth */
-::-webkit-scrollbar {
-  width: 6px;
+/* Adaptive Map */
+.map-container {
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
-::-webkit-scrollbar-track {
-  background: var(--background);
+
+[data-bs-theme='dark'] .map-iframe {
+  filter: invert(90%) hue-rotate(180deg) brightness(80%) contrast(90%);
 }
+
+/* Scrollbar Sidebar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--background); }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--border);
   border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
-}
+::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
