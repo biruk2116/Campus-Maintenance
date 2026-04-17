@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f8fafc;
+        }
+
+        button {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        .card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,.06);
+            margin-bottom: 18px;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Student Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<div class="card">
+    <h3>Create Request</h3>
+    <form id="requestForm">
+        <input type="text" name="title" placeholder="Title" required>
+        <textarea name="description" placeholder="Description" rows="4" required></textarea>
+        <button type="submit">Submit Request</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Your Requests</h3>
+    <div id="requests"></div>
+</div>
+
+<div class="card">
+    <h3>Progress Chart</h3>
+    <canvas id="progressChart" width="600" height="320"></canvas>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/session.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let chart = null;
+
+    checkSession("student");
+
+    document.getElementById("requestForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        const res = await apiRequest("createRequest", "POST", {
+            title: formData.get("title"),
+            description: formData.get("description")
+        });
+
+        if (!res.success) {
+            alert(res.message);
+            return;
+        }
+
+        alert(res.message);
+        this.reset();
+        loadRequests();
+    });
+
+    async function loadRequests() {
+        const res = await apiRequest("getStudentRequests", "POST");
+
+        if (!res.success) {
+            document.getElementById("requests").innerText = res.message;
+            return;
+        }
+
+        let html = "";
+        res.data.forEach(r => {
+            html += `
+                <div style="border:1px solid #d1d5db; padding:12px; margin-bottom:12px; border-radius:10px; background:white;">
+                    <strong>${r.title}</strong><br>
+                    Status: ${r.status}<br>
+                    <button onclick="loadChart(${r.id})" style="margin-top:10px;">View Progress</button>
+                </div>
+            `;
+        });
+
+        document.getElementById("requests").innerHTML = html || '<p>No requests found.</p>';
+    }
+
+    async function loadChart(request_id) {
+        const res = await apiRequest("getRequestProgress", "GET", { request_id });
+
+        if (!res.success) {
+            alert(res.message);
+            return;
+        }
+
+        const labels = res.data.map(p => new Date(p.created_at).toLocaleString());
+        const data = res.data.map(p => Number(p.progress_percentage));
+
+        const ctx = document.getElementById("progressChart").getContext("2d");
+
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Progress (%)",
+                    data,
+                    borderColor: "#2563eb",
+                    backgroundColor: "rgba(37,99,235,0.2)",
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    loadRequests();
+
+    async function logout() {
+        await apiRequest("logout", "POST");
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>
