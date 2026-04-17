@@ -59,6 +59,54 @@ switch ($action) {
         createUser($pdo);
         break;
 
+    case 'updateUser':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/UserController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        updateUser($pdo);
+        break;
+
+    case 'deleteUser':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/UserController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        deleteUser($pdo);
+        break;
+
+    case 'resetPassword':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/UserController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        resetPassword($pdo);
+        break;
+
+    case 'getAllUsers':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/UserController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        getAllUsers($pdo);
+        break;
+
     case 'assignTechnician':
         require_once "middleware/RoleMiddleware.php";
         require_once "middleware/StatusMiddleware.php";
@@ -81,6 +129,18 @@ switch ($action) {
         requireActiveUser($pdo);
 
         getAllRequests($pdo);
+        break;
+
+    case 'deleteRequest':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/RequestController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        deleteRequest($pdo);
         break;
 
     case 'updateProgress':
