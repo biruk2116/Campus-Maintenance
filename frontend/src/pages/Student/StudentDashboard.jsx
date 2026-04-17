@@ -4,49 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../../components/Sidebar';
 import axios from '../../api/axios';
 import { 
-    Plus, 
-    Clock, 
-    CheckCircle2, 
-    FileText, 
-    ChevronRight,
-    Search,
-    Bell,
-    Settings,
-    Filter,
-    ArrowUpRight,
-    Zap,
-    MapPin,
-    AlertCircle
+    Plus, Clock, CheckCircle2, FileText, ChevronRight,
+    Search, Bell, Settings, ArrowUpRight, Zap, MapPin
 } from 'lucide-react';
 import {
-    Chart as ChartJS,
-    ArcElement,
-    Tooltip,
-    Legend,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
+    Chart as ChartJS, ArcElement, Tooltip, Legend,
+    CategoryScale, LinearScale, BarElement, PointElement, LineElement,
 } from 'chart.js';
-import { Pie, Bar, Line } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
+import { useAuth } from '../../context/AuthContext';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement);
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
-};
 
 const DashboardHeader = ({ title, subtitle }) => (
     <div className="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h2 className="fw-bold tracking-tighter mb-1 text-white">{title}</h2>
+            <h2 className="fw-bold tracking-tighter mb-1 text-main">{title}</h2>
             <p className="text-muted small mb-0 fw-medium">{subtitle}</p>
         </div>
         <div className="d-flex gap-2">
@@ -54,8 +27,7 @@ const DashboardHeader = ({ title, subtitle }) => (
                 <span className="input-group-text bg-transparent border-0 ps-3"><Search size={16} className="text-muted" /></span>
                 <input type="text" className="form-control border-0 bg-transparent shadow-none smaller" placeholder="Search orders..." />
             </div>
-            <button className="btn btn-surface border-secondary border-opacity-10 p-2 rounded-3 text-muted"><Bell size={18} /></button>
-            <button className="btn btn-surface border-secondary border-opacity-10 p-2 rounded-3 text-muted"><Settings size={18} /></button>
+            <button className="btn btn-surface border-secondary border-opacity-10 p-2 rounded-3 text-muted shadow-sm"><Bell size={18} /></button>
         </div>
     </div>
 );
@@ -64,6 +36,7 @@ const StudentOverview = () => {
     const [stats, setStats] = useState({ Pending: 0, Assigned: 0, "In Progress": 0, Completed: 0 });
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { isDarkMode } = useAuth();
 
     const fetchData = async () => {
         try {
@@ -91,10 +64,10 @@ const StudentOverview = () => {
         }],
     };
 
-    if (loading) return <div className="p-5 text-center"><div className="spinner-border text-primary border-0 bg-primary bg-opacity-10"></div></div>;
+    if (loading) return <div className="p-5 text-center"><div className="spinner-border text-primary"></div></div>;
 
     return (
-        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="container-fluid py-4 h-100">
+        <div className="container-fluid">
             <DashboardHeader title="Student Workspace" subtitle="Lodge and track facility maintenance work orders." />
 
             <div className="row g-4 mb-5">
@@ -104,57 +77,57 @@ const StudentOverview = () => {
                     { label: 'Total Tickets', count: requests.length, color: 'primary', icon: <FileText /> },
                     { label: 'Completed', count: stats.Completed, color: 'success', icon: <CheckCircle2 /> }
                 ].map((s, i) => (
-                    <motion.div key={i} variants={itemVariants} className="col-md-3">
-                        <div className="premium-card p-4 h-100 border-secondary border-opacity-10">
+                    <div key={i} className="col-md-3">
+                        <div className="premium-card p-4 h-100 shadow-sm">
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <div className={`text-${s.color} opacity-80`}>{s.icon}</div>
-                                <span className="smaller text-muted fw-bold">Real-time</span>
+                                <span className="smaller text-muted fw-bold">Live Status</span>
                             </div>
-                            <h2 className="fw-bold mb-0 text-white">{s.count}</h2>
+                            <h2 className="fw-bold mb-0 text-main">{s.count}</h2>
                             <p className="text-muted smaller fw-bold text-uppercase mb-0">{s.label}</p>
                         </div>
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 
             <div className="row g-4">
-                <motion.div variants={itemVariants} className="col-lg-4">
-                    <div className="premium-card p-4 h-100 border-secondary border-opacity-10 bg-surface bg-opacity-30">
-                        <h6 className="fw-bold mb-4 text-white">Request Distribution</h6>
-                        <div style={{ height: '250px' }}>
+                <div className="col-lg-4">
+                    <div className="premium-card p-4 h-100 bg-surface shadow-sm">
+                        <h6 className="fw-bold mb-4 text-main">Request Distribution</h6>
+                        <div style={{ height: '240px' }}>
                             <Pie 
                                 data={chartData} 
                                 options={{ 
                                     maintainAspectRatio: false, 
-                                    plugins: { legend: { position: 'bottom', labels: { color: '#a1a1aa', usePointStyle: true, font: { size: 10 } } } } 
+                                    plugins: { legend: { position: 'bottom', labels: { color: isDarkMode ? '#a1a1aa' : '#71717a', usePointStyle: true, font: { size: 10 } } } } 
                                 }} 
                             />
                         </div>
                     </div>
-                </motion.div>
-                <motion.div variants={itemVariants} className="col-lg-8">
-                    <div className="premium-card p-4 h-100 border-secondary border-opacity-10">
+                </div>
+                <div className="col-lg-8">
+                    <div className="premium-card p-4 h-100 shadow-sm">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h6 className="fw-bold m-0 text-white">Recent Activities</h6>
-                            <Link to="/student/new-request" className="btn btn-primary btn-sm rounded-3 py-2 px-3 fw-bold smaller">New Request</Link>
+                            <h6 className="fw-bold m-0 text-main">Recent Activity Ledger</h6>
+                            <Link to="/student/new-request" className="btn btn-primary btn-sm rounded-3 py-2 px-3 fw-bold smaller shadow-sm">New Request</Link>
                         </div>
                         <div className="table-responsive">
                             <table className="table align-middle">
                                 <thead>
-                                    <tr>
+                                    <tr className="smaller text-muted fw-bold text-uppercase">
                                         <th>Ticket ID</th>
                                         <th>Subject</th>
                                         <th>Status</th>
-                                        <th>Dispatched</th>
+                                        <th>Engineering Unit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {requests.slice(0, 4).map((r, i) => (
+                                    {requests.slice(0, 5).map((r, i) => (
                                         <tr key={i}>
                                             <td className="smaller text-muted fw-bold">#{r.id.toString().padStart(4, '0')}</td>
-                                            <td className="small fw-bold text-white">{r.title}</td>
+                                            <td className="small fw-bold text-main">{r.title}</td>
                                             <td><span className={`status-badge status-${r.status.toLowerCase().replace(' ', '_')}`}>{r.status}</span></td>
-                                            <td className="smaller text-muted">{r.technician_name || 'In Queue'}</td>
+                                            <td className="smaller text-muted fw-medium">{r.technician_name || 'Dispatching...'}</td>
                                         </tr>
                                     ))}
                                     {requests.length === 0 && <tr><td colSpan="4" className="text-center py-5 text-muted smaller">No active tickets found.</td></tr>}
@@ -162,9 +135,9 @@ const StudentOverview = () => {
                             </table>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 
@@ -190,15 +163,15 @@ const NewRequest = () => {
     };
 
     return (
-        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="container-fluid py-4 h-100">
-            <DashboardHeader title="Log Maintenance Fault" subtitle="Report campus infrastructure issues to the technical unit." />
+        <div className="container-fluid">
+            <DashboardHeader title="Field Report" subtitle="Log a facility malfunction for immediate engineering review." />
             
-            <motion.div variants={itemVariants} className="premium-card p-4 p-lg-5 border-secondary border-opacity-10 bg-surface bg-opacity-30 mx-auto" style={{ maxWidth: '900px' }}>
+            <div className="premium-card p-4 p-lg-5 shadow-sm mx-auto" style={{ maxWidth: '900px' }}>
                 <AnimatePresence>
                     {success && (
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="alert alert-success bg-success bg-opacity-10 border-success border-opacity-20 d-flex align-items-center mb-5 p-3 rounded-3" >
                             <CheckCircle2 size={18} className="me-3" />
-                            <div className="smaller fw-bold">Work order dispatched successfully. Track progress in "My Tickets".</div>
+                            <div className="smaller fw-bold">Work order dispatched successfully. Track in "My Tickets".</div>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -206,13 +179,13 @@ const NewRequest = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="row g-4">
                         <div className="col-md-7">
-                            <label className="form-label smaller fw-bold text-muted mb-2">Issue Title</label>
-                            <input type="text" className="form-control" placeholder="e.g. Fluorescent tube failure" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+                            <label className="form-label smaller fw-bold text-muted mb-2">Service Subject</label>
+                            <input type="text" className="form-control" placeholder="e.g. Broken laboratory faucet" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
                         </div>
                         <div className="col-md-5">
-                            <label className="form-label smaller fw-bold text-muted mb-2">Tech Category</label>
+                            <label className="form-label smaller fw-bold text-muted mb-2">Engineering Dept</label>
                             <select className="form-select" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required>
-                                <option value="">Select Category</option>
+                                <option value="">Select Department</option>
                                 <option value="Electrical">Electrical</option>
                                 <option value="Plumbing">Plumbing</option>
                                 <option value="Carpentry">Carpentry</option>
@@ -220,21 +193,21 @@ const NewRequest = () => {
                             </select>
                         </div>
                         <div className="col-md-7">
-                            <label className="form-label smaller fw-bold text-muted mb-2">Specific Location</label>
-                            <div className="input-group bg-background rounded-3">
+                            <label className="form-label smaller fw-bold text-muted mb-2">Deployment Location</label>
+                            <div className="input-group bg-surface rounded-3 border">
                                 <span className="input-group-text bg-transparent border-0 pe-0"><MapPin size={16} className="text-muted" /></span>
-                                <input type="text" className="form-control border-0" placeholder="e.g. Block 12, Level 2, Rm 204" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} required />
+                                <input type="text" className="form-control border-0" placeholder="e.g. Block 04, Rm 201" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} required />
                             </div>
                         </div>
                         <div className="col-md-5">
-                            <label className="form-label smaller fw-bold text-muted mb-2">Urgency Level</label>
+                            <label className="form-label smaller fw-bold text-muted mb-2">Priority Matrix</label>
                             <div className="d-flex gap-2">
                                 {['Medium', 'High', 'Critical'].map(p => (
                                     <button
                                         key={p}
                                         type="button"
                                         onClick={() => setFormData({...formData, priority: p})}
-                                        className={`btn btn-sm flex-grow-1 py-3 rounded-3 border-0 transition-all ${formData.priority === p ? 'btn-primary' : 'bg-background text-muted'}`}
+                                        className={`btn btn-sm flex-grow-1 py-3 rounded-3 border transition-all ${formData.priority === p ? 'btn-primary border-0' : 'btn-surface'}`}
                                     >
                                         <span className="smaller fw-bold">{p}</span>
                                     </button>
@@ -242,43 +215,32 @@ const NewRequest = () => {
                             </div>
                         </div>
                         <div className="col-12">
-                            <label className="form-label smaller fw-bold text-muted mb-2">Detailed Description</label>
-                            <textarea className="form-control" rows="5" placeholder="Please describe the malfunction..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required />
+                            <label className="form-label smaller fw-bold text-muted mb-2">Fault Narrrative</label>
+                            <textarea className="form-control" rows="5" placeholder="Please provide clear details for the technician..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required />
                         </div>
                         <div className="col-12 mt-5">
-                            <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} type="submit" className="btn btn-primary w-100 py-3 fw-bold shadow-lg" disabled={loading} >
-                                {loading ? 'Transmitting Data...' : 'Dispatch Work Order'}
-                            </motion.button>
+                            <button type="submit" className="btn btn-primary w-100 py-3 fw-bold shadow-lg" disabled={loading} >
+                                {loading ? 'Transmitting...' : 'Dispatch Work Order'}
+                            </button>
                         </div>
                     </div>
                 </form>
-            </motion.div>
-        </motion.div>
+            </div>
+        </div>
     );
 };
 
-const MyRequests = () => (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="container-fluid py-4 h-100">
-        <DashboardHeader title="Ticket History" subtitle="View all your previously logged maintenance logs." />
-        <div className="premium-card p-4 border-secondary border-opacity-10 bg-surface bg-opacity-30">
-            <div className="text-center py-5">
-                <AlertCircle size={40} className="text-muted mb-3 opacity-20" />
-                <h6 className="text-muted smaller fw-bold">History Archive Loading...</h6>
-            </div>
-        </div>
-    </motion.div>
-);
-
 const StudentDashboard = () => {
     return (
-        <div className="bg-background min-vh-100 text-white">
+        <div className="bg-background min-vh-100">
             <Sidebar />
-            <div className="main-content-area" style={{ marginLeft: '280px', minHeight: '100vh', transition: 'all 0.4s' }}>
-                <Routes>
-                    <Route index element={<StudentOverview />} />
-                    <Route path="new-request" element={<NewRequest />} />
-                    <Route path="my-requests" element={<MyRequests />} />
-                </Routes>
+            <div className="main-content-area">
+                <AnimatePresence mode="wait">
+                    <Routes>
+                        <Route index element={<motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><StudentOverview /></motion.div>} />
+                        <Route path="new-request" element={<motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><NewRequest /></motion.div>} />
+                    </Routes>
+                </AnimatePresence>
             </div>
         </div>
     );
