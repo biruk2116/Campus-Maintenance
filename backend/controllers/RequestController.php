@@ -3,13 +3,12 @@
 require_once "config/database.php";
 require_once "utils/Response.php";
 
-session_start();
-
 
 // ========================
 // CREATE REQUEST (STUDENT)
 // ========================
-function createRequest($pdo) {
+function createRequest($pdo)
+{
 
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
         response(false, "Only students can create requests");
@@ -40,7 +39,8 @@ function createRequest($pdo) {
 // ========================
 // GET STUDENT REQUESTS
 // ========================
-function getStudentRequests($pdo) {
+function getStudentRequests($pdo)
+{
 
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
         response(false, "Unauthorized");
@@ -61,7 +61,8 @@ function getStudentRequests($pdo) {
 // ========================
 // GET ALL REQUESTS (ADMIN)
 // ========================
-function getAllRequests($pdo) {
+function getAllRequests($pdo)
+{
 
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         response(false, "Unauthorized");
@@ -81,7 +82,8 @@ function getAllRequests($pdo) {
 // ========================
 // ASSIGN TECHNICIAN (ADMIN)
 // ========================
-function assignTechnician($pdo) {
+function assignTechnician($pdo)
+{
 
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         response(false, "Unauthorized");
@@ -109,7 +111,8 @@ function assignTechnician($pdo) {
 // ========================
 // TECHNICIAN UPDATE PROGRESS
 // ========================
-function updateProgress($pdo) {
+function updateProgress($pdo)
+{
 
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'technician') {
         response(false, "Unauthorized");
@@ -153,5 +156,28 @@ function updateProgress($pdo) {
 
     response(true, "Progress updated");
 }
+function getRequestProgress($pdo)
+{
 
-?>
+    if (!isset($_SESSION['user_id'])) {
+        response(false, "Unauthorized");
+    }
+
+    $request_id = $_GET['request_id'] ?? '';
+
+    if (!$request_id) {
+        response(false, "Request ID required");
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT p.*, u.name AS technician_name
+        FROM progress_updates p
+        JOIN users u ON p.technician_id = u.id
+        WHERE p.request_id = ?
+        ORDER BY p.created_at ASC
+    ");
+
+    $stmt->execute([$request_id]);
+
+    response(true, "Progress history", $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
