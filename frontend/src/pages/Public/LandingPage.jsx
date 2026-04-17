@@ -258,7 +258,7 @@ const LandingPage = () => {
                                 </div>
                                 <div className="col-12 d-flex align-items-center">
                                     <div className="bg-primary bg-opacity-10 p-3 rounded-circle text-primary me-4"><Mail /></div>
-                                    <div><p className="small fw-bold mb-0">maintenance@dbu.edu.et</p><p className="smaller text-muted mb-0">Support Response < 2hrs</p></div>
+                                    <div><p className="small fw-bold mb-0">maintenance@dbu.edu.et</p><p className="smaller text-muted mb-0">Support Response &lt; 2hrs</p></div>
                                 </div>
                                 <div className="col-12 d-flex align-items-center">
                                     <div className="bg-primary bg-opacity-10 p-3 rounded-circle text-primary me-4"><Phone /></div>
