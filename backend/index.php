@@ -1,10 +1,21 @@
 <?php
 
+header('Content-Type: application/json; charset=utf-8');
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
+
+// Handle preflight OPTIONS requests
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit();
+}
+
 require_once "config/database.php";
 require_once "utils/Response.php";
 require_once "middleware/AuthMiddleware.php";
-
-header('Content-Type: application/json; charset=utf-8');
+require_once "middleware/RoleMiddleware.php";
+require_once "middleware/StatusMiddleware.php";
 
 $rawBody = file_get_contents('php://input');
 if ($rawBody) {
@@ -95,6 +106,18 @@ switch ($action) {
         resetPassword($pdo);
         break;
 
+    case 'resetUserPassword':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/UserController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        resetUserPassword($pdo);
+        break;
+
     case 'getAllUsers':
         require_once "middleware/RoleMiddleware.php";
         require_once "middleware/StatusMiddleware.php";
@@ -132,14 +155,11 @@ switch ($action) {
         break;
 
     case 'deleteRequest':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
-
         requireAuth();
-        requireRole(['admin']);
+        requireRole(['admin', 'student']);
         requireActiveUser($pdo);
 
+        require_once "controllers/RequestController.php";
         deleteRequest($pdo);
         break;
 
@@ -173,8 +193,6 @@ switch ($action) {
         break;
 
     case 'getAssignedRequests':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
         require_once "controllers/TechnicianController.php";
 
         requireAuth();
@@ -185,8 +203,6 @@ switch ($action) {
         break;
 
     case 'deactivateUser':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
         require_once "controllers/UserController.php";
 
         requireAuth();
@@ -215,6 +231,18 @@ switch ($action) {
         requireActiveUser($pdo);
 
         getTechnicians($pdo);
+        break;
+
+    case 'getNotificationCounts':
+        require_once "controllers/RequestController.php";
+        requireAuth();
+        getNotificationCounts($pdo);
+        break;
+
+    case 'markNotificationsRead':
+        require_once "controllers/RequestController.php";
+        requireAuth();
+        markNotificationsRead($pdo);
         break;
 
     default:
