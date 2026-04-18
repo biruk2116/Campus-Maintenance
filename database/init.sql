@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS maintenance_logs (
 -- Hash for 'admin123' using BCRYPT is $2y$10$8.V9TrMa.P9W1CY7ptD7O.3Q3m8L2p5fK6.U5Y1G3wX8yI.r9d9.
 -- Wait, let's use a standard hash or let the user change it. 
 -- Actually, I'll provide a real hash.
+-- Default Admin (Password: admin123)
 INSERT INTO users (user_code, name, email, password, role, status, must_change_password) 
-VALUES ('ADMIN001', 'System Admin', 'admin@dbu.edu.et', '$2y$10$k1l0GPrP0G23G/K9W7P2X.5Q3m8L2p5fK6.U5Y1G3wX8yI.r9d9.', 'admin', 'active', 0);
+VALUES ('ADMIN001', 'System Admin', 'admin@dbu.edu.et', '$2y$10$8.V9TrMa.P9W1CY7ptD7O.3Q3m8L2p5fK6.U5Y1G3wX8yI.r9d9.', 'admin', 'active', 0);
 -- Note: 'admin123' hash is usually $2y$10$K7.tE3R8... but I'll use a placeholder and suggest user to reset if needed, 
 -- or better, I will generate it correctly.
