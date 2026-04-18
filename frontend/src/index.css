@@ -179,3 +179,95 @@ h1, h2, h3, h4, .navbar-brand {
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+
+/* Modern Footer & Link Hovers */
+.hover-primary:hover {
+  color: var(--primary) !important;
+  transform: translateX(5px);
+}
+
+.footer-modern .btn-link {
+  transition: all var(--transition-fast);
+}
+
+.smallest {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* Cinematic Floating Background */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, var(--primary) 0%, transparent 60%);
+  opacity: 0.03;
+  z-index: -1;
+  animation: pulse-bg 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.03; }
+  50% { transform: scale(1.1) translate(5%, 5%); opacity: 0.05; }
+}
+
+/* Page Awareness & Image Sizing */
+.hero-image-container {
+  max-height: 500px;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.service-image-container {
+  max-height: 300px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.img-standard {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-normal);
+}
+
+.img-standard:hover {
+  transform: scale(1.05);
+}
+
+/* Advanced Hover Easing */
+.premium-card {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.premium-card:hover {
+  border-color: var(--primary) !important;
+  transform: translateY(-8px) scale(1.01) !important;
+  box-shadow: 0 40px 80px -20px rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Typography Refinement */
+.tracking-tighter { letter-spacing: -0.05em; }
+.tracking-widest { letter-spacing: 0.1em; }
+
+.text-main {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+/* Scroll Visibility fixes */
+section {
+  scroll-margin-top: 100px;
+}
+
+/* Tactical Entry UI Adjust */
+.nav-glass {
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
