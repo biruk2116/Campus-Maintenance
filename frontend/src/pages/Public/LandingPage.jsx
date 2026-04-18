@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 
 // Import Assets
@@ -12,10 +12,10 @@ import fireEmergency from '../../assets/images/fire_emergency.png';
 
 import { 
     Sun, Moon, Wrench, Shield, User, MapPin, 
-    Phone, Mail, CheckCircle, Globe, ChevronRight,
-    Zap, Activity, Cpu, Bell, Lock, Smartphone,
+    Phone, Mail, Globe, ChevronRight,
+    Zap, Activity, Cpu, Smartphone,
     CheckCircle2, Target, Eye, LogIn,
-    ExternalLink, ArrowUpRight, PlayCircle
+    ArrowUpRight
 } from 'lucide-react';
 
 const fadeInUp = {
@@ -32,51 +32,72 @@ const staggerContainer = {
     viewport: { once: true }
 };
 
-export const Navbar = () => {
-    const { user, isDarkMode, toggleDarkMode, login } = useAuth();
-    const navigate = useNavigate();
-    const location = useLocation();
+const sectionLinks = [
+    { id: '#home', label: 'Home' },
+    { id: '#about', label: 'About Us' },
+    { id: '#features', label: 'Features' },
+    { id: '#services', label: 'Services' },
+    { id: '#contact', label: 'Contact' }
+];
 
-    const handleNav = (id) => {
-        if (location.pathname !== '/') {
-            navigate('/' + id);
-        } else {
-            const el = document.querySelector(id);
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
+const heroMetrics = [
+    { icon: <Activity size={18} />, value: '24/7', label: 'response monitoring' },
+    { icon: <Wrench size={18} />, value: '320+', label: 'maintenance tasks closed' },
+    { icon: <Shield size={18} />, value: '98%', label: 'priority repair completion' }
+];
+
+export const Navbar = ({ onNavigate }) => {
+    const { user, isDarkMode, toggleDarkMode } = useAuth();
 
     return (
-        <nav className="navbar navbar-expand-lg nav-glass fixed-top py-3">
+        <nav className={`navbar navbar-expand-lg nav-glass fixed-top py-3 ${isDarkMode ? 'navbar-dark' : 'navbar-light'}`}>
             <div className="container">
                 <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
-                    <Wrench className="me-2 text-primary" size={28} />
-                    <span className="fs-4">Campus<span className="text-primary text-opacity-75">Maintain</span></span>
+                    <span className="nav-brand-mark me-2 d-inline-flex align-items-center justify-content-center">
+                        <Wrench size={18} />
+                    </span>
+                    <span className="nav-brand-text text-main">Campus<span className="hero-title-accent">Maintain</span></span>
                 </Link>
-                <button className="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <button
+                    className="navbar-toggler border-0 shadow-none"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ms-auto align-items-center">
-                        <li className="nav-item"><button className="nav-link mx-2 small fw-bold btn btn-link text-decoration-none" onClick={() => handleNav('#home')}>Home</button></li>
-                        <li className="nav-item"><button className="nav-link mx-2 small fw-bold btn btn-link text-decoration-none" onClick={() => handleNav('#about')}>About Us</button></li>
-                        <li className="nav-item"><button className="nav-link mx-2 small fw-bold btn btn-link text-decoration-none" onClick={() => handleNav('#features')}>Features</button></li>
-                        <li className="nav-item"><button className="nav-link mx-2 small fw-bold btn btn-link text-decoration-none" onClick={() => handleNav('#services')}>Services</button></li>
-                        <li className="nav-item"><button className="nav-link mx-2 small fw-bold btn btn-link text-decoration-none" onClick={() => handleNav('#contact')}>Contact</button></li>
-                        <li className="nav-item ms-lg-3 me-3">
+                    <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        {sectionLinks.map((item) => (
+                            <li className="nav-item" key={item.id}>
+                                <button
+                                    type="button"
+                                    className="nav-link landing-nav-link px-3 py-2 small fw-bold btn btn-link text-decoration-none"
+                                    onClick={() => onNavigate(item.id)}
+                                >
+                                    {item.label}
+                                </button>
+                            </li>
+                        ))}
+                        <li className="nav-item ms-lg-2 me-lg-1">
                             <motion.button 
                                 whileTap={{ scale: 0.9 }}
-                                className="btn btn-surface border-0 p-2 rounded-circle" 
+                                type="button"
+                                className="btn theme-toggle-btn border-0 p-2 rounded-circle"
                                 onClick={toggleDarkMode}
+                                aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
                             >
                                 {isDarkMode ? <Sun size={20} className="text-warning" /> : <Moon size={20} className="text-primary" />}
                             </motion.button>
                         </li>
                         <li className="nav-item">
                             {user ? (
-                                <Link className="btn btn-primary px-4 py-2 small fw-bold rounded-pill shadow-sm" to={`/${user.role}`}>Live Dashboard</Link>
+                                <Link className="btn nav-cta-btn px-4 py-2 small fw-bold rounded-pill shadow-sm" to={`/${user.role}`}>Live Dashboard</Link>
                             ) : (
-                                <Link className="btn btn-primary px-4 py-2 small fw-bold rounded-pill shadow-sm d-flex align-items-center" to="/login">
+                                <Link className="btn nav-cta-btn px-4 py-2 small fw-bold rounded-pill shadow-sm d-flex align-items-center" to="/login">
                                     <LogIn size={14} className="me-2" /> Sign In
                                 </Link>
                             )}
@@ -103,6 +124,20 @@ const SectionHeading = ({ title, subtitle, centered = true }) => (
 const LandingPage = () => {
     const location = useLocation();
 
+    const handleNav = (id) => {
+        if (id === '#home') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.history.replaceState(null, '', '#home');
+            return;
+        }
+
+        const el = document.querySelector(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.history.replaceState(null, '', id);
+        }
+    };
+
     useEffect(() => {
         if (location.hash) {
             const el = document.querySelector(location.hash);
@@ -112,63 +147,98 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page position-relative bg-background">
-            <Navbar />
+            <Navbar onNavigate={handleNav} />
             
             {/* 1. Home / Hero Section */}
-            <section id="home" className="hero-gradient min-vh-100 d-flex align-items-center pt-5">
-                <div className="container py-5 mt-5">
-                    <div className="row align-items-center g-5">
-                        <div className="col-lg-7">
+            <section id="home" className="hero-section d-flex align-items-center pt-5">
+                <div className="container hero-stage">
+                    <div className="row align-items-center g-5 hero-grid">
+                        <div className="col-lg-6">
                             <motion.div
-                                initial={{ opacity: 0, x: -50 }}
+                                initial={{ opacity: 0, x: -40 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.8 }}
+                                transition={{ duration: 0.7, ease: 'easeOut' }}
+                                className="hero-copy"
                             >
-                                <div className="d-flex align-items-center mb-4">
-                                    <div className="bg-primary bg-opacity-20 px-3 py-1 rounded-pill text-primary fw-bold smaller d-flex align-items-center">
-                                        <Activity size={14} className="me-2" /> Live Logistics Control
-                                    </div>
+                                <div className="hero-kicker">
+                                    <Activity size={15} className="me-2" />
+                                    Smart Maintenance Command
                                 </div>
-                                <h1 className="display-1 fw-bold mb-4 tracking-tighter">
-                                    Engineering <br />
-                                    <span className="text-primary">Campus Stability</span>
+                                <h1 className="hero-heading mb-4">
+                                    Modern campus maintenance that keeps every repair in motion.
                                 </h1>
-                                <p className="lead mb-5 text-muted pe-lg-5">
-                                    Revolutionizing infrastructure maintenance at Debre Birhan University. 
-                                    Real-time precision engineering for the modern academic environment.
+                                <p className="hero-subtext mb-4">
+                                    Coordinate technicians, monitor urgent requests, and manage infrastructure work
+                                    through a faster and more reliable maintenance system experience.
                                 </p>
-                                <div className="d-flex flex-wrap gap-3">
-                                    <Link to="/login" className="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold shadow-lg d-flex align-items-center">
-                                        Deploy Work Order <ArrowUpRight className="ms-2" size={20} />
+                                <div className="hero-actions">
+                                    <Link to="/login" className="btn hero-cta-primary btn-lg px-5 py-3 rounded-pill fw-bold shadow-lg d-inline-flex align-items-center justify-content-center">
+                                        Deploy Work Order <ArrowUpRight className="ms-2" size={18} />
                                     </Link>
-                                    <button onClick={() => document.getElementById('about').scrollIntoView({behavior:'smooth'})} className="btn btn-surface btn-lg px-5 py-3 rounded-pill fw-bold border-secondary border-opacity-10 shadow-sm">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleNav('#about')}
+                                        className="btn hero-cta-secondary btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm"
+                                    >
                                         Explore Mission
                                     </button>
                                 </div>
+                                <div className="row g-3 hero-metrics">
+                                    {heroMetrics.map((item) => (
+                                        <div className="col-sm-4" key={item.label}>
+                                            <motion.div
+                                                whileHover={{ y: -6 }}
+                                                className="hero-metric-card"
+                                            >
+                                                <div className="hero-metric-icon">{item.icon}</div>
+                                                <div className="hero-metric-value">{item.value}</div>
+                                                <div className="hero-metric-label">{item.label}</div>
+                                            </motion.div>
+                                        </div>
+                                    ))}
+                                </div>
                             </motion.div>
                         </div>
-                        <div className="col-lg-5">
+                        <div className="col-lg-6">
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 1, ease: "easeOut" }}
-                                className="hero-image-container premium-card p-2 border-0 shadow-2xl position-relative overflow-visible"
+                                initial={{ opacity: 0, x: 40, scale: 0.96 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                transition={{ duration: 0.8, ease: 'easeOut' }}
+                                className="hero-visual"
                             >
-                                <div className="position-absolute top-0 start-100 translate-middle-x mt-n4 me-n4 bg-primary p-3 rounded-4 shadow-xl text-white z-2">
-                                    <Shield size={32} />
-                                </div>
-                                <img 
-                                    src={maintHero} 
-                                    alt="Professional Maintenance" 
-                                    className="img-standard rounded-4 position-relative shadow-xl"
-                                    style={{ transform: 'rotate(-1deg)' }}
-                                />
-                                <div className="premium-card position-absolute bottom-0 start-0 translate-middle-y ms-n4 p-4 shadow-2xl border-0 bg-glass" style={{ maxWidth: '240px' }}>
-                                    <div className="d-flex align-items-center gap-2 mb-2">
-                                        <CheckCircle size={14} className="text-success" />
-                                        <span className="smaller fw-bold text-muted">Field Verified Operations</span>
+                                <div className="hero-visual-orb hero-visual-orb-one"></div>
+                                <div className="hero-visual-orb hero-visual-orb-two"></div>
+                                <div className="hero-image-shell">
+                                    <motion.div
+                                        animate={{ y: [0, -10, 0] }}
+                                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                                        className="hero-float-card hero-float-card-top"
+                                    >
+                                        <div className="hero-float-icon"><Zap size={16} /></div>
+                                        <div>
+                                            <p className="hero-float-label mb-1">Live dispatch</p>
+                                            <strong>Technician assigned in seconds</strong>
+                                        </div>
+                                    </motion.div>
+                                    <motion.div
+                                        animate={{ y: [0, 12, 0] }}
+                                        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+                                        className="hero-float-card hero-float-card-bottom"
+                                    >
+                                        <div className="hero-float-icon"><CheckCircle2 size={16} /></div>
+                                        <div>
+                                            <p className="hero-float-label mb-1">Verified completion</p>
+                                            <strong>Real-time maintenance updates</strong>
+                                        </div>
+                                    </motion.div>
+                                    <div className="hero-image-frame">
+                                        <img
+                                            src={maintHero}
+                                            alt="Maintenance technician handling a campus repair"
+                                            className="hero-main-image"
+                                        />
+                                        <div className="hero-image-tint"></div>
                                     </div>
-                                    <h4 className="fw-bold mb-0">99.2% Efficiency</h4>
                                 </div>
                             </motion.div>
                         </div>
@@ -353,9 +423,9 @@ const LandingPage = () => {
                         <div className="col-md-4 col-lg-2">
                             <h6 className="fw-bold mb-4 smaller text-uppercase tracking-widest text-primary">Operations</h6>
                             <ul className="list-unstyled d-flex flex-column gap-3">
-                                {['Home', 'About Us', 'Features', 'Services', 'Contact'].map((link, i) => (
-                                    <li key={i}><button className="btn btn-link p-0 smaller text-muted text-decoration-none hover-primary transition-all d-flex align-items-center" onClick={() => handleNav(`#${link.toLowerCase().replace(' us', '').replace(' ', '')}`)}>
-                                        <ChevronRight size={14} className="me-1 opacity-50" /> {link}
+                                {sectionLinks.map((item) => (
+                                    <li key={item.id}><button type="button" className="btn btn-link p-0 smaller text-muted text-decoration-none hover-primary transition-all d-flex align-items-center" onClick={() => handleNav(item.id)}>
+                                        <ChevronRight size={14} className="me-1 opacity-50" /> {item.label}
                                     </button></li>
                                 ))}
                             </ul>
@@ -390,7 +460,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                     <div className="mt-5 pt-5 border-top border-secondary border-opacity-10 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                        <p className="smallest text-muted mb-0">© 2026 DEBRE BIRHAN UNIVERSITY. DESIGNED FOR INFRASTRUCTURE STABILITY.</p>
+                        <p className="smallest text-muted mb-0">Copyright 2026 DEBRE BIRHAN UNIVERSITY. DESIGNED FOR INFRASTRUCTURE STABILITY.</p>
                         <div className="d-flex gap-4">
                             <a href="#" className="smallest text-muted text-decoration-none hover-primary">LEGAL</a>
                             <a href="#" className="smallest text-muted text-decoration-none hover-primary">PRIVACY</a>
