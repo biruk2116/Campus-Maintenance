@@ -27,8 +27,8 @@ function createRequest($pdo)
     }
 
     $stmt = $pdo->prepare("
-        INSERT INTO requests (title, description, category, location, priority, student_id, status)
-        VALUES (?, ?, ?, ?, ?, ?, 'Pending')
+        INSERT INTO requests (title, description, category, location, priority, student_id, status, admin_seen)
+        VALUES (?, ?, ?, ?, ?, ?, 'Pending', 0)
     ");
 
     $stmt->execute([
@@ -53,7 +53,7 @@ function getStudentRequests($pdo)
     }
 
     $stmt = $pdo->prepare("
-        SELECT r.*, u.name as technician_name 
+        SELECT r.*, u.name as technician_name, u.skills as technician_skills
         FROM requests r
         LEFT JOIN users u ON r.technician_id = u.id
         WHERE r.student_id = ?
@@ -75,7 +75,7 @@ function getAllRequests($pdo)
     }
 
     $stmt = $pdo->query("
-        SELECT r.*, s.name AS student_name, t.name AS technician_name
+        SELECT r.*, s.name AS student_name, t.name AS technician_name, t.skills AS technician_skills
         FROM requests r
         JOIN users s ON r.student_id = s.id
         LEFT JOIN users t ON r.technician_id = t.id
@@ -103,7 +103,7 @@ function assignTechnician($pdo)
 
     $stmt = $pdo->prepare("
         UPDATE requests
-        SET technician_id = ?, status = 'Assigned'
+        SET technician_id = ?, status = 'Assigned', tech_seen = 0
         WHERE id = ?
     ");
 
@@ -202,8 +202,68 @@ function deleteRequest($pdo)
         response(false, "ID required");
     }
 
-    $stmt = $pdo->prepare("DELETE FROM requests WHERE id = ?");
-    $stmt->execute([$id]);
+    $role = $_SESSION['role'];
+    $user_id = $_SESSION['user_id'];
 
-    response(true, "Request deleted successfully");
+    if ($role === 'admin') {
+        $stmt = $pdo->prepare("DELETE FROM requests WHERE id = ?");
+        $stmt->execute([$id]);
+    } else {
+        // Students can only delete their OWN requests IF they are COMPLETED
+        $stmt = $pdo->prepare("DELETE FROM requests WHERE id = ? AND student_id = ? AND status = 'Completed'");
+        $stmt->execute([$id, $user_id]);
+
+        if ($stmt->rowCount() === 0) {
+            response(false, "Unauthorized: Self-purge only allowed for completed personal orders.");
+        }
+    }
+
+    response(true, "Request purged successfully");
+}
+
+// ========================
+// GET NOTIFICATION COUNTS
+// ========================
+function getNotificationCounts($pdo)
+{
+    if (!isset($_SESSION['user_id'])) {
+        response(false, "Unauthorized");
+    }
+
+    $role = $_SESSION['role'];
+    $userId = $_SESSION['user_id'];
+    $count = 0;
+
+    if ($role === 'admin') {
+        $stmt = $pdo->query("SELECT COUNT(*) FROM requests WHERE admin_seen = 0 AND status = 'Pending'");
+        $count = $stmt->fetchColumn();
+    } elseif ($role === 'technician') {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM requests WHERE technician_id = ? AND tech_seen = 0");
+        $stmt->execute([$userId]);
+        $count = $stmt->fetchColumn();
+    }
+
+    response(true, "Notification counts", ["unread" => (int)$count]);
+}
+
+// ========================
+// MARK NOTIFICATIONS AS READ
+// ========================
+function markNotificationsRead($pdo)
+{
+    if (!isset($_SESSION['user_id'])) {
+        response(false, "Unauthorized");
+    }
+
+    $role = $_SESSION['role'];
+    $userId = $_SESSION['user_id'];
+
+    if ($role === 'admin') {
+        $stmt = $pdo->query("UPDATE requests SET admin_seen = 1 WHERE admin_seen = 0");
+    } elseif ($role === 'technician') {
+        $stmt = $pdo->prepare("UPDATE requests SET tech_seen = 1 WHERE technician_id = ? AND tech_seen = 0");
+        $stmt->execute([$userId]);
+    }
+
+    response(true, "Notifications marked as read");
 }
