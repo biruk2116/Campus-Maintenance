@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react';
+<<<<<<< HEAD
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+=======
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
 import { useAuth } from '../../context/AuthContext';
 
 // Import Assets
-import maintHero from '../../assets/images/maint_hero.png';
+import dbuLogo from '../../assets/images/dbu-logo.png';
+import campusHero from '../../assets/images/campus-hero.png';
 import techPc from '../../assets/images/tech_pc.png';
 import lockDetail from '../../assets/images/lock_detail.png';
 import safetyKit from '../../assets/images/safety_kit.png';
@@ -12,16 +18,23 @@ import fireEmergency from '../../assets/images/fire_emergency.png';
 
 import { 
     Sun, Moon, Wrench, Shield, User, MapPin, 
+<<<<<<< HEAD
     Phone, Mail, Globe, ChevronRight,
     Zap, Activity, Cpu, Smartphone,
     CheckCircle2, Target, Eye, LogIn,
     ArrowUpRight
+=======
+    Phone, Mail, CheckCircle, Globe, ChevronRight,
+    Zap, Activity, Cpu, Bell, Lock, Smartphone,
+    Target, Eye, LogIn, ArrowUpRight,
+    Facebook, Twitter, Instagram
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
 } from 'lucide-react';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
-    transition: { duration: 0.6, ease: "easeOut" },
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
     viewport: { once: true }
 };
 
@@ -32,6 +45,7 @@ const staggerContainer = {
     viewport: { once: true }
 };
 
+<<<<<<< HEAD
 const sectionLinks = [
     { id: '#home', label: 'Home' },
     { id: '#about', label: 'About Us' },
@@ -39,6 +53,12 @@ const sectionLinks = [
     { id: '#services', label: 'Services' },
     { id: '#contact', label: 'Contact' }
 ];
+=======
+export const Navbar = () => {
+    const { user, isDarkMode, toggleDarkMode } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
 
 const heroMetrics = [
     { icon: <Activity size={18} />, value: '24/7', label: 'response monitoring' },
@@ -50,6 +70,7 @@ export const Navbar = ({ onNavigate }) => {
     const { user, isDarkMode, toggleDarkMode } = useAuth();
 
     return (
+<<<<<<< HEAD
         <nav className={`navbar navbar-expand-lg nav-glass fixed-top py-3 ${isDarkMode ? 'navbar-dark' : 'navbar-light'}`}>
             <div className="container">
                 <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
@@ -102,7 +123,37 @@ export const Navbar = ({ onNavigate }) => {
                                 </Link>
                             )}
                         </li>
+=======
+        <nav className="navbar navbar-expand-lg nav-glass fixed-top">
+            <div className="container">
+                <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
+                    <img src={dbuLogo} alt="DBU" className="me-3" style={{ height: '42px' }} />
+                    <div className="d-flex flex-column" style={{ lineHeight: '1.1' }}>
+                        <span className="fs-5 fw-800">CAMPUS</span>
+                        <span className="text-primary smaller fw-bold tracking-widest">MAINTAIN</span>
+                    </div>
+                </Link>
+                <div className="collapse navbar-collapse d-none d-lg-block" id="navbarNav">
+                    <ul className="navbar-nav ms-auto align-items-center">
+                        {['Home', 'About', 'Features', 'Services', 'Contact'].map((item) => (
+                            <li key={item} className="nav-item">
+                                <button className="nav-link mx-3 smallest fw-bold btn btn-link text-decoration-none border-0 shadow-none text-muted uppercase tracking-widest" onClick={() => handleNav(`#${item.toLowerCase()}`)}>{item}</button>
+                            </li>
+                        ))}
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
                     </ul>
+                </div>
+                <div className="ms-auto d-flex align-items-center gap-3">
+                    <button className="btn btn-link p-2 text-muted border-0 shadow-none hover-bg-surface-hover rounded-circle" onClick={toggleDarkMode}>
+                        {isDarkMode ? <Sun size={20} className="text-warning" /> : <Moon size={20} className="text-primary" />}
+                    </button>
+                    {user ? (
+                        <Link className="btn btn-primary px-4 rounded-pill shadow-lg" to={`/${user.role}`}>Command Centre</Link>
+                    ) : (
+                        <Link className="btn btn-primary px-4 rounded-pill d-flex align-items-center shadow-lg" to="/login">
+                            <LogIn size={16} className="me-2" /> Sign In
+                        </Link>
+                    )}
                 </div>
             </div>
         </nav>
@@ -110,18 +161,16 @@ export const Navbar = ({ onNavigate }) => {
 };
 
 const SectionHeading = ({ title, subtitle, centered = true }) => (
-    <motion.div 
-        {...fadeInUp}
-        className={`mb-5 ${centered ? 'text-center' : ''}`}
-    >
-        <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 text-uppercase fw-bold smaller">Maintenance Operations</span>
-        <h2 className="display-4 fw-bold mb-3">{title}</h2>
-        <div className={`bg-primary rounded-pill mb-3 ${centered ? 'mx-auto' : ''}`} style={{ height: '4px', width: '60px' }}></div>
-        {subtitle && <p className="text-muted lead mx-auto" style={{ maxWidth: '750px' }}>{subtitle}</p>}
+    <motion.div {...fadeInUp} className={`mb-5 ${centered ? 'text-center' : ''}`}>
+        <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 text-uppercase fw-800 tracking-widest smallest">Strategic Unit</span>
+        <h2 className="display-4 fw-800 mb-3 tracking-tighter text-main">{title}</h2>
+        <div className={`bg-primary rounded-pill mb-4 ${centered ? 'mx-auto' : ''}`} style={{ height: '4px', width: '60px' }}></div>
+        {subtitle && <p className="text-muted lead mx-auto font-medium" style={{ maxWidth: '700px' }}>{subtitle}</p>}
     </motion.div>
 );
 
 const LandingPage = () => {
+<<<<<<< HEAD
     const location = useLocation();
 
     const handleNav = (id) => {
@@ -180,6 +229,45 @@ const LandingPage = () => {
                                         onClick={() => handleNav('#about')}
                                         className="btn hero-cta-secondary btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm"
                                     >
+=======
+    return (
+        <div className="landing-page position-relative">
+            {/* Premium Backdrop Deployment */}
+            <div className="app-backdrop">
+                <div 
+                    className="fullscreen-bg-fixed" 
+                    style={{ backgroundImage: `url(${campusHero})` }}
+                ></div>
+                <div className="bg-overlay"></div>
+            </div>
+
+            <Navbar />
+            
+            {/* Hero Section */}
+            <section id="home" className="min-vh-100 d-flex align-items-center pt-5">
+                <div className="container py-5 mt-5">
+                    <div className="row align-items-center g-5">
+                        <div className="col-lg-7">
+                            <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1 }} className="p-5 bg-glass-mobile rounded-5 border border-secondary border-opacity-10 shadow-22xl">
+                                <div className="d-flex align-items-center mb-4">
+                                    <div className="bg-primary bg-opacity-20 px-3 py-1 rounded-pill text-primary fw-800 smallest d-flex align-items-center tracking-widest uppercase">
+                                        <Activity size={14} className="me-2" /> Official Infrastructure Command
+                                    </div>
+                                </div>
+                                <h1 className="display-1 fw-800 mb-4 tracking-tighter text-main">
+                                    Engineering <br />
+                                    <span className="text-primary">DBU Stability</span>
+                                </h1>
+                                <p className="lead mb-5 text-muted pe-lg-5 fw-medium">
+                                    Sustaining academic excellence through professional infrastructure maintenance. 
+                                    Real-time facility management for the next generation of DBU legacy.
+                                </p>
+                                <div className="d-flex flex-wrap gap-3">
+                                    <Link to="/login" className="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-22xl d-flex align-items-center">
+                                        Request Service <ArrowUpRight className="ms-2" size={20} />
+                                    </Link>
+                                    <button onClick={() => document.getElementById('about').scrollIntoView({behavior:'smooth'})} className="btn btn-surface btn-lg px-5 py-3 rounded-pill border-secondary border-opacity-10 shadow-md">
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
                                         Explore Mission
                                     </button>
                                 </div>
@@ -199,6 +287,7 @@ const LandingPage = () => {
                                 </div>
                             </motion.div>
                         </div>
+<<<<<<< HEAD
                         <div className="col-lg-6">
                             <motion.div
                                 initial={{ opacity: 0, x: 40, scale: 0.96 }}
@@ -242,109 +331,72 @@ const LandingPage = () => {
                                 </div>
                             </motion.div>
                         </div>
+=======
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
                     </div>
                 </div>
             </section>
 
-            {/* 2. About Us Section */}
-            <section id="about" className="py-5 bg-background">
+            {/* About Section */}
+            <section id="about" className="py-5 bg-glass">
                 <div className="container py-5">
                     <div className="row align-items-center g-5">
                         <div className="col-lg-6 order-2 order-lg-1">
-                            <SectionHeading 
-                                title="Building Infrastructure Excellence" 
-                                subtitle="At Debre Birhan University, we ensure that every square inch of our campus is maintained to the highest institutional standards."
-                                centered={false}
-                            />
-                            <div className="row g-4 mb-5">
-                                <div className="col-md-6">
-                                    <motion.div whileHover={{ x: 5 }} className="d-flex align-items-start p-3 rounded-4 hover-bg-surface-hover transition-all">
-                                        <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary me-3"><Target size={24} /></div>
-                                        <div>
-                                            <h6 className="fw-bold mb-1">Our Mission</h6>
-                                            <p className="smaller text-muted">Systematic response protocols for all technical campus units.</p>
-                                        </div>
-                                    </motion.div>
-                                </div>
-                                <div className="col-md-6">
-                                    <motion.div whileHover={{ x: 5 }} className="d-flex align-items-start p-3 rounded-4 hover-bg-surface-hover transition-all">
-                                        <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary me-3"><Eye size={24} /></div>
-                                        <div>
-                                            <h6 className="fw-bold mb-1">Our Vision</h6>
-                                            <p className="smaller text-muted">A predictive maintenance ecosystem powered by live field data.</p>
-                                        </div>
-                                    </motion.div>
-                                </div>
-                            </div>
+                            <SectionHeading title="Institutional Quality" subtitle="Ensuring every square inch of the Debre Berhan University campus is maintained to international safety standards." centered={false} />
                             <div className="bg-surface p-4 rounded-4 border border-secondary border-opacity-10 d-flex align-items-center shadow-sm">
-                                <div className="p-2 bg-success bg-opacity-10 rounded-circle me-3"><CheckCircle2 className="text-success" /></div>
-                                <span className="small fw-bold">Governed by the Debre Birhan University Infrastructure Command</span>
+                                <Shield className="text-primary me-4" size={32} />
+                                <div>
+                                    <h6 className="fw-800 mb-1 text-main">Governed Sovereignty</h6>
+                                    <p className="smallest text-muted mb-0 uppercase tracking-widest fw-bold">DBU Infrastructure Policy Unit</p>
+                                </div>
                             </div>
                         </div>
-                        <div className="col-lg-6 order-1 order-lg-2">
-                            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="service-image-container position-relative">
-                                <img src={lockDetail} className="img-standard rounded-5 shadow-2xl border border-secondary border-opacity-10" alt="Lock Maintenance" />
-                                <div className="position-absolute -bottom-10 -right-10 w-50 h-50 bg-primary opacity-10 rounded-pill blur-3xl"></div>
-                            </motion.div>
+                        <div className="col-lg-6 order-1 order-lg-2 text-center">
+                            <motion.img {...fadeInUp} src={lockDetail} className="img-fluid rounded-5 shadow-22xl border border-secondary border-opacity-10" alt="Maintenance Detail" />
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* 3. Features Section */}
-            <section id="features" className="py-5 bg-surface-hover">
+            {/* Features Section */}
+            <section id="features" className="py-5">
                 <div className="container py-5">
-                    <SectionHeading 
-                        title="Tactical Software Suite" 
-                        subtitle="Optimizing the engineering workflow through intelligent dispatch and live monitoring."
-                    />
-                    <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" className="row g-4">
+                    <SectionHeading title="Tactical Operations" subtitle="Optimizing the engineering workflow through intelligent dispatch and live monitoring." />
+                    <motion.div variants={staggerContainer} initial="initial" whileInView="whileInView" className="row g-4">
                         {[
-                            { icon: <Zap />, title: "Precision Dispatch", desc: "AI-driven routing to the exact GPS markers of reported faults." },
-                            { icon: <Activity />, title: "Live Pulse", desc: "Granular status updates from field engineers as they work." },
-                            { icon: <Smartphone />, title: "Mobile Reporting", desc: "Instantly lodge tickets via mobile with photo evidence." },
-                            { icon: <Cpu />, title: "Resource Engine", desc: "Track inventory and parts usage across all repair tickets." }
+                            { icon: <Zap />, title: "Rapid Response", desc: "Precision routing to the exact site of reported facility faults." },
+                            { icon: <Cpu />, title: "Asset Logic", desc: "Granular tracking of internal campus logistics and parts." },
+                            { icon: <Activity />, title: "Live Pulse", desc: "Real-time verification of field engineer progress and stability." }
                         ].map((f, i) => (
-                            <motion.div key={i} variants={fadeInUp} className="col-md-3">
-                                <motion.div 
-                                    whileHover={{ y: -10, scale: 1.02 }}
-                                    className="premium-card p-5 h-100 border-secondary border-opacity-10 bg-surface shadow-lg text-center"
-                                >
+                            <div key={i} className="col-md-4">
+                                <motion.div whileHover={{ y: -10 }} className="premium-card p-5 h-100 text-center border-secondary border-opacity-10 shadow-lg">
                                     <div className="bg-primary bg-opacity-10 d-inline-block p-4 rounded-4 text-primary mb-4 shadow-sm">{f.icon}</div>
-                                    <h4 className="fw-bold mb-3">{f.title}</h4>
-                                    <p className="text-muted mb-0 small">{f.desc}</p>
+                                    <h4 className="fw-800 mb-3 text-main">{f.title}</h4>
+                                    <p className="text-muted mb-0 smaller fw-medium">{f.desc}</p>
                                 </motion.div>
-                            </motion.div>
+                            </div>
                         ))}
                     </motion.div>
                 </div>
             </section>
 
-            {/* 4. Services Section */}
-            <section id="services" className="py-5 bg-background">
+            {/* Services Section */}
+            <section id="services" className="py-5 bg-glass">
                 <div className="container py-5">
-                    <SectionHeading 
-                        title="Engineering Departments" 
-                        subtitle="Professional support suites for across internal campus logistics."
-                    />
+                    <SectionHeading title="Strategic Departments" subtitle="Professional support suites for across internal campus logistics." />
                     <div className="row g-4">
                         {[
-                            { title: "Network & IT", img: techPc, desc: "Lab diagnostics and institutional grid maintenance." },
-                            { title: "Structural Assets", img: lockDetail, desc: "Building integrity, carpentry, and locksmithing." },
-                            { title: "Health & Safety", img: safetyKit, desc: "First aid stations and sanitary compliance." },
-                            { title: "Emergency Response", img: fireEmergency, desc: "Fire safety systems and crisis management." }
+                            { title: "ICT Systems", img: techPc, desc: "Network grid maintenance and laboratory diagnostics." },
+                            { title: "Structural Assets", img: campusHero, desc: "Building integrity and large-scale structural repairs." },
+                            { title: "Plumbing Unit", img: safetyKit, desc: "Sanitary compliance and campus-wide water grid." },
+                            { title: "Emergency Division", img: fireEmergency, desc: "Critical infrastructure protection and safety response." }
                         ].map((s, i) => (
-                            <div key={i} className="col-md-6 col-lg-3">
-                                <motion.div 
-                                    whileHover={{ y: -10 }}
-                                    className="premium-card h-100 overflow-hidden border-secondary border-opacity-10 flex-column d-flex shadow-lg"
-                                >
-                                    <div className="service-image-container">
-                                        <img src={s.img} alt={s.title} className="img-standard" />
-                                    </div>
+                            <div key={i} className="col-md-3">
+                                <motion.div whileHover={{ scale: 1.02 }} className="premium-card h-100 overflow-hidden border-secondary border-opacity-10 shadow-lg">
+                                    <img src={s.img} alt={s.title} className="w-100" style={{ height: '220px', objectFit: 'cover' }} />
                                     <div className="p-4 text-center">
-                                        <h5 className="fw-bold mb-2">{s.title}</h5>
-                                        <p className="smaller text-muted mb-0">{s.desc}</p>
+                                        <h5 className="fw-800 mb-2 text-main">{s.title}</h5>
+                                        <p className="smallest text-muted mb-0 uppercase tracking-widest fw-bold">{s.desc}</p>
                                     </div>
                                 </motion.div>
                             </div>
@@ -353,73 +405,26 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* 5. Contact Section Redesign (Side-by-side) */}
-            <section id="contact" className="py-5 border-top border-secondary border-opacity-10 bg-surface-hover overflow-hidden">
-                <div className="container py-5">
-                    <SectionHeading 
-                        title="Tactical Command Center" 
-                        subtitle="Centralized logistics hub for Debre Birhan University Infrastructure Operations."
-                    />
-                    <div className="row g-4 align-items-stretch">
-                        <div className="col-lg-5">
-                            <div className="d-flex flex-column h-100 gap-3">
-                                {[
-                                    { icon: <MapPin />, title: "Main Campus, Ethiopia", desc: "Debre Birhan University Hub" },
-                                    { icon: <Mail />, title: "ops@dbu.edu.et", desc: "Strategic Response Desk" },
-                                    { icon: <Phone />, title: "+251 11 681 2040", desc: "24/7 Deployment Line" }
-                                ].map((item, i) => (
-                                    <motion.div key={i} whileHover={{ x: 10 }} className="premium-card p-4 d-flex align-items-center bg-surface border-secondary border-opacity-10 shadow-sm flex-grow-1">
-                                        <div className="bg-primary bg-opacity-10 p-3 rounded-circle text-primary me-4">{item.icon}</div>
-                                        <div><p className="small fw-bold mb-0">{item.title}</p><p className="smallest text-muted mb-0">{item.desc}</p></div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="col-lg-7">
-                            <motion.div 
-                                whileHover={{ scale: 1.01 }}
-                                className="map-container shadow-2xl h-100 overflow-hidden border-secondary border-opacity-10 position-relative"
-                                style={{ minHeight: '350px' }}
-                            >
-                                <div className="position-absolute top-0 start-0 m-3 z-3">
-                                    <span className="badge bg-primary px-3 py-2 rounded-pill shadow-lg d-flex align-items-center fw-bold small">
-                                        <Activity size={12} className="me-2" /> LIVE DEPLOYMENT ZONE
-                                    </span>
-                                </div>
-                                <iframe 
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15745.2862803875!2d39.5255462!3d9.6961148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x16460395642d64f3%3A0xc62b47e85295c2!2sDebre%20Birhan%20University!5e0!3m2!1sen!2set!4v1713350000000!5m2!1sen!2set" 
-                                    className="w-100 h-100 map-iframe"
-                                    style={{ border: 0, minHeight: '350px' }} 
-                                    allowFullScreen="" 
-                                    loading="lazy">
-                                </iframe>
-                            </motion.div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Modern Animated Footer */}
-            <footer className="footer-modern py-5 bg-surface border-top border-secondary border-opacity-10 mt-5">
-                <div className="container py-5">
+            {/* Footer */}
+            <footer className="py-5 bg-surface border-top border-secondary border-opacity-10 mt-5">
+                <div className="container py-5 text-main">
                     <div className="row g-5">
                         <div className="col-lg-4">
                             <div className="mb-4 d-flex align-items-center">
-                                <Wrench size={32} className="text-primary me-2" />
-                                <h4 className="fw-bold tracking-tighter text-main mb-0">Campus Maintain</h4>
+                                <img src={dbuLogo} alt="DBU" className="me-3" style={{ height: '50px' }} />
+                                <h4 className="fw-800 tracking-tighter mb-0 text-main">Campus Maintain</h4>
                             </div>
-                            <p className="text-muted smaller mb-4" style={{ maxWidth: '300px' }}>
-                                The primary infrastructure gateway for Debre Birhan University. 
-                                Ensuring academic excellence through sustained facility stability.
+                            <p className="text-muted smaller mb-4 fw-medium" style={{ maxWidth: '300px' }}>
+                                The official infrastructure gateway for Debre Berhan University. 
+                                Sustaining institutional excellence through technical precision.
                             </p>
                             <div className="d-flex gap-3 mt-4">
-                                {[Globe, Mail, Shield, User].map((Icon, i) => (
-                                    <motion.a key={i} href="#" whileHover={{ y: -5, scale: 1.1 }} className="btn btn-surface p-2 rounded-circle border-secondary border-opacity-10 text-muted">
-                                        <Icon size={18} />
-                                    </motion.a>
+                                {[Facebook, Twitter, Instagram].map((Icon, i) => (
+                                    <motion.a key={i} href="#" whileHover={{ y: -5 }} className="btn btn-surface p-2 rounded-circle border-secondary border-opacity-10 text-muted"><Icon size={20} /></motion.a>
                                 ))}
                             </div>
                         </div>
+<<<<<<< HEAD
                         <div className="col-md-4 col-lg-2">
                             <h6 className="fw-bold mb-4 smaller text-uppercase tracking-widest text-primary">Operations</h6>
                             <ul className="list-unstyled d-flex flex-column gap-3">
@@ -455,16 +460,29 @@ const LandingPage = () => {
                                 <div className="d-flex align-items-start">
                                     <Mail size={18} className="text-primary me-3 flex-shrink-0" />
                                     <div><p className="smaller fw-bold mb-0">ops@dbu.edu.et</p><p className="smallest text-muted mb-0">Strategic Desk</p></div>
+=======
+                        <div className="col-lg-8">
+                            <div className="row g-4">
+                                <div className="col-md-6 text-md-end ms-auto">
+                                    <h6 className="fw-800 mb-4 smallest text-uppercase tracking-widest text-primary">Strategic Logistics</h6>
+                                    <p className="smaller text-muted mb-1">Debre Berhan, Amhara Region</p>
+                                    <p className="smaller text-muted mb-1">info@dbu.edu.et</p>
+                                    <p className="smaller text-muted">+251 11 681 2040</p>
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="mt-5 pt-5 border-top border-secondary border-opacity-10 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+<<<<<<< HEAD
                         <p className="smallest text-muted mb-0">Copyright 2026 DEBRE BIRHAN UNIVERSITY. DESIGNED FOR INFRASTRUCTURE STABILITY.</p>
+=======
+                        <p className="smallest text-muted mb-0 opacity-50 uppercase tracking-widest fw-bold">© 2026 DEBRE BIRHAN UNIVERSITY. INFRASTRUCTURE COMMAND CENTER.</p>
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
                         <div className="d-flex gap-4">
-                            <a href="#" className="smallest text-muted text-decoration-none hover-primary">LEGAL</a>
-                            <a href="#" className="smallest text-muted text-decoration-none hover-primary">PRIVACY</a>
-                            <a href="#" className="smallest text-muted text-decoration-none hover-primary">COOKIES</a>
+                            {['Legal', 'Security', 'Governance'].map(link => (
+                                <a key={link} href="#" className="smallest text-muted text-decoration-none hover-primary uppercase tracking-widest fw-bold">{link}</a>
+                            ))}
                         </div>
                     </div>
                 </div>

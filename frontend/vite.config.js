@@ -4,6 +4,14 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+<<<<<<< HEAD
   // Ensure relative pathing for sub-folder hosting and XAMPP compatibility
+=======
+<<<<<<< HEAD
+  // Ensure relative pathing for sub-folder hosting (XAMPP compatibility)
+=======
+  // Ensure relative pathing for all built assets and module lookups
+>>>>>>> 8ff3b9ea8355a0bf1f7d1ac749850604cef201c0
+>>>>>>> 32961a270f3a032ab768c319ff2af9f1e092c00a
   base: './',
 })
