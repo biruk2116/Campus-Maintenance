@@ -5,7 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { Navbar } from './LandingPage';
 import { 
     LogIn, AlertCircle, Loader2, User, 
-    ShieldCheck, Key, ArrowRight, Sun, Moon
+    ShieldCheck, Key, ArrowRight, Sun, Moon,
+    Zap, Terminal, Disc, Activity
 } from 'lucide-react';
 
 const LoginPage = () => {
@@ -13,8 +14,11 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showReset, setShowReset] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     
-    const { login, isDarkMode, toggleDarkMode } = useAuth();
+    const { login, updatePassword, isDarkMode, toggleDarkMode } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async (code, pass) => {
@@ -22,9 +26,34 @@ const LoginPage = () => {
         setLoading(true);
         try {
             const res = await login(code, pass);
-            navigate(`/${res.role}`);
+            if (res.data && res.data.action === 'change_password') {
+                setShowReset(true);
+            } else if (res.data && res.data.role) {
+                navigate(`/${res.data.role.toLowerCase()}`);
+            }
         } catch (err) {
             setError(err.message || 'Authentication failed. Access denied.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleReset = async (e) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            setError('Account keys do not match.');
+            return;
+        }
+        setError('');
+        setLoading(true);
+        try {
+            await updatePassword(password, newPassword);
+            const res = await login(userCode, newPassword);
+            if (res.data && res.data.role) {
+                navigate(`/${res.data.role.toLowerCase()}`);
+            }
+        } catch (err) {
+            setError(err.message || 'Security update failed.');
         } finally {
             setLoading(false);
         }
@@ -35,119 +64,139 @@ const LoginPage = () => {
         handleLogin(userCode, password);
     };
 
-    const demoAccounts = [
-        { role: 'admin', icon: <ShieldCheck />, label: 'Administrator Unity', code: 'ADMIN001', pass: 'admin123', color: 'primary' },
-        { role: 'student', icon: <User />, label: 'Student Portal', code: 'DBU1601069', pass: 'student123', color: 'success' },
-        { role: 'technician', icon: <Key />, label: 'Field Engineer Unit', code: 'TECH001', pass: 'tech123', color: 'warning' }
-    ];
-
     return (
-        <div className="min-vh-100 d-flex flex-column bg-background transition-all">
+        <div className="min-vh-100 d-flex flex-column bg-background transition-all text-main">
             <Navbar />
             <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5 mt-5">
                 <div className="container">
-                    <div className="row justify-content-center align-items-center g-5">
+                    <div className="row justify-content-center">
                         <div className="col-lg-5">
                             <motion.div 
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="premium-card p-5 shadow-2xl bg-surface border-secondary border-opacity-10"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="premium-card p-5 shadow-22xl bg-surface border-secondary border-opacity-10"
                             >
-                                <div className="text-center mb-5">
-                                    <h2 className="fw-bold tracking-tighter mb-1 text-main">Central Authority</h2>
-                                    <p className="smaller text-muted fw-medium">Infrastructure Management & Operations Portal</p>
-                                </div>
-
                                 <AnimatePresence mode="wait">
-                                    {error && (
+                                    {!showReset ? (
                                         <motion.div 
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-20 d-flex align-items-center mb-4" 
-                                            role="alert"
+                                            key="login-form"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 20 }}
                                         >
-                                            <AlertCircle size={16} className="me-2 flex-shrink-0" />
-                                            <div className="smaller fw-bold">{error}</div>
+                                            <div className="text-center mb-5">
+                                                <div className="bg-primary bg-opacity-10 d-inline-block p-3 rounded-4 text-primary mb-3">
+                                                    <Terminal size={32} />
+                                                </div>
+                                                <h2 className="fw-bold tracking-tighter mb-1">Central Identification</h2>
+                                                <p className="smaller text-muted fw-medium">Manual Institutional Protocol</p>
+                                            </div>
+
+                                            {error && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    className="alert alert-danger mb-4 p-3 rounded-4 d-flex align-items-center smaller fw-bold" 
+                                                >
+                                                    <AlertCircle size={16} className="me-2" /> {error}
+                                                </motion.div>
+                                            )}
+
+                                            <form onSubmit={handleSubmit}>
+                                                <div className="mb-4">
+                                                    <label className="form-label smaller fw-bold text-muted mb-2 uppercase tracking-widest">Member Identification</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="form-control py-3" 
+                                                        placeholder="DBU-XXXXXXX"
+                                                        value={userCode}
+                                                        onChange={(e) => setUserCode(e.target.value)}
+                                                        required 
+                                                    />
+                                                </div>
+                                                <div className="mb-5">
+                                                    <div className="d-flex justify-content-between mb-2">
+                                                        <label className="form-label smaller fw-bold text-muted uppercase tracking-widest">Access Key</label>
+                                                        <a href="#" className="smallest text-primary fw-bold text-decoration-none">FORGOT?</a>
+                                                    </div>
+                                                    <input 
+                                                        type="password" 
+                                                        className="form-control py-3" 
+                                                        placeholder="••••••••"
+                                                        value={password}
+                                                        onChange={(e) => setPassword(e.target.value)}
+                                                        required 
+                                                    />
+                                                </div>
+                                                <button 
+                                                    type="submit" 
+                                                    className="btn btn-primary w-100 py-3 fw-bold shadow-lg d-flex align-items-center justify-content-center rounded-pill"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <LogIn size={18} className="me-2" />}
+                                                    {loading ? 'SYNCHRONIZING...' : 'AUTHORIZE ENTRY'}
+                                                </button>
+                                            </form>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div 
+                                            key="reset-form"
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
+                                        >
+                                            <div className="text-center mb-5">
+                                                <div className="bg-warning bg-opacity-10 d-inline-block p-3 rounded-4 text-warning mb-3">
+                                                    <ShieldCheck size={32} />
+                                                </div>
+                                                <h2 className="fw-bold tracking-tighter mb-1">Security Upgrade</h2>
+                                                <p className="smaller text-muted fw-medium">Initial access detected. Personalize your key.</p>
+                                            </div>
+
+                                            {error && (
+                                                <div className="alert alert-danger mb-4 p-3 rounded-4 smaller fw-bold">
+                                                    <AlertCircle size={16} className="me-2" /> {error}
+                                                </div>
+                                            )}
+
+                                            <form onSubmit={handleReset}>
+                                                <div className="mb-4">
+                                                    <label className="form-label smaller fw-bold text-muted mb-2 uppercase tracking-widest">New Private Key</label>
+                                                    <input 
+                                                        type="password" 
+                                                        className="form-control py-3" 
+                                                        placeholder="••••••••"
+                                                        value={newPassword}
+                                                        onChange={(e) => setNewPassword(e.target.value)}
+                                                        required 
+                                                    />
+                                                </div>
+                                                <div className="mb-5">
+                                                    <label className="form-label smaller fw-bold text-muted mb-2 uppercase tracking-widest">Confirm Security Pattern</label>
+                                                    <input 
+                                                        type="password" 
+                                                        className="form-control py-3" 
+                                                        placeholder="••••••••"
+                                                        value={confirmPassword}
+                                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                                        required 
+                                                    />
+                                                </div>
+                                                <button 
+                                                    type="submit" 
+                                                    className="btn btn-warning w-100 py-3 fw-bold shadow-lg d-flex align-items-center justify-content-center rounded-pill text-white"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <ShieldCheck size={18} className="me-2" />}
+                                                    {loading ? 'UPGRADING...' : 'COMMIT SECURITY PATTERN'}
+                                                </button>
+                                            </form>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-
-                                <form onSubmit={handleSubmit}>
-                                    <div className="mb-4">
-                                        <label className="form-label smaller fw-bold text-muted mb-2 uppercase">Official Member Code</label>
-                                        <input 
-                                            type="text" 
-                                            className="form-control" 
-                                            placeholder="DBU-XXXXXXX"
-                                            value={userCode}
-                                            onChange={(e) => setUserCode(e.target.value)}
-                                            required 
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <div className="d-flex justify-content-between mb-2">
-                                            <label className="form-label smaller fw-bold text-muted uppercase">Access Key</label>
-                                            <a href="#" className="smaller text-primary fw-bold text-decoration-none">Lost Access?</a>
-                                        </div>
-                                        <input 
-                                            type="password" 
-                                            className="form-control" 
-                                            placeholder="••••••••"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required 
-                                        />
-                                    </div>
-                                    <button 
-                                        type="submit" 
-                                        className="btn btn-primary w-100 py-3 fw-bold shadow-lg d-flex align-items-center justify-content-center"
-                                        disabled={loading}
-                                    >
-                                        {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <LogIn size={18} className="me-2" />}
-                                        {loading ? 'Verifying Identity...' : 'Confirm Identity'}
-                                    </button>
-                                </form>
-                            </motion.div>
-                        </div>
-
-                        <div className="col-lg-5">
-                            <motion.div
-                                initial={{ opacity: 0, x: 30 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.2 }}
-                            >
-                                <div className="mb-4 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 className="fw-bold text-main mb-1">Accelerated Access</h5>
-                                        <p className="smaller text-muted mb-0">Switch between verified demo units.</p>
-                                    </div>
-                                    <button onClick={toggleDarkMode} className="btn btn-surface p-2 rounded-circle shadow-sm">
-                                        {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
-                                    </button>
-                                </div>
-
-                                <div className="d-flex flex-column gap-3">
-                                    {demoAccounts.map((account, i) => (
-                                        <motion.button
-                                            key={i}
-                                            whileHover={{ x: 10 }}
-                                            onClick={() => handleLogin(account.code, account.pass)}
-                                            className="premium-card p-4 border-secondary border-opacity-10 bg-surface text-start d-flex align-items-center w-100 shadow-sm"
-                                            disabled={loading}
-                                        >
-                                            <div className={`bg-${account.color} bg-opacity-10 p-3 rounded-3 me-3 text-${account.color}`}>
-                                                {account.icon}
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <h6 className="fw-bold mb-1 smaller text-main">{account.label}</h6>
-                                                <div className="d-flex align-items-center text-muted smaller fw-medium italic opacity-70">
-                                                    <ArrowRight size={12} className="me-1" /> Provisioned Access
-                                                </div>
-                                            </div>
-                                            <div className="smaller fw-bold text-primary opacity-50 px-2">ENTRY</div>
-                                        </motion.button>
-                                    ))}
+                                
+                                <div className="mt-5 pt-4 border-top border-secondary border-opacity-10 text-center">
+                                    <p className="smallest text-muted fw-bold mb-0 tracking-widest opacity-50">GOVERNED BY DEBRE BIRHAN UNIVERSITY INFRASTRUCTURE COMMAND</p>
                                 </div>
                             </motion.div>
                         </div>
@@ -155,9 +204,14 @@ const LoginPage = () => {
                 </div>
             </div>
             
-            <footer className="py-4 text-center text-muted smaller bg-surface-hover border-top border-secondary border-opacity-10">
-                <p className="mb-0 fw-bold opacity-60">ADMINISTRATIVE PROTOCOL ACTIVE • DEBRE BIRHAN UNIVERSITY</p>
-                <div className="mt-2 text-primary opacity-40 italic">Global Environment v3.0.0-Adaptive</div>
+            <footer className="py-4 text-center text-muted smallest bg-surface border-top border-secondary border-opacity-10">
+                <div className="container d-flex justify-content-between align-items-center">
+                    <p className="mb-0 fw-bold opacity-40 uppercase tracking-widest">Protocol Active • Debre Birhan University</p>
+                    <div className="d-flex gap-4 opacity-40">
+                        <span className="fw-bold">v3.1.2-LOGISTICS</span>
+                        <Disc size={14} className="animate-spin" />
+                    </div>
+                </div>
             </footer>
         </div>
     );
