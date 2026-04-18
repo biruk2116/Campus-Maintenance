@@ -28,6 +28,7 @@ function createUser($pdo)
     $email = $_POST['email'] ?? '';
     $role = $_POST['role'] ?? '';
     $user_code = $_POST['user_code'] ?? '';
+    $skills = $_POST['skills'] ?? null;
 
     if (!$name || !$role || !$user_code) {
         response(false, "Missing required fields");
@@ -54,8 +55,8 @@ function createUser($pdo)
 
     $stmt = $pdo->prepare("
         INSERT INTO users 
-        (user_code, name, email, password, role, must_change_password, status)
-        VALUES (?, ?, ?, ?, ?, 1, 'active')
+        (user_code, name, email, password, role, must_change_password, status, skills)
+        VALUES (?, ?, ?, ?, ?, 1, 'active', ?)
     ");
 
     $stmt->execute([
@@ -63,7 +64,8 @@ function createUser($pdo)
         $name,
         $email,
         $hashedPassword,
-        $role
+        $role,
+        $skills
     ]);
 
     response(true, "User created successfully", [
@@ -161,7 +163,7 @@ function getTechnicians($pdo)
     }
 
     $stmt = $pdo->query("
-        SELECT id, name 
+        SELECT id, name, skills 
         FROM users 
         WHERE role = 'technician' AND status = 'active'
     ");
@@ -180,6 +182,43 @@ function getAllUsers($pdo)
         response(false, "Unauthorized");
     }
 
-    $stmt = $pdo->query("SELECT id, user_code, name, email, role, status, created_at FROM users WHERE role != 'admin'");
+    $stmt = $pdo->query("SELECT id, user_code, name, email, role, status, skills, created_at FROM users WHERE role != 'admin'");
     response(true, "Users list", $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+/*
+-----------------------------------
+RESET USER PASSWORD (ADMIN ONLY)
+-----------------------------------
+*/
+function resetUserPassword($pdo)
+{
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        response(false, "Unauthorized");
+    }
+
+    $user_code = $_POST['user_code'] ?? '';
+
+    if (!$user_code) {
+        response(false, "User code is required");
+    }
+
+    // Check if user exists
+    $check = $pdo->prepare("SELECT id FROM users WHERE user_code = ?");
+    $check->execute([$user_code]);
+    $user = $check->fetch();
+
+    if (!$user) {
+        response(false, "User not found");
+    }
+
+    $plainPassword = generatePassword();
+    $hashedPassword = hashPassword($plainPassword);
+
+    $stmt = $pdo->prepare("UPDATE users SET password = ?, must_change_password = 1 WHERE id = ?");
+    $stmt->execute([$hashedPassword, $user['id']]);
+
+    response(true, "Password reset successfully", [
+        "temporary_password" => $plainPassword
+    ]);
 }
