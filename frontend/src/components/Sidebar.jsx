@@ -19,22 +19,37 @@ import {
 const Sidebar = () => {
     const { user, logout, isDarkMode, toggleDarkMode } = useAuth();
     const navigate = useNavigate();
+    const [pendingCount, setPendingCount] = React.useState(0);
+
+    const fetchNotifications = React.useCallback(async () => {
+        if (user?.role === 'admin') {
+            try {
+                const res = await axios.get('index.php?action=getAllRequests');
+                if (res.data.success) {
+                    setPendingCount(res.data.data.filter(r => r.status === 'Pending').length);
+                }
+            } catch (err) { console.warn("Notification sync failed"); }
+        }
+    }, [user]);
+
+    React.useEffect(() => {
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 30000); // 30s polling
+        return () => clearInterval(interval);
+    }, [fetchNotifications]);
 
     const roleLinks = {
         student: [
             { path: '/student', icon: <LayoutDashboard size={18} />, label: 'Overview' },
             { path: '/student/new-request', icon: <PlusCircle size={18} />, label: 'Log Fault' },
-            { path: '/student/my-requests', icon: <ClipboardList size={18} />, label: 'My Tickets' },
         ],
         technician: [
             { path: '/technician', icon: <LayoutDashboard size={18} />, label: 'Task Board' },
-            { path: '/technician/performance', icon: <Activity size={18} />, label: 'Field Output' },
         ],
         admin: [
             { path: '/admin', icon: <LayoutDashboard size={18} />, label: 'Operations' },
             { path: '/admin/requests', icon: <ClipboardList size={18} />, label: 'Active Queue' },
             { path: '/admin/users', icon: <Users size={18} />, label: 'Personnel' },
-            { path: '/admin/settings', icon: <Settings size={18} />, label: 'System' },
         ]
     };
 
@@ -83,6 +98,11 @@ const Sidebar = () => {
                         >
                             <span className="me-3">{link.icon}</span>
                             <span className="flex-grow-1 smaller">{link.label}</span>
+                            {link.path === '/admin/requests' && pendingCount > 0 && (
+                                <span className="badge bg-danger rounded-circle p-1 me-2 shadow-sm" style={{ width: '18px', height: '18px', fontSize: '0.6rem' }}>
+                                    {pendingCount}
+                                </span>
+                            )}
                             {({ isActive }) => isActive && (
                                 <motion.div layoutId="activeInd" className="bg-primary rounded-pill me-n2" style={{ width: '3px', height: '16px' }} />
                             )}
