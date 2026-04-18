@@ -29,18 +29,18 @@ export const AuthProvider = ({ children }) => {
                 setUser(res.data.data);
             }
         } catch (err) {
-            console.warn("User not logged in");
+            console.warn("No active session detected");
         } finally {
             setLoading(false);
         }
     };
 
     const login = async (user_code, password) => {
-        const formData = new URLSearchParams();
-        formData.append('user_code', user_code);
-        formData.append('password', password);
+        const res = await axios.post('index.php?action=login', { 
+            user_code, 
+            password 
+        });
         
-        const res = await axios.post('index.php?action=login', formData);
         if (res.data.success) {
             setUser(res.data.data);
             return res.data;
@@ -49,11 +49,28 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updatePassword = async (old_password, new_password) => {
+        const res = await axios.post('index.php?action=changePassword', {
+            old_password, 
+            new_password 
+        });
+        if (res.data.success) {
+            return true;
+        } else {
+            throw new Error(res.data.message || 'Update failed');
+        }
+    };
+
     const logout = async () => {
         try {
             await axios.post('index.php?action=logout');
+            // Hard session purge: Clear all role-based data and tracking keys
+            Object.keys(localStorage).forEach(key => {
+                if (key !== 'theme') localStorage.removeItem(key);
+            });
         } finally {
             setUser(null);
+            window.location.href = '/'; // Force a clean reload to purge memory state
         }
     };
 
@@ -77,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     }, [isDarkMode]);
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading, isDarkMode, toggleDarkMode }}>
+        <AuthContext.Provider value={{ user, login, logout, updatePassword, loading, isDarkMode, toggleDarkMode }}>
             {children}
         </AuthContext.Provider>
     );
