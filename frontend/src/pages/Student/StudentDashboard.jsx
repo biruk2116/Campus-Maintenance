@@ -1,177 +1,270 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import Sidebar from '../../components/Sidebar';
-import axios from '../../api/axios';
-import PremiumModal from '../../components/PremiumModal';
-import { fadeInUp, staggerContainer } from '../../utils/animations';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import {
+    Activity,
+    Bell,
+    CheckCircle,
+    Loader2,
+    LogOut,
+    MapPin,
+    Phone,
+    Plus,
+    Send,
+    Trash2,
+    Wrench
+} from 'lucide-react';
+import {
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Legend,
+    LinearScale,
+    Tooltip
+} from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
 
-// Assets
+import Sidebar from '../../components/Sidebar';
+import PremiumModal from '../../components/PremiumModal';
+import axios from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
+
 import dbuLogo from '../../assets/images/dbu-logo.png';
 import techBg from '../../assets/images/tech-bg.png';
 
-import { 
-    Plus, ClipboardList, Clock, CheckCircle, AlertTriangle,
-    AlertCircle, Search, Bell, Settings, Activity, Shield, Loader2, LogIn, ArrowUpRight,
-    MapPin, FileText, ChevronRight, X, Radio, Layers, Info, Wrench, BarChart2, Send, Trash2, Trash
-} from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
-const DashboardHeader = ({ title, subtitle }) => {
-    return (
-        <div className="d-flex justify-content-between align-items-center mb-5 mt-2">
-            <div className="d-flex align-items-center">
-                <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '45px' }} />
-                <div>
-                    <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
-                    <p className="text-muted smallest fw-800 uppercase tracking-widest opacity-75">{subtitle}</p>
-                </div>
-            </div>
-            <div className="d-flex align-items-center gap-3">
-                <div className="bg-glass border border-secondary border-opacity-10 p-2 rounded-circle text-primary shadow-sm d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
-                    <Activity size={18} className="animate-pulse" />
-                </div>
-            </div>
-        </div>
-    );
+const REQUEST_CATEGORIES = [
+    'Plumbing',
+    'Electricity',
+    'ICT Technician',
+    'Carpentry',
+    'HVAC / Cooling',
+    'Painting / Finishing'
+];
+
+const statusClassName = (status) => {
+    if (status === 'Completed') return 'bg-success bg-opacity-10 text-success';
+    if (status === 'Pending') return 'bg-danger bg-opacity-10 text-danger';
+    if (status === 'On Hold') return 'bg-secondary bg-opacity-10 text-secondary';
+    return 'bg-warning bg-opacity-10 text-warning';
 };
 
+const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
+    <div className="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap gap-3">
+        <div className="d-flex align-items-center">
+            <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '46px' }} />
+            <div>
+                <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
+                <p className="text-muted smallest fw-800 uppercase tracking-widest opacity-75 mb-0">{subtitle}</p>
+            </div>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+            <button
+                type="button"
+                onClick={onReadNotifications}
+                className="btn btn-surface position-relative rounded-circle p-3 border-secondary border-opacity-10"
+                style={{ width: '48px', height: '48px' }}
+                title="Open requests"
+            >
+                <Bell size={20} className={unreadCount > 0 ? 'text-danger' : 'text-muted'} />
+                {unreadCount > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ minWidth: '22px', minHeight: '22px', fontSize: '0.65rem' }}>
+                        {unreadCount}
+                    </span>
+                )}
+            </button>
+            <button type="button" onClick={onLogout} className="btn btn-danger rounded-pill px-4 py-2 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
+                <LogOut size={15} className="me-2" />
+                Logout
+            </button>
+        </div>
+    </div>
+);
+
+const RequestTimelineModal = ({ request, logs, loading, onClose }) => (
+    <PremiumModal
+        isOpen={!!request}
+        onClose={onClose}
+        title={request ? `Request #${request.id} Timeline` : 'Request Timeline'}
+        maxWidth="760px"
+        showFooter={false}
+    >
+        {request && (
+            <div>
+                <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 mb-4">
+                    <div className="d-flex justify-content-between flex-wrap gap-3">
+                        <div>
+                            <h5 className="fw-800 text-main mb-1">{request.title}</h5>
+                            <p className="smallest text-muted mb-0">{request.location}</p>
+                        </div>
+                        <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
+                    </div>
+                    <p className="smallest text-muted mt-3 mb-0">{request.description}</p>
+                </div>
+
+                <div className="d-flex flex-column gap-3">
+                    {loading ? (
+                        <div className="text-center py-4">
+                            <Loader2 size={24} className="animate-spin text-primary" />
+                        </div>
+                    ) : logs.length > 0 ? (
+                        logs.map((log) => (
+                            <div key={log.id} className="p-3 rounded-4 bg-surface border border-secondary border-opacity-10">
+                                <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                    <div>
+                                        <div className="fw-800 text-main">{log.action_taken}</div>
+                                        <div className="smallest text-muted">{log.action_by}</div>
+                                    </div>
+                                    <span className="smallest text-muted">{new Date(log.created_at).toLocaleString()}</span>
+                                </div>
+                                <p className="small text-main mb-2">{log.remarks}</p>
+                                <span className="smallest text-primary fw-bold">Progress: {log.progress_percentage ?? 0}%</span>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-4 text-muted">No updates yet.</div>
+                    )}
+                </div>
+            </div>
+        )}
+    </PremiumModal>
+);
+
 const NewRequestForm = () => {
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+    const { unreadCount, markNotificationsRead } = useStudentDashboardData();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        category: 'Structural',
+        category: 'Plumbing',
         location: '',
         priority: 'Medium'
     });
-    const [submitting, setSubmitting] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSubmitting(true);
-        setError(null);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setSaving(true);
+        setError('');
 
         try {
-            const params = new URLSearchParams();
-            Object.entries(formData).forEach(([key, value]) => params.append(key, value));
+            const res = await axios.post('index.php?action=createRequest', formData);
 
-            const res = await axios.post('index.php?action=createRequest', params);
-            if (res.data.success) {
-                setShowSuccess(true);
-            } else {
-                setError(res.data.message || 'Deployment protocol failed.');
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Unable to submit request');
             }
-        } catch (err) {
-            setError('Critical link failure: Backend unreachable.');
+
+            setSuccess(true);
+            setFormData({
+                title: '',
+                description: '',
+                category: 'Plumbing',
+                location: '',
+                priority: 'Medium'
+            });
+        } catch (error) {
+            setError(error.message || 'Unable to submit request');
         } finally {
-            setSubmitting(false);
+            setSaving(false);
         }
     };
 
-    return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="container-fluid">
-            <DashboardHeader title="Log Discovery" subtitle="Strategic Fault Identification Module" />
-            
-            <div className="row justify-content-center">
-                <div className="col-lg-8">
-                    <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        <div className="d-flex align-items-center mb-5">
-                            <div className="bg-primary bg-opacity-10 p-3 rounded-4 text-primary me-3 shadow-sm"><Radio size={28} /></div>
-                            <div>
-                                <h4 className="fw-800 mb-0 tracking-tighter text-main">Initialize Field Report</h4>
-                                <p className="smallest text-muted fw-800 uppercase tracking-widest mb-0">Direct Uplink to Strategic Command</p>
-                            </div>
-                        </div>
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/student');
+    };
 
-                        <AnimatePresence>
-                            {error && (
-                                <motion.div 
-                                    initial={{ opacity: 0, height: 0 }} 
-                                    animate={{ opacity: 1, height: 'auto' }} 
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="alert alert-danger border-0 rounded-4 p-3 mb-5 smallest fw-800 uppercase tracking-widest d-flex align-items-center bg-danger bg-opacity-10 text-danger shadow-sm"
-                                >
-                                    <AlertTriangle size={18} className="me-2" />
-                                    {error}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+    return (
+        <div className="container-fluid">
+            <DashboardHeader
+                title="New Request"
+                subtitle="Send a maintenance problem to the admin team"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
+
+            <div className="row justify-content-center">
+                <div className="col-xl-8">
+                    <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                        {error && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 rounded-4">{error}</div>}
 
                         <form onSubmit={handleSubmit}>
                             <div className="row g-4">
-                                <div className="col-md-12">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted mb-2">Operation Summary</label>
-                                    <input 
-                                        type="text" 
+                                <div className="col-12">
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Problem Title</label>
+                                    <input
+                                        type="text"
                                         className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        placeholder="e.g., Grid Failure - Block 5 Laboratory"
                                         value={formData.title}
-                                        onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
+                                        placeholder="Example: Water leakage in Block B"
                                         required
                                     />
                                 </div>
+
                                 <div className="col-md-6">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted mb-2">Tactical Category</label>
-                                    <select 
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Category</label>
+                                    <select
                                         className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
                                         value={formData.category}
-                                        onChange={(e) => setFormData({...formData, category: e.target.value})}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
                                     >
-                                        <option value="Structural">Structural Assets</option>
-                                        <option value="Electricity">ICT & Power Grid</option>
-                                        <option value="Plumbing">Hydraulic Systems</option>
-                                        <option value="Network">Data Infrastructure</option>
+                                        {REQUEST_CATEGORIES.map((category) => (
+                                            <option key={category} value={category}>
+                                                {category}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
+
                                 <div className="col-md-6">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted mb-2">Priority Level</label>
-                                    <select 
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Priority</label>
+                                    <select
                                         className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
                                         value={formData.priority}
-                                        onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, priority: event.target.value }))}
                                     >
-                                        <option value="Low">Low - Static Task</option>
-                                        <option value="Medium">Medium - Operational Need</option>
-                                        <option value="High">High - Critical Fault</option>
-                                        <option value="Emergency">Emergency - Instant Deployment</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="High">High</option>
+                                        <option value="Emergency">Emergency</option>
                                     </select>
                                 </div>
-                                <div className="col-md-12">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted mb-2">Site Coordinates / ID</label>
-                                    <div className="position-relative">
-                                        <input 
-                                            type="text" 
-                                            className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main ps-5 shadow-sm"
-                                            placeholder="Room 204, Library Wing"
-                                            value={formData.location}
-                                            onChange={(e) => setFormData({...formData, location: e.target.value})}
-                                            required
-                                        />
-                                        <MapPin size={18} className="position-absolute top-5 transition-middle-y start-0 ms-3 mt-3 text-primary opacity-50" />
-                                    </div>
-                                </div>
-                                <div className="col-md-12">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted mb-2">Engineering Details</label>
-                                    <textarea 
+
+                                <div className="col-12">
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Location</label>
+                                    <input
+                                        type="text"
                                         className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        rows="4"
-                                        placeholder="Detail the technical anomaly observed..."
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                        value={formData.location}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, location: event.target.value }))}
+                                        placeholder="Room number, block, or office"
                                         required
-                                    ></textarea>
+                                    />
                                 </div>
-                                <div className="col-md-12 mt-5">
-                                    <button 
-                                        type="submit" 
-                                        className="btn btn-primary w-100 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl d-flex align-items-center justify-content-center"
-                                        disabled={submitting}
-                                    >
-                                        {submitting ? <Loader2 size={18} className="me-2 animate-spin" /> : <Send size={18} className="me-2" />}
-                                        {submitting ? 'Transmitting...' : 'Submit Strategic Dispatch'}
+
+                                <div className="col-12">
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Description</label>
+                                    <textarea
+                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                        rows="5"
+                                        value={formData.description}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
+                                        placeholder="Describe the maintenance problem clearly"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="col-12">
+                                    <button type="submit" className="btn btn-primary px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl d-inline-flex align-items-center" disabled={saving}>
+                                        {saving ? <Loader2 size={18} className="me-2 animate-spin" /> : <Send size={18} className="me-2" />}
+                                        {saving ? 'Sending...' : 'Submit Request'}
                                     </button>
                                 </div>
                             </div>
@@ -181,280 +274,436 @@ const NewRequestForm = () => {
             </div>
 
             <PremiumModal
-                isOpen={showSuccess}
-                onClose={() => navigate('/student')}
-                title="Transmission Successful"
-                type="success"
-                confirmText="Acknowledged"
+                isOpen={success}
+                onClose={() => setSuccess(false)}
                 onConfirm={() => navigate('/student')}
+                title="Request Sent"
+                type="success"
+                confirmText="Go to Dashboard"
             >
-                <div className="text-center py-4">
-                    <div className="bg-success bg-opacity-10 p-4 rounded-circle d-inline-block mb-4 shadow-sm">
-                        <CheckCircle size={48} className="text-success animate-bounce" />
-                    </div>
-                    <h5 className="fw-800 mb-3 text-main">Log Committed to Grid</h5>
-                    <p className="smallest text-muted fw-bold uppercase tracking-widest">Technician dispatch sequence initiated.</p>
-                </div>
+                <p className="mb-0 text-muted">Your maintenance request was sent to the admin queue successfully.</p>
             </PremiumModal>
-        </motion.div>
+        </div>
     );
 };
 
-const StudentOverview = () => {
+const useStudentDashboardData = () => {
     const [requests, setRequests] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [selectedHistory, setSelectedHistory] = useState(null);
-    const [historyLogs, setHistoryLogs] = useState([]);
-    const [fetchingHistory, setFetchingHistory] = useState(false);
 
-    const fetchRequests = useCallback(async () => {
-        setLoading(true);
+    const refreshData = useCallback(async () => {
         try {
-            const res = await axios.get('index.php?action=getStudentRequests');
-            if (res.data.success) setRequests(res.data.data);
-        } catch (err) {
-            console.error("Ops Sync Failed");
+            const [requestRes, notificationRes] = await Promise.all([
+                axios.get('index.php?action=getStudentRequests'),
+                axios.get('index.php?action=getNotificationCounts')
+            ]);
+
+            if (requestRes.data.success) {
+                setRequests(requestRes.data.data);
+            }
+
+            if (notificationRes.data.success) {
+                setUnreadCount(notificationRes.data.data.unread || 0);
+            }
         } finally {
             setLoading(false);
         }
     }, []);
 
-    const fetchHistory = async (requestId) => {
-        setFetchingHistory(true);
-        try {
-            const res = await axios.get(`index.php?action=getRequestProgress&request_id=${requestId}`);
-            if (res.data.success) {
-                setHistoryLogs(res.data.data);
-                setSelectedHistory(requests.find(r => r.id === requestId));
-            }
-        } catch (err) {
-            console.error("History Fetch Failed");
-        } finally {
-            setFetchingHistory(false);
-        }
-    };
-
-    const handlePurge = async (id) => {
-        try {
-            const params = new URLSearchParams();
-            params.append('id', id);
-            const res = await axios.post('index.php?action=deleteRequest', params);
-            if (res.data.success) {
-                fetchRequests();
-            }
-        } catch (err) {
-            console.error("Purge Link Failure");
-        }
-    };
+    const markNotificationsRead = useCallback(async () => {
+        await axios.post('index.php?action=markNotificationsRead');
+        await refreshData();
+    }, [refreshData]);
 
     useEffect(() => {
-        fetchRequests();
-    }, [fetchRequests]);
+        void (async () => {
+            await refreshData();
+        })();
+        const interval = setInterval(refreshData, 15000);
+        return () => clearInterval(interval);
+    }, [refreshData]);
+
+    return { requests, unreadCount, loading, refreshData, markNotificationsRead };
+};
+
+const StudentOverview = () => {
+    const { requests, unreadCount, loading, refreshData, markNotificationsRead } = useStudentDashboardData();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [historyLogs, setHistoryLogs] = useState([]);
+    const [timelineLoading, setTimelineLoading] = useState(false);
+
+    const activeRequests = useMemo(() => requests.filter((request) => request.status !== 'Completed'), [requests]);
+    const historyRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
+
+    const statusCounts = useMemo(() => ({
+        pending: requests.filter((request) => request.status === 'Pending').length,
+        assigned: requests.filter((request) => request.status === 'Assigned').length,
+        progress: requests.filter((request) => request.status === 'In Progress').length,
+        completed: historyRequests.length
+    }), [historyRequests.length, requests]);
+
+    const categoryCounts = useMemo(
+        () => REQUEST_CATEGORIES.map((category) => requests.filter((request) => request.category === category).length),
+        [requests]
+    );
+
+    const openTimeline = async (request) => {
+        setSelectedRequest(request);
+        setTimelineLoading(true);
+
+        try {
+            const res = await axios.get(`index.php?action=getRequestProgress&request_id=${request.id}`);
+            if (res.data.success) {
+                setHistoryLogs(res.data.data);
+            } else {
+                setHistoryLogs([]);
+            }
+        } finally {
+            setTimelineLoading(false);
+        }
+    };
+
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/student');
+    };
 
     return (
         <div className="container-fluid text-main">
-            <DashboardHeader title="Command Hub" subtitle="Student Infrastructure Gateway" />
-            
-            <motion.div 
-                variants={staggerContainer}
-                initial="initial"
-                whileInView="whileInView"
-                viewport={{ once: true }}
-                className="row g-4 mb-5"
-            >
-                <div className="col-lg-4">
-                    <motion.div variants={fadeInUp} className="premium-card p-5 h-100 bg-glass shadow-22xl border-secondary border-opacity-10">
-                        <div className="d-flex justify-content-between align-items-center mb-5">
-                            <div className="bg-primary bg-opacity-10 p-3 rounded-4 text-primary shadow-sm"><Activity size={28} /></div>
-                            <span className="smallest text-primary fw-800 uppercase tracking-widest bg-primary bg-opacity-10 px-2 py-1 rounded-pill shadow-sm">Active Link</span>
-                        </div>
-                        <h3 className="fw-800 mb-4 tracking-tighter text-main">Institutional Pulse</h3>
-                        <p className="text-muted smallest fw-800 uppercase tracking-widest mb-5 opacity-75">Your reports directly impact the DBU stability grid. Monitor tactical repairs below.</p>
-                        <hr className="border-secondary border-opacity-10 mb-5" />
-                        <div className="d-flex flex-column gap-4">
-                            <div className="d-flex align-items-center justify-content-between">
-                                <span className="smallest fw-800 text-muted uppercase tracking-widest">Restoration Success Ratio</span>
-                                <span className="fw-800 text-primary">98.4%</span>
-                            </div>
-                            <div className="progress rounded-pill bg-surface shadow-inner" style={{ height: '8px' }}>
-                                <div className="progress-bar bg-primary shadow-22xl" style={{ width: '98%' }}></div>
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-                <div className="col-lg-8">
-                    <motion.div variants={fadeInUp} className="premium-card p-5 h-100 bg-primary bg-opacity-5 border-primary border-opacity-10 shadow-22xl d-flex flex-column align-items-center justify-content-center text-center">
-                        <motion.div 
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => navigate('new-request')}
-                            className="bg-primary p-4 rounded-circle text-white mb-5 shadow-22xl animate-pulse cursor-pointer border-4 border-white border-opacity-10"
-                        >
-                            <Plus size={48} />
-                        </motion.div>
-                        <h2 className="display-6 fw-800 mb-3 tracking-tighter text-main">Log New Discovery</h2>
-                        <p className="text-muted smallest fw-800 uppercase tracking-widest mb-5 mx-auto opacity-75" style={{ maxWidth: '450px' }}>Identify facility operational faults and notify strategic command for tactical restoration.</p>
-                        <Link to="new-request" className="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-800 shadow-22xl d-flex align-items-center smallest tracking-widest uppercase">
-                            Initialize Dispatch <ArrowUpRight size={18} className="ms-3" />
-                        </Link>
-                    </motion.div>
-                </div>
-            </motion.div>
+            <DashboardHeader
+                title="Student Dashboard"
+                subtitle="Track the problem you reported and see technician updates"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
 
-            <div className="row">
-                <div className="col-12">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        <div className="d-flex justify-content-between align-items-center mb-5">
-                            <div className="d-flex align-items-center">
-                                <div className="bg-warning bg-opacity-10 p-3 rounded-4 text-warning me-3 shadow-sm"><Clock size={28} /></div>
-                                <div>
-                                    <h4 className="fw-800 mb-0 tracking-tighter text-main">Strategic Queue History</h4>
-                                    <p className="smallest text-muted fw-800 uppercase tracking-widest mb-0">{requests.length} Dispatched Logs</p>
-                                </div>
+            <div className="row g-4 mb-4">
+                <div className="col-xl-4">
+                    <div className="premium-card p-4 h-100 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h4 className="fw-800 text-main mb-1">My Request Summary</h4>
+                                <p className="smallest text-muted mb-0">Live counts from your dashboard</p>
                             </div>
-                            <button onClick={fetchRequests} className={`btn btn-surface btn-sm p-3 rounded-circle border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`}><Activity size={18} /></button>
+                            <Activity size={22} className="text-primary" />
+                        </div>
+                        <Doughnut
+                            data={{
+                                labels: ['Pending', 'Assigned', 'In Progress', 'Completed'],
+                                datasets: [
+                                    {
+                                        data: [statusCounts.pending, statusCounts.assigned, statusCounts.progress, statusCounts.completed],
+                                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+                                        borderWidth: 0
+                                    }
+                                ]
+                            }}
+                            options={{
+                                responsive: true,
+                                plugins: { legend: { position: 'bottom' } }
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <div className="col-xl-8">
+                    <div className="premium-card p-4 h-100 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h4 className="fw-800 text-main mb-1">Category Activity</h4>
+                                <p className="smallest text-muted mb-0">Chart.js updates whenever your requests change</p>
+                            </div>
+                            <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
+                                <Activity size={18} />
+                            </button>
+                        </div>
+                        <div style={{ height: '300px' }}>
+                            <Bar
+                                data={{
+                                    labels: REQUEST_CATEGORIES,
+                                    datasets: [
+                                        {
+                                            label: 'Requests',
+                                            data: categoryCounts,
+                                            backgroundColor: '#3b82f6',
+                                            borderRadius: 10
+                                        }
+                                    ]
+                                }}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { display: false } }
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="row g-4">
+                <div className="col-12">
+                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                            <div>
+                                <h4 className="fw-800 text-main mb-1">Active Requests</h4>
+                                <p className="smallest text-muted mb-0">See the current status, assigned technician name, and phone number</p>
+                            </div>
+                            <Link to="/student/new-request" className="btn btn-primary rounded-pill px-4 py-3 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
+                                <Plus size={16} className="me-2" />
+                                New Request
+                            </Link>
                         </div>
 
                         <div className="table-responsive">
                             <table className="table align-middle table-borderless">
                                 <thead>
                                     <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                        <th className="pb-3 text-main">Protocol ID / Discovery</th>
-                                        <th className="pb-3 text-main">Site Coordinates</th>
-                                        <th className="pb-3 text-center text-main">Deployment Status</th>
-                                        <th className="pb-3 text-end text-main">Pulse</th>
+                                        <th className="pb-3 text-main">Problem</th>
+                                        <th className="pb-3 text-main">Location</th>
+                                        <th className="pb-3 text-main">Status</th>
+                                        <th className="pb-3 text-main">Assigned Technician</th>
+                                        <th className="pb-3 text-end text-main">Timeline</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {!loading && requests.length === 0 && (
+                                    {loading ? (
                                         <tr>
-                                            <td colSpan="4" className="text-center py-5">
-                                                <div className="text-muted smallest fw-800 uppercase tracking-widest py-4 opacity-50">No strategic dispatches found in local grid.</div>
+                                            <td colSpan="5" className="text-center py-5">
+                                                <Loader2 size={28} className="animate-spin text-primary" />
+                                            </td>
+                                        </tr>
+                                    ) : activeRequests.length > 0 ? (
+                                        activeRequests.map((request) => (
+                                            <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
+                                                <td className="py-4">
+                                                    <div className="fw-800 text-main">{request.title}</div>
+                                                    <div className="smallest text-muted mt-1">{request.category}</div>
+                                                </td>
+                                                <td className="py-4">
+                                                    <div className="d-flex align-items-center text-muted">
+                                                        <MapPin size={14} className="me-2 text-primary" />
+                                                        {request.location}
+                                                    </div>
+                                                </td>
+                                                <td className="py-4">
+                                                    <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
+                                                    <div className="smallest text-muted mt-2">Progress: {request.progress_percentage}%</div>
+                                                </td>
+                                                <td className="py-4">
+                                                    {request.technician_name ? (
+                                                        <>
+                                                            <div className="fw-800 text-main">{request.technician_name}</div>
+                                                            <div className="smallest text-muted d-flex align-items-center mt-1">
+                                                                <Phone size={13} className="me-2 text-primary" />
+                                                                {request.technician_phone || 'No phone number'}
+                                                            </div>
+                                                            <div className="smallest text-muted d-flex align-items-center mt-1">
+                                                                <Wrench size={13} className="me-2 text-primary" />
+                                                                {request.technician_skills || 'Technician'}
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <span className="smallest text-muted">Waiting for admin assignment</span>
+                                                    )}
+                                                </td>
+                                                <td className="py-4 text-end">
+                                                    <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => openTimeline(request)}>
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="text-center py-5 text-muted">
+                                                No active requests right now.
                                             </td>
                                         </tr>
                                     )}
-                                    {requests.map((r, i) => (
-                                        <tr key={i} className="border-bottom border-secondary border-opacity-5 hover-bg-surface-hover transition-all">
-                                            <td className="py-4">
-                                                <div className="fw-800 text-main mb-1">{r.title}</div>
-                                                <div className="smallest text-primary text-uppercase fw-800 tracking-widest bg-primary bg-opacity-10 d-inline-block px-2 py-1 rounded-pill border border-primary border-opacity-10 shadow-sm">{r.category}</div>
-                                            </td>
-                                            <td className="py-4">
-                                                <div className="d-flex align-items-center text-muted fw-bold smaller uppercase tracking-widest">
-                                                    <MapPin size={14} className="text-primary me-2 shadow-sm" /> {r.location}
-                                                </div>
-                                            </td>
-                                            <td className="py-4">
-                                                <div className="d-flex flex-column align-items-center">
-                                                    <span className={`status-badge bg-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} bg-opacity-10 text-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} shadow-sm mb-2`}>
-                                                        {r.status}
-                                                    </span>
-                                                    {r.technician_name && (
-                                                        <div className="text-center">
-                                                            <div className="smallest fw-800 text-main uppercase tracking-widest">{r.technician_name}</div>
-                                                            <div className="smallest text-muted fw-bold mt-1 opacity-75">{r.technician_phone || 'NO PHONE'}</div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="py-4 text-end">
-                                                <div className="d-flex align-items-center justify-content-end gap-2">
-                                                    <button 
-                                                        onClick={() => fetchHistory(r.id)} 
-                                                        className="btn btn-surface btn-sm p-3 rounded-circle border-secondary border-opacity-10 text-primary hover-bg-primary hover-text-white transition-all shadow-sm"
-                                                        title="View Restoration History"
-                                                    >
-                                                        {fetchingHistory && selectedHistory?.id === r.id ? <Loader2 size={16} className="animate-spin" /> : <Layers size={16} />}
-                                                    </button>
-                                                    {r.status === 'Completed' && (
-                                                        <button 
-                                                            onClick={() => handlePurge(r.id)} 
-                                                            className="btn btn-surface btn-sm p-3 rounded-circle border-secondary border-opacity-10 text-danger hover-bg-danger hover-text-white transition-all shadow-sm"
-                                                            title="Purge Completed Log"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
                                 </tbody>
                             </table>
                         </div>
-                    </motion.div>
-                </div>
-            </div>
 
-            {/* History Pulse Modal */}
-            <PremiumModal
-                isOpen={!!selectedHistory}
-                onClose={() => setSelectedHistory(null)}
-                title="Strategic Restoration History"
-                maxWidth="650px"
-                showFooter={false}
-            >
-                <div className="mb-5 p-4 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10">
-                    <div className="d-flex align-items-center gap-3 mb-2">
-                        <Activity size={20} className="text-primary" />
-                        <h5 className="fw-800 mb-0 text-main">{selectedHistory?.title}</h5>
                     </div>
-                    <p className="smallest text-muted fw-bold uppercase tracking-widest mb-0 opacity-75">Protocol ID: {selectedHistory?.id} | {selectedHistory?.location}</p>
                 </div>
+            </div>
 
-                <div className="history-timeline">
-                    {historyLogs.length > 0 ? historyLogs.map((log, i) => (
-                        <div key={i} className="mb-4 ps-4 border-start border-secondary border-opacity-10 position-relative">
-                            <div className="position-absolute top-0 start-0 translate-middle-x bg-primary rounded-circle" style={{ width: '10px', height: '10px', marginTop: '6px', marginLeft: '-1px' }}></div>
-                            <div className="d-flex justify-content-between align-items-start mb-2">
-                                <span className={`smallest fw-800 uppercase tracking-widest ${log.action_taken.includes('Completed') ? 'text-success' : 'text-primary'}`}>
-                                    {log.action_taken}
-                                </span>
-                                <span className="smallest text-muted opacity-50 fw-bold">{new Date(log.created_at).toLocaleString()}</span>
-                            </div>
-                            <p className="smaller text-main fw-bold mb-1 opacity-90">{log.remarks}</p>
-                            <div className="d-flex align-items-center gap-2">
-                                <span className="smallest text-muted uppercase fw-800 opacity-50 tracking-widest">Logged By:</span>
-                                <span className="smallest fw-800 text-main">{log.action_by}</span>
-                                <span className="badge bg-surface border border-secondary border-opacity-10 rounded-pill text-muted smallest fw-800">{log.progress_percentage}% Pulse</span>
-                            </div>
-                        </div>
-                    )) : (
-                        <div className="text-center py-5 opacity-50 uppercase smallest fw-800 tracking-widest">No historical logs found for this dispatch.</div>
-                    )}
-                </div>
-                
-                <div className="mt-5">
-                    <button onClick={() => setSelectedHistory(null)} className="btn btn-primary w-100 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl">Close Terminal</button>
-                </div>
-            </PremiumModal>
+            <RequestTimelineModal
+                request={selectedRequest}
+                logs={historyLogs}
+                loading={timelineLoading}
+                onClose={() => {
+                    setSelectedRequest(null);
+                    setHistoryLogs([]);
+                }}
+            />
         </div>
     );
 };
 
-const StudentDashboard = () => {
+const StudentHistory = () => {
+    const { requests, unreadCount, loading, refreshData, markNotificationsRead } = useStudentDashboardData();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [historyLogs, setHistoryLogs] = useState([]);
+    const [timelineLoading, setTimelineLoading] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+
+    const completedRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
+
+    const openTimeline = async (request) => {
+        setSelectedRequest(request);
+        setTimelineLoading(true);
+
+        try {
+            const res = await axios.get(`index.php?action=getRequestProgress&request_id=${request.id}`);
+            if (res.data.success) {
+                setHistoryLogs(res.data.data);
+            } else {
+                setHistoryLogs([]);
+            }
+        } finally {
+            setTimelineLoading(false);
+        }
+    };
+
+    const removeFromHistory = async (requestId) => {
+        setDeletingId(requestId);
+        try {
+            await axios.post('index.php?action=deleteRequest', { id: requestId });
+            await refreshData();
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/student');
+    };
+
     return (
-        <div className="min-vh-100 position-relative">
-            <div className="app-backdrop">
-                <div 
-                    className="fullscreen-bg-fixed" 
-                    style={{ backgroundImage: `url(${techBg})` }}
-                ></div>
-                <div className="bg-overlay"></div>
+        <div className="container-fluid text-main">
+            <DashboardHeader
+                title="Request History"
+                subtitle="Completed tasks that you can keep as history or remove from your dashboard"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
+
+            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                <div className="d-flex align-items-center gap-3 mb-4">
+                    <CheckCircle size={22} className="text-success" />
+                    <div>
+                        <h4 className="fw-800 text-main mb-1">Completed Requests</h4>
+                        <p className="smallest text-muted mb-0">Students can remove completed tasks from their dashboard here</p>
+                    </div>
+                </div>
+
+                <div className="table-responsive">
+                    <table className="table align-middle table-borderless">
+                        <thead>
+                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
+                                <th className="pb-3 text-main">Problem</th>
+                                <th className="pb-3 text-main">Technician</th>
+                                <th className="pb-3 text-main">Completed</th>
+                                <th className="pb-3 text-end text-main">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="4" className="text-center py-5">
+                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    </td>
+                                </tr>
+                            ) : completedRequests.length > 0 ? (
+                                completedRequests.map((request) => (
+                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.title}</div>
+                                            <div className="smallest text-muted d-flex align-items-center mt-1">
+                                                <MapPin size={13} className="me-2 text-primary" />
+                                                {request.location}
+                                            </div>
+                                        </td>
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.technician_name || 'Not assigned'}</div>
+                                            <div className="smallest text-muted d-flex align-items-center mt-1">
+                                                <Phone size={13} className="me-2 text-primary" />
+                                                {request.technician_phone || 'No phone number'}
+                                            </div>
+                                        </td>
+                                        <td className="py-4">
+                                            <div className="small text-main">{new Date(request.updated_at).toLocaleString()}</div>
+                                        </td>
+                                        <td className="py-4 text-end">
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => openTimeline(request)}>
+                                                    View
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger rounded-pill px-3 py-2"
+                                                    onClick={() => removeFromHistory(request.id)}
+                                                    disabled={deletingId === request.id}
+                                                >
+                                                    {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="text-center py-5 text-muted">
+                                        No completed requests in history.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <Sidebar />
-            <div className="main-content-area text-main">
-                <AnimatePresence mode="wait">
-                    <Routes>
-                        <Route index element={<motion.div key="overview" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><StudentOverview /></motion.div>} />
-                        <Route path="new-request" element={<NewRequestForm />} />
-                    </Routes>
-                </AnimatePresence>
-            </div>
+            <RequestTimelineModal
+                request={selectedRequest}
+                logs={historyLogs}
+                loading={timelineLoading}
+                onClose={() => {
+                    setSelectedRequest(null);
+                    setHistoryLogs([]);
+                }}
+            />
         </div>
     );
 };
+
+const StudentDashboard = () => (
+    <div className="min-vh-100 position-relative">
+        <div className="app-backdrop">
+            <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${techBg})` }}></div>
+            <div className="bg-overlay"></div>
+        </div>
+
+        <Sidebar />
+        <div className="main-content-area text-main">
+            <AnimatePresence mode="wait">
+                <Routes>
+                    <Route index element={<div><StudentOverview /></div>} />
+                    <Route path="new-request" element={<div><NewRequestForm /></div>} />
+                    <Route path="history" element={<div><StudentHistory /></div>} />
+                </Routes>
+            </AnimatePresence>
+        </div>
+    </div>
+);
 
 export default StudentDashboard;
-
