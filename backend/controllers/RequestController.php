@@ -267,3 +267,18 @@ function markNotificationsRead($pdo)
 
     response(true, "Notifications marked as read");
 }
+
+// ========================
+// PURGE COMPLETED REQUESTS (ADMIN ONLY)
+// ========================
+function purgeRequests($pdo)
+{
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        response(false, "Unauthorized");
+    }
+
+    $stmt = $pdo->prepare("DELETE FROM requests WHERE status = 'Completed'");
+    $stmt->execute();
+
+    response(true, "All completed operations have been purged from the grid.");
+}
