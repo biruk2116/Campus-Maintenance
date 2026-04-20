@@ -6,16 +6,15 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 
-// Handle preflight OPTIONS requests
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once "config/database.php";
-require_once "utils/Response.php";
-require_once "middleware/AuthMiddleware.php";
-require_once "middleware/RoleMiddleware.php";
-require_once "middleware/StatusMiddleware.php";
+require_once __DIR__ . "/config/database.php";
+require_once __DIR__ . "/utils/Response.php";
+require_once __DIR__ . "/middleware/AuthMiddleware.php";
+require_once __DIR__ . "/middleware/RoleMiddleware.php";
+require_once __DIR__ . "/middleware/StatusMiddleware.php";
 
 $rawBody = file_get_contents('php://input');
 if ($rawBody) {
@@ -30,127 +29,118 @@ $action = $_GET['action'] ?? '';
 
 switch ($action) {
     case 'login':
-        require_once "controllers/AuthController.php";
+        require_once __DIR__ . "/controllers/AuthController.php";
         login($pdo);
         break;
 
-    case 'createRequest':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
+    case 'logout':
+        require_once __DIR__ . "/controllers/AuthController.php";
+        logout();
+        break;
 
+    case 'checkSession':
+        require_once __DIR__ . "/controllers/AuthController.php";
+        checkSession($pdo);
+        break;
+
+    case 'changePassword':
+        require_once __DIR__ . "/controllers/AuthController.php";
+        changePassword($pdo);
+        break;
+
+    case 'createRequest':
         requireAuth();
         requireRole(['student']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/RequestController.php";
         createRequest($pdo);
         break;
 
     case 'getStudentRequests':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
-
         requireAuth();
         requireRole(['student']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/RequestController.php";
         getStudentRequests($pdo);
         break;
 
     case 'createUser':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/UserController.php";
         createUser($pdo);
         break;
 
     case 'updateUser':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/UserController.php";
         updateUser($pdo);
         break;
 
     case 'deleteUser':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/UserController.php";
         deleteUser($pdo);
         break;
 
     case 'resetPassword':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/UserController.php";
         resetPassword($pdo);
         break;
 
     case 'resetUserPassword':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/UserController.php";
         resetUserPassword($pdo);
         break;
 
     case 'getAllUsers':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/UserController.php";
         getAllUsers($pdo);
         break;
 
-    case 'assignTechnician':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
-
+    case 'deactivateUser':
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/UserController.php";
+        deactivateUser($pdo);
+        break;
 
+    case 'getTechnicians':
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/UserController.php";
+        getTechnicians($pdo);
+        break;
+
+    case 'assignTechnician':
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/RequestController.php";
         assignTechnician($pdo);
         break;
 
     case 'getAllRequests':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/RequestController.php";
         getAllRequests($pdo);
         break;
 
@@ -158,109 +148,57 @@ switch ($action) {
         requireAuth();
         requireRole(['admin', 'student']);
         requireActiveUser($pdo);
-
-        require_once "controllers/RequestController.php";
+        require_once __DIR__ . "/controllers/RequestController.php";
         deleteRequest($pdo);
         break;
 
     case 'updateProgress':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
-
         requireAuth();
         requireRole(['technician']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/RequestController.php";
         updateProgress($pdo);
         break;
 
-    case 'logout':
-        require_once "controllers/AuthController.php";
-        logout();
-        break;
-
-    case 'checkSession':
-        require_once "controllers/AuthController.php";
-        checkSession();
-        break;
-
-    case 'changePassword':
-        require_once "controllers/AuthController.php";
-        requireAuth();
-        requireActiveUser($pdo);
-        changePassword($pdo);
-        break;
-
     case 'getAssignedRequests':
-        require_once "controllers/TechnicianController.php";
-
         requireAuth();
         requireRole(['technician']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/TechnicianController.php";
         getAssignedRequests($pdo);
         break;
 
-    case 'deactivateUser':
-        require_once "controllers/UserController.php";
-
-        requireAuth();
-        requireRole(['admin']);
-        requireActiveUser($pdo);
-
-        deactivateUser($pdo);
-        break;
-
     case 'getRequestProgress':
-        require_once "controllers/RequestController.php";
-
         requireAuth();
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/RequestController.php";
         getRequestProgress($pdo);
         break;
 
-    case 'getTechnicians':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/UserController.php";
-
-        requireAuth();
-        requireRole(['admin']);
-        requireActiveUser($pdo);
-
-        getTechnicians($pdo);
-        break;
-
     case 'getNotificationCounts':
-        require_once "controllers/RequestController.php";
         requireAuth();
+        requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/RequestController.php";
         getNotificationCounts($pdo);
         break;
 
     case 'markNotificationsRead':
-        require_once "controllers/RequestController.php";
         requireAuth();
+        requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/RequestController.php";
         markNotificationsRead($pdo);
         break;
 
     case 'purgeRequests':
-        require_once "middleware/RoleMiddleware.php";
-        require_once "middleware/StatusMiddleware.php";
-        require_once "controllers/RequestController.php";
-
         requireAuth();
         requireRole(['admin']);
         requireActiveUser($pdo);
-
+        require_once __DIR__ . "/controllers/RequestController.php";
         purgeRequests($pdo);
         break;
 
     default:
-        echo json_encode([
-            "success" => false,
-            "message" => "Invalid route"
-        ]);
-        break;
+        response(false, "Invalid route");
 }
+
+?>
