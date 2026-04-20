@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../../components/Sidebar';
 import axios from '../../api/axios';
 import PremiumModal from '../../components/PremiumModal';
+import { fadeInUp, staggerContainer } from '../../utils/animations';
 
 // Assets
 import dbuLogo from '../../assets/images/dbu-logo.png';
@@ -222,9 +223,15 @@ const StudentOverview = () => {
         <div className="container-fluid text-main">
             <DashboardHeader title="Command Hub" subtitle="Student Infrastructure Gateway" />
             
-            <div className="row g-4 mb-5">
+            <motion.div 
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="whileInView"
+                viewport={{ once: true }}
+                className="row g-4 mb-5"
+            >
                 <div className="col-lg-4">
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="premium-card p-5 h-100 bg-glass shadow-22xl border-secondary border-opacity-10">
+                    <motion.div variants={fadeInUp} className="premium-card p-5 h-100 bg-glass shadow-22xl border-secondary border-opacity-10">
                         <div className="d-flex justify-content-between align-items-center mb-5">
                             <div className="bg-primary bg-opacity-10 p-3 rounded-4 text-primary shadow-sm"><Activity size={28} /></div>
                             <span className="smallest text-primary fw-800 uppercase tracking-widest bg-primary bg-opacity-10 px-2 py-1 rounded-pill shadow-sm">Active Link</span>
@@ -244,10 +251,15 @@ const StudentOverview = () => {
                     </motion.div>
                 </div>
                 <div className="col-lg-8">
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="premium-card p-5 h-100 bg-primary bg-opacity-5 border-primary border-opacity-10 shadow-22xl d-flex flex-column align-items-center justify-content-center text-center">
-                        <div className="bg-primary p-4 rounded-circle text-white mb-5 shadow-22xl animate-pulse cursor-pointer border-4 border-white border-opacity-10">
+                    <motion.div variants={fadeInUp} className="premium-card p-5 h-100 bg-primary bg-opacity-5 border-primary border-opacity-10 shadow-22xl d-flex flex-column align-items-center justify-content-center text-center">
+                        <motion.div 
+                            whileHover={{ scale: 1.1, rotate: 90 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => navigate('new-request')}
+                            className="bg-primary p-4 rounded-circle text-white mb-5 shadow-22xl animate-pulse cursor-pointer border-4 border-white border-opacity-10"
+                        >
                             <Plus size={48} />
-                        </div>
+                        </motion.div>
                         <h2 className="display-6 fw-800 mb-3 tracking-tighter text-main">Log New Discovery</h2>
                         <p className="text-muted smallest fw-800 uppercase tracking-widest mb-5 mx-auto opacity-75" style={{ maxWidth: '450px' }}>Identify facility operational faults and notify strategic command for tactical restoration.</p>
                         <Link to="new-request" className="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-800 shadow-22xl d-flex align-items-center smallest tracking-widest uppercase">
@@ -255,7 +267,7 @@ const StudentOverview = () => {
                         </Link>
                     </motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             <div className="row">
                 <div className="col-12">
