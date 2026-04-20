@@ -35,12 +35,11 @@ const LoginPage = () => {
         setLoading(true);
         try {
             const res = await login(userCode, password);
-            if (res.data && res.data.action === 'change_password') {
+            // res is { success, message, data } where data has must_change_password
+            if (res.data && res.data.must_change_password === 1) {
                 setPasswords({ ...passwords, old: password });
                 setShowChangePassword(true);
             } else if (res.data && res.data.role) {
-                navigate(`/${res.data.role.toLowerCase()}`);
-            } else if (res.success && res.data) {
                 navigate(`/${res.data.role.toLowerCase()}`);
             }
         } catch (err) {
