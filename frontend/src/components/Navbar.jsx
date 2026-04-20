@@ -1,19 +1,16 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
     Wrench,
     Sun,
     Moon,
     LogIn,
-    ChevronDown,
-    Activity,
-    Shield,
-    Target
+    Activity
 } from 'lucide-react';
 
-export const sectionLinks = [
+const sectionLinks = [
     { id: '#home', label: 'Home' },
     { id: '#about', label: 'About Us' },
     { id: '#features', label: 'Features' },
@@ -21,32 +18,34 @@ export const sectionLinks = [
     { id: '#contact', label: 'Contact' }
 ];
 
+const LANDING_PATH = '/landing';
+
 const Navbar = () => {
     const { user, isDarkMode, toggleDarkMode } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
     const handleNavigate = (id) => {
-        if (location.pathname === '/') {
+        if (location.pathname === LANDING_PATH) {
             if (id === '#home') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                window.history.replaceState(null, '', '#home');
+                window.history.replaceState(null, '', `${LANDING_PATH}#home`);
                 return;
             }
 
             const el = document.querySelector(id);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                window.history.replaceState(null, '', id);
+                window.history.replaceState(null, '', `${LANDING_PATH}${id}`);
             }
         } else {
             // Navigate to landing page with hash
-            navigate(`/${id}`);
+            navigate(`${LANDING_PATH}${id}`);
         }
     };
 
     return (
-        <motion.nav 
+        <Motion.nav 
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -54,14 +53,14 @@ const Navbar = () => {
             style={{ transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', height: '80px' }}
         >
             <div className="container">
-                <Link className="navbar-brand fw-bold d-flex align-items-center" to="/" style={{ letterSpacing: '-0.05em' }}>
-                    <motion.div 
+                <Link className="navbar-brand fw-bold d-flex align-items-center" to={LANDING_PATH} style={{ letterSpacing: '-0.05em' }}>
+                    <Motion.div 
                         whileHover={{ rotate: 15, scale: 1.1 }}
                         className="nav-brand-mark me-3 d-flex align-items-center justify-content-center shadow-lg"
                         style={{ width: '40px', height: '40px' }}
                     >
                         <Wrench size={22} />
-                    </motion.div>
+                    </Motion.div>
                     <span className="nav-brand-text text-main fs-4">Campus<span className="hero-title-accent" style={{ color: '#f7b718' }}>Maintain</span></span>
                 </Link>
                 <button
@@ -76,7 +75,7 @@ const Navbar = () => {
                     <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-1">
                         {sectionLinks.map((item) => (
                             <li className="nav-item" key={item.id}>
-                                <motion.button
+                                <Motion.button
                                     whileHover={{ y: -2 }}
                                     whileTap={{ scale: 0.95 }}
                                     type="button"
@@ -84,21 +83,21 @@ const Navbar = () => {
                                     onClick={() => handleNavigate(item.id)}
                                 >
                                     {item.label}
-                                </motion.button>
+                                </Motion.button>
                             </li>
                         ))}
                         
                         <div className="vr d-none d-lg-block mx-3 text-muted opacity-10" style={{ height: '24px' }}></div>
                         
                         <li className="nav-item d-flex align-items-center me-lg-2">
-                            <motion.button
+                            <Motion.button
                                 whileTap={{ scale: 0.9 }}
                                 type="button"
                                 className="btn theme-toggle-btn border-0 p-2 rounded-circle shadow-sm"
                                 onClick={toggleDarkMode}
                             >
                                 {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
-                            </motion.button>
+                            </Motion.button>
                         </li>
                         
                         <li className="nav-item">
@@ -121,7 +120,7 @@ const Navbar = () => {
                     </ul>
                 </div>
             </div>
-        </motion.nav>
+        </Motion.nav>
     );
 };
 
