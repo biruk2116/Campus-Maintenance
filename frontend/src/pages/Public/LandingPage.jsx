@@ -124,7 +124,13 @@ const LandingPage = () => {
             </section>
 
             {/* 2. About Us Section */}
-            <section id="about" className="py-5 bg-background">
+            <motion.section 
+                id="about" 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="py-5 bg-background"
+            >
                 <div className="container py-5">
                     <div className="row align-items-center g-5">
                         <div className="col-lg-6 order-2 order-lg-1">
@@ -169,7 +175,13 @@ const LandingPage = () => {
             </section>
 
             {/* 3. Features Section */}
-            <section id="features" className="py-5 bg-surface-hover">
+            <motion.section 
+                id="features" 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="py-5 bg-surface-hover"
+            >
                 <div className="container py-5">
                     <SectionHeading 
                         title="Tactical Software Suite" 
@@ -198,7 +210,13 @@ const LandingPage = () => {
             </section>
 
             {/* 4. Services Section */}
-            <section id="services" className="py-5 bg-background">
+            <motion.section 
+                id="services" 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="py-5 bg-background"
+            >
                 <div className="container py-5">
                     <SectionHeading 
                         title="Engineering Departments" 
@@ -231,7 +249,13 @@ const LandingPage = () => {
             </section>
 
             {/* 5. Contact Section Redesign (Side-by-side) */}
-            <section id="contact" className="py-5 border-top border-secondary border-opacity-10 bg-surface-hover overflow-hidden">
+            <motion.section 
+                id="contact" 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="py-5 border-top border-secondary border-opacity-10 bg-surface-hover overflow-hidden"
+            >
                 <div className="container py-5">
                     <SectionHeading 
                         title="Tactical Command Center" 
