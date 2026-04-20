@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 
 // Import Assets
 import maintHero from '../../assets/images/maint_hero.png';
+import dbuLogo from '../../assets/images/dbu-logo.png';
 import techPc from '../../assets/images/tech_pc.png';
 import lockDetail from '../../assets/images/lock_detail.png';
 import safetyKit from '../../assets/images/safety_kit.png';
@@ -57,12 +58,25 @@ const LandingPage = () => {
         }
     }, [location]);
 
+    const handleNav = (id) => {
+        const el = document.querySelector(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
+
     return (
-        <div className="landing-page position-relative bg-background">
+        <div className="landing-page position-relative overflow-hidden">
+            <div className="app-backdrop">
+                <div 
+                    className="fullscreen-bg-fixed" 
+                    style={{ backgroundImage: `url(${maintHero})` }}
+                ></div>
+                <div className="bg-overlay"></div>
+            </div>
+
             <Navbar />
             
             {/* 1. Home / Hero Section */}
-            <section id="home" className="hero-gradient min-vh-100 d-flex align-items-center pt-5">
+            <section id="home" className="hero-section d-flex align-items-center pt-5">
                 <div className="container py-5 mt-5">
                     <div className="row align-items-center g-5">
                         <div className="col-lg-7">
@@ -123,13 +137,14 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* 2. About Us Section */}
+            {/* 1.5 Quick Stats / Mission Section */}
             <motion.section 
                 id="about" 
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="whileInView"
                 viewport={{ once: true, margin: "-100px" }}
-                className="py-5 bg-background"
+                className="py-5 bg-background bg-opacity-30"
             >
                 <div className="container py-5">
                     <div className="row align-items-center g-5">
@@ -172,7 +187,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* 3. Features Section */}
             <motion.section 
@@ -207,7 +222,7 @@ const LandingPage = () => {
                         ))}
                     </motion.div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* 4. Services Section */}
             <motion.section 
@@ -246,7 +261,7 @@ const LandingPage = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* 5. Contact Section Redesign (Side-by-side) */}
             <motion.section 
@@ -298,7 +313,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* Modern Animated Footer */}
             <footer className="footer-modern py-5 bg-surface border-top border-secondary border-opacity-10 mt-5">
@@ -306,8 +321,8 @@ const LandingPage = () => {
                     <div className="row g-5">
                         <div className="col-lg-4">
                             <div className="mb-4 d-flex align-items-center">
-                                <Wrench size={32} className="text-primary me-2" />
-                                <h4 className="fw-bold tracking-tighter text-main mb-0">Campus Maintain</h4>
+                                <img src={dbuLogo} alt="DBU" className="me-3" style={{ height: '40px' }} />
+                                <h4 className="fw-800 tracking-tighter text-main mb-0">Command OS</h4>
                             </div>
                             <p className="text-muted smaller mb-4" style={{ maxWidth: '300px' }}>
                                 The primary infrastructure gateway for Debre Birhan University. 
@@ -315,7 +330,7 @@ const LandingPage = () => {
                             </p>
                             <div className="d-flex gap-3 mt-4">
                                 {[Globe, Mail, Shield, User].map((Icon, i) => (
-                                    <motion.a key={i} href="#" whileHover={{ y: -5, scale: 1.1 }} className="btn btn-surface p-2 rounded-circle border-secondary border-opacity-10 text-muted">
+                                    <motion.a key={i} href="#" whileHover={{ y: -5, scale: 1.1, backgroundColor: 'var(--primary)', color: 'white' }} className="btn btn-surface p-2 rounded-circle border-secondary border-opacity-10 text-muted transition-all">
                                         <Icon size={18} />
                                     </motion.a>
                                 ))}
@@ -324,8 +339,8 @@ const LandingPage = () => {
                         <div className="col-md-4 col-lg-2">
                             <h6 className="fw-bold mb-4 smaller text-uppercase tracking-widest text-primary">Operations</h6>
                             <ul className="list-unstyled d-flex flex-column gap-3">
-                                {['Home', 'About Us', 'Features', 'Services', 'Contact'].map((link, i) => (
-                                    <li key={i}><button className="btn btn-link p-0 smaller text-muted text-decoration-none hover-primary transition-all d-flex align-items-center" onClick={() => handleNav(`#${link.toLowerCase().replace(' us', '').replace(' ', '')}`)}>
+                                {['Home', 'About', 'Features', 'Services', 'Contact'].map((link, i) => (
+                                    <li key={i}><button className="btn btn-link p-0 smaller text-muted text-decoration-none hover-primary transition-all d-flex align-items-center" onClick={() => handleNav(`#${link.toLowerCase().replace(' ', '')}`)}>
                                         <ChevronRight size={14} className="me-1 opacity-50" /> {link}
                                     </button></li>
                                 ))}
