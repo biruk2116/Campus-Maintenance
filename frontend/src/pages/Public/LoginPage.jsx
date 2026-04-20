@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import axios from '../../api/axios';
+import PremiumModal from '../../components/PremiumModal';
 
 // Assets
 import campusHero from '../../assets/images/campus-hero.png';
@@ -13,6 +14,7 @@ import {
     Shield, Lock, Sun, Moon,
     Activity, ChevronRight, Save, X
 } from 'lucide-react';
+import { fadeInUp, staggerContainer, scaleUp } from '../../utils/animations';
 
 const LoginPage = () => {
     const [userCode, setUserCode] = useState('');
@@ -86,8 +88,8 @@ const LoginPage = () => {
 
             <Navbar />
             
-            <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5 mt-5">
-                <div className="container">
+            <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+                <div className="container mt-5">
                     <div className="row justify-content-center">
                         <div className="col-lg-5 col-md-8">
                             <motion.div 
@@ -122,36 +124,52 @@ const LoginPage = () => {
 
                                 {!showChangePassword ? (
                                     <form onSubmit={handleSubmit}>
-                                        <div className="mb-4">
-                                            <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User Identification</label>
-                                            <input 
-                                                type="text" 
-                                                className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm" 
-                                                placeholder="DBU-XXXX-XXXX"
-                                                value={userCode}
-                                                onChange={(e) => setUserCode(e.target.value)}
-                                                required 
-                                            />
-                                        </div>
-                                        <div className="mb-5">
-                                            <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Strategic Key</label>
-                                            <input 
-                                                type="password" 
-                                                className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm" 
-                                                placeholder="••••••••••••"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                required 
-                                            />
-                                        </div>
-                                        <button 
-                                            type="submit" 
-                                            className="btn btn-primary w-100 py-3 fw-800 shadow-22xl d-flex align-items-center justify-content-center rounded-pill smallest tracking-widest uppercase"
-                                            disabled={loading}
+                                        <motion.div 
+                                            variants={staggerContainer}
+                                            initial="initial"
+                                            animate="animate"
+                                            className="d-flex flex-column gap-4"
                                         >
-                                            {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <LogIn size={18} className="me-2" />}
-                                            {loading ? 'Securing Link...' : 'Authorize Entry'}
-                                        </button>
+                                            <motion.div variants={fadeInUp}>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User Identification</label>
+                                                <div className="position-relative">
+                                                    <input 
+                                                        type="text" 
+                                                        className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5" 
+                                                        placeholder="DBU-XXXX-XXXX"
+                                                        value={userCode}
+                                                        onChange={(e) => setUserCode(e.target.value)}
+                                                        required 
+                                                    />
+                                                    <User size={18} className="position-absolute top-50 translate-middle-y start-0 ms-3 text-primary opacity-50" />
+                                                </div>
+                                            </motion.div>
+                                            <motion.div variants={fadeInUp}>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Strategic Key</label>
+                                                <div className="position-relative">
+                                                    <input 
+                                                        type="password" 
+                                                        className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5" 
+                                                        placeholder="••••••••••••"
+                                                        value={password}
+                                                        onChange={(e) => setPassword(e.target.value)}
+                                                        required 
+                                                    />
+                                                    <Lock size={18} className="position-absolute top-50 translate-middle-y start-0 ms-3 text-primary opacity-50" />
+                                                </div>
+                                            </motion.div>
+                                            <motion.button 
+                                                variants={fadeInUp}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                type="submit" 
+                                                className="btn btn-primary w-100 py-3 fw-800 shadow-22xl d-flex align-items-center justify-content-center rounded-pill smallest tracking-widest uppercase mt-3"
+                                                disabled={loading}
+                                            >
+                                                {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <LogIn size={18} className="me-2" />}
+                                                {loading ? 'Securing Link...' : 'Authorize Entry'}
+                                            </motion.button>
+                                        </motion.div>
                                     </form>
                                 ) : (
                                     <form onSubmit={handlePasswordChange}>
