@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children, role }) => {
     const { user, loading } = useAuth();
 
     if (loading) return (
-        <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div className="d-flex justify-content-center align-items-center vh-100 bg-background">
             <motion.div 
                 animate={{ rotate: 360 }}
                 transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
