@@ -46,7 +46,13 @@ const Navbar = () => {
     };
 
     return (
-        <nav className={`navbar navbar-expand-lg nav-glass fixed-top py-3 ${isDarkMode ? 'navbar-dark' : 'navbar-light'}`} style={{ transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', height: '80px' }}>
+        <motion.nav 
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className={`navbar navbar-expand-lg nav-glass fixed-top py-3 ${isDarkMode ? 'navbar-dark' : 'navbar-light'}`} 
+            style={{ transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', height: '80px' }}
+        >
             <div className="container">
                 <Link className="navbar-brand fw-bold d-flex align-items-center" to="/" style={{ letterSpacing: '-0.05em' }}>
                     <motion.div 
@@ -108,14 +114,14 @@ const Navbar = () => {
                                     className="btn nav-cta-btn px-4 py-2 smaller fw-800 text-uppercase tracking-widest rounded-pill shadow-lg d-flex align-items-center bg-primary text-white border-0" 
                                     to="/login"
                                 >
-                                    <LogIn size={14} className="me-2" /> Authorize Entry
+                                    <LogIn size={14} className="me-2" /> Sign In
                                 </Link>
                             )}
                         </li>
                     </ul>
                 </div>
             </div>
-        </nav>
+        </motion.nav>
     );
 };
 
