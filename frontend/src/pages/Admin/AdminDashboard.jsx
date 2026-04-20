@@ -29,6 +29,13 @@ ChartJS.register(
 );
 
 const DashboardHeader = ({ title, subtitle, unreadCount }) => {
+    useEffect(() => {
+        if (unreadCount > 0) {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play().catch(e => console.log("Audio Pulse Blocked"));
+        }
+    }, [unreadCount]);
+
     return (
         <div className="d-flex justify-content-between align-items-center mb-5 mt-2">
             <div className="d-flex align-items-center">
@@ -40,11 +47,20 @@ const DashboardHeader = ({ title, subtitle, unreadCount }) => {
             </div>
             <div className="d-flex align-items-center gap-4">
                 <div className="position-relative">
-                    <div className="bg-glass border border-secondary border-opacity-10 p-2 rounded-circle text-muted shadow-sm cursor-pointer d-flex align-items-center justify-content-center" style={{ width: '45px', height: '45px' }}>
-                        <Bell size={22} className={unreadCount > 0 ? "animate-pulse text-primary" : ""} />
+                    <div 
+                        onClick={async () => {
+                            try {
+                                await axios.post('index.php?action=markNotificationsRead');
+                                if (window.location.reload) window.location.reload();
+                            } catch (e) { console.error("Pulse acknowledgment failed"); }
+                        }}
+                        className="bg-glass border border-secondary border-opacity-10 p-2 rounded-circle text-muted shadow-sm cursor-pointer d-flex align-items-center justify-content-center" 
+                        style={{ width: '45px', height: '45px' }}
+                    >
+                        <Bell size={22} className={unreadCount > 0 ? "animate-pulse text-danger" : ""} />
                     </div>
                     {unreadCount > 0 && (
-                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger border-2 border-surface shadow-lg" style={{ width: '20px', height: '20px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800' }}>
+                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger border-2 border-surface shadow-22xl animate__animated animate__heartBeat animate__infinite" style={{ width: '22px', height: '22px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800' }}>
                             {unreadCount}
                         </span>
                     )}
@@ -133,14 +149,14 @@ const AdminOverview = () => {
                         <div style={{ height: '300px' }}>
                             <Bar 
                                 data={{
-                                    labels: ['Structural', 'ICT Grid', 'Plumbing', 'Network'],
+                                    labels: ['Structural', 'Electricity', 'Plumbing', 'ICT / Grid'],
                                     datasets: [{
                                         label: 'Maintenance Frequency',
                                         data: [
                                             requests.filter(r => r.category === 'Structural').length,
                                             requests.filter(r => r.category === 'Electricity').length,
                                             requests.filter(r => r.category === 'Plumbing').length,
-                                            requests.filter(r => r.category === 'Network').length,
+                                            requests.filter(r => r.category === 'ICT Technician' || r.category === 'Network').length,
                                         ],
                                         backgroundColor: isDarkMode ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.6)',
                                         borderRadius: 8,
@@ -172,6 +188,7 @@ const StrategicQueue = () => {
     const [technicians, setTechnicians] = useState([]);
     const [loading, setLoading] = useState(true);
     const [confirmDelete, setConfirmDelete] = useState(null);
+    const [selectedRequest, setSelectedRequest] = useState(null);
 
     const fetchData = useCallback(async () => {
         try {
@@ -194,7 +211,10 @@ const StrategicQueue = () => {
             params.append('request_id', requestId);
             params.append('technician_id', technicianId);
             const res = await axios.post('index.php?action=assignTechnician', params);
-            if (res.data.success) fetchData();
+            if (res.data.success) {
+                setSelectedRequest(null);
+                fetchData();
+            }
         } catch (err) { console.error("Assignment Interrupted"); }
     };
 
@@ -248,28 +268,43 @@ const StrategicQueue = () => {
                             {requests.map((r, i) => (
                                 <tr key={r.id} className="border-bottom border-secondary border-opacity-5 hover-bg-surface-hover transition-all">
                                     <td className="py-4">
-                                        <div className="fw-800 text-main mb-1">{r.title}</div>
-                                        <div className="smallest text-muted fw-bold">Reported By: {r.student_name}</div>
+                                        <div className="d-flex align-items-center mb-1">
+                                            <div className="fw-800 text-main me-2">{r.title}</div>
+                                            <button onClick={() => setSelectedRequest(r)} className="btn btn-link btn-sm p-0 smallest text-primary border-0"><Info size={14} /></button>
+                                        </div>
+                                        <div className="smallest text-muted fw-bold uppercase tracking-widest">{r.student_name}</div>
                                     </td>
-                                    <td className="py-4 smaller fw-bold text-muted uppercase tracking-wider"><MapPin size={14} className="me-2 text-primary" />{r.location}</td>
+                                    <td className="py-4">
+                                        <div className="d-flex align-items-center text-muted fw-bold smaller uppercase tracking-widest">
+                                            <MapPin size={14} className="text-primary me-2 shadow-sm" /> {r.location}
+                                        </div>
+                                    </td>
                                     <td className="py-4 text-center">
-                                        <span className={`status-badge bg-${r.status === 'Pending' ? 'danger' : (r.status === 'Completed' ? 'success' : 'warning')} bg-opacity-10 text-${r.status === 'Pending' ? 'danger' : (r.status === 'Completed' ? 'success' : 'warning')} shadow-sm`}>
+                                        <span className={`status-badge bg-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} bg-opacity-10 text-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} shadow-sm`}>
                                             {r.status}
                                         </span>
                                     </td>
                                     <td className="py-4">
                                         {r.technician_name ? (
-                                            <div className="d-flex align-items-center smallest fw-800 uppercase text-primary bg-primary bg-opacity-10 px-3 py-2 rounded-pill d-inline-flex border border-primary border-opacity-10">
-                                                <UserCheck size={14} className="me-2" /> {r.technician_name}
+                                            <div className="d-flex align-items-center">
+                                                <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary me-3"><Wrench size={14} /></div>
+                                                <div>
+                                                    <div className="smallest fw-800 text-main uppercase tracking-widest">{r.technician_name}</div>
+                                                    <div className="progress rounded-pill bg-surface mt-1" style={{ height: '4px', width: '60px' }}>
+                                                        <div className="progress-bar bg-primary" style={{ width: `${r.progress_percentage}%` }}></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         ) : (
                                             <select 
-                                                className="form-select form-select-sm bg-surface border-secondary border-opacity-10 rounded-pill smallest fw-800 text-main"
+                                                className="form-select smallest fw-800 uppercase tracking-widest bg-surface border-secondary border-opacity-10 rounded-pill px-3 py-2 text-muted"
                                                 onChange={(e) => handleAssign(r.id, e.target.value)}
                                                 defaultValue=""
                                             >
-                                                <option value="" disabled>Select Technician</option>
-                                                {technicians.map(t => <option key={t.id} value={t.id}>{t.name} ({t.skills})</option>)}
+                                                <option value="" disabled>Assign Field Unit</option>
+                                                {technicians.map(t => (
+                                                    <option key={t.id} value={t.id}>{t.name} ({t.skills})</option>
+                                                ))}
                                             </select>
                                         )}
                                     </td>
@@ -282,6 +317,70 @@ const StrategicQueue = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Request Detail Modal */}
+            <PremiumModal
+                isOpen={!!selectedRequest}
+                onClose={() => setSelectedRequest(null)}
+                title="Operational Telemetry"
+                maxWidth="700px"
+                showFooter={false}
+            >
+                {selectedRequest && (
+                    <div className="py-2">
+                        <div className="mb-5 p-4 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10">
+                            <div className="d-flex align-items-center gap-3 mb-2">
+                                <Activity size={20} className="text-primary" />
+                                <h5 className="fw-800 mb-0 text-main">{selectedRequest.title}</h5>
+                            </div>
+                            <p className="smallest text-muted fw-bold uppercase tracking-widest mb-0 opacity-75">Discovery ID: {selectedRequest.id} | Priority: {selectedRequest.priority}</p>
+                        </div>
+
+                        <div className="row g-4 mb-5">
+                            <div className="col-md-6">
+                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Reporting Entity</label>
+                                <div className="smaller fw-bold text-main">{selectedRequest.student_name}</div>
+                            </div>
+                            <div className="col-md-6">
+                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Deployment Site</label>
+                                <div className="smaller fw-bold text-main">{selectedRequest.location}</div>
+                            </div>
+                            <div className="col-12">
+                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Technical Description</label>
+                                <div className="smaller text-muted p-4 bg-surface border border-secondary border-opacity-5 rounded-4 border-start border-primary border-3 lh-relaxed fw-medium">
+                                    {selectedRequest.description}
+                                </div>
+                            </div>
+                        </div>
+
+                        {!selectedRequest.technician_id && (
+                            <div className="pt-4 border-top border-secondary border-opacity-5">
+                                <label className="smallest fw-800 uppercase tracking-widest text-primary mb-3 d-block">Assign Strategic Personnel</label>
+                                <div className="row g-3">
+                                    {technicians.length > 0 ? technicians.map(t => (
+                                        <div key={t.id} className="col-md-6">
+                                            <div 
+                                                onClick={() => handleAssign(selectedRequest.id, t.id)}
+                                                className="p-3 rounded-4 bg-surface border border-secondary border-opacity-5 hover-border-primary cursor-pointer transition-all d-flex align-items-center shadow-sm"
+                                            >
+                                                <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary me-3"><UserCheck size={18} /></div>
+                                                <div>
+                                                    <div className="smaller fw-800 text-main uppercase">{t.name}</div>
+                                                    <div className="smallest text-muted fw-bold text-primary">{t.skills}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <div className="col-12 text-center py-4 bg-surface rounded-4">
+                                            <p className="smallest text-muted fw-800 uppercase tracking-widest mb-0 opacity-50">No field engineers available in local grid.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </PremiumModal>
 
             <PremiumModal
                 isOpen={!!confirmDelete}
@@ -309,7 +408,8 @@ const PersonnelRegistry = () => {
     const [loading, setLoading] = useState(true);
     const [showRegister, setShowRegister] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(null);
-    const [newUser, setNewUser] = useState({ name: '', user_code: '', email: '', role: 'technician', skills: '' });
+    const [registrationResult, setRegistrationResult] = useState(null);
+    const [newUser, setNewUser] = useState({ name: '', user_code: '', email: '', phone_number: '', role: 'technician', skills: '' });
 
     const fetchUsers = useCallback(async () => {
         try {
@@ -321,15 +421,37 @@ const PersonnelRegistry = () => {
 
     useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
+    const handleResetPassword = async (userCode) => {
+        try {
+            const params = new URLSearchParams();
+            params.append('user_code', userCode);
+            const res = await axios.post('index.php?action=resetUserPassword', params);
+            if (res.data.success) {
+                // Ensure the reset password result is displayed in the strategic modal
+                setRegistrationResult({
+                    user_code: userCode,
+                    temporary_password: res.data.data.temporary_password
+                });
+            }
+        } catch (err) { console.error("Strategic Reset Failed"); }
+    };
+
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
             const params = new URLSearchParams();
-            Object.entries(newUser).forEach(([k, v]) => params.append(k, v));
+            params.append('name', newUser.name);
+            params.append('user_code', newUser.user_code);
+            params.append('email', newUser.email);
+            params.append('phone_number', newUser.phone_number);
+            params.append('role', newUser.role);
+            params.append('skills', newUser.skills);
+            
             const res = await axios.post('index.php?action=createUser', params);
             if (res.data.success) {
-                alert(`User Created! Recovery Key: ${res.data.data.temporary_password}`);
+                setRegistrationResult(res.data.data);
                 setShowRegister(false);
+                setNewUser({ name: '', user_code: '', email: '', phone_number: '', role: 'technician', skills: '' });
                 fetchUsers();
             }
         } catch (err) { console.error("Registration Halted"); }
@@ -383,7 +505,22 @@ const PersonnelRegistry = () => {
                                         <span className={`status-badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 shadow-sm`}>{u.status}</span>
                                     </td>
                                     <td className="py-4 text-end">
-                                        <button onClick={() => setConfirmDelete(u)} className="btn btn-surface btn-sm p-3 rounded-circle text-danger border-0 shadow-sm hover-bg-danger hover-text-white transition-all"><Trash2 size={16} /></button>
+                                        <div className="d-flex align-items-center justify-content-end gap-2">
+                                            <button 
+                                                onClick={() => handleResetPassword(u.user_code)} 
+                                                className="btn btn-surface btn-sm p-3 rounded-circle text-primary border-0 shadow-sm hover-bg-primary hover-text-white transition-all"
+                                                title="Strategic Key Reset"
+                                            >
+                                                <RefreshCcw size={16} />
+                                            </button>
+                                            <button 
+                                                onClick={() => setConfirmDelete(u)} 
+                                                className="btn btn-surface btn-sm p-3 rounded-circle text-danger border-0 shadow-sm hover-bg-danger hover-text-white transition-all"
+                                                title="Purge Personnel"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -424,14 +561,33 @@ const PersonnelRegistry = () => {
                                         <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" required value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Access ID</label>
-                                        <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="DBU-XXXX" required value={newUser.user_code} onChange={e => setNewUser({...newUser, user_code: e.target.value})} />
+                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Institutional ID</label>
+                                        <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="DBU1601069" required value={newUser.user_code} onChange={e => setNewUser({...newUser, user_code: e.target.value})} />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Strategic Phone</label>
+                                        <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="+251..." required value={newUser.phone_number || ''} onChange={e => setNewUser({...newUser, phone_number: e.target.value})} />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Institutional Email</label>
+                                        <input type="email" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="Optional" value={newUser.email || ''} onChange={e => setNewUser({...newUser, email: e.target.value})} />
                                     </div>
                                     <div className="col-md-6">
                                         <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Role Priority</label>
                                         <select className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
                                             <option value="student">Student Investigator</option>
                                             <option value="technician">Field Engineer</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Technical Expertise</label>
+                                        <select className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" disabled={newUser.role !== 'technician'} value={newUser.skills} onChange={e => setNewUser({...newUser, skills: e.target.value})}>
+                                            <option value="">N/A</option>
+                                            <option value="Plumbing">Plumbing</option>
+                                            <option value="Electrician">Electrician</option>
+                                            <option value="ICT Technician">ICT Technician</option>
+                                            <option value="HVAC / Cooling">HVAC / Cooling</option>
+                                            <option value="Carpentry">Carpentry</option>
                                         </select>
                                     </div>
                                     <div className="col-12 mt-5">
@@ -443,6 +599,35 @@ const PersonnelRegistry = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            <PremiumModal
+                isOpen={!!registrationResult}
+                onClose={() => setRegistrationResult(null)}
+                title="Personnel Credentials Generated"
+                type="success"
+                confirmText="Securely Copied"
+                onConfirm={() => setRegistrationResult(null)}
+            >
+                <div className="text-center py-4">
+                    <div className="bg-success bg-opacity-10 p-4 rounded-circle d-inline-block mb-4 shadow-sm border border-success border-opacity-10">
+                        <Key size={48} className="text-success animate-bounce" />
+                    </div>
+                    <h5 className="fw-800 mb-0 text-main">Activation Sequence Ready</h5>
+                    <p className="smallest text-muted fw-bold uppercase tracking-widest mt-2 mb-5">Provide these credentials to the field unit.</p>
+                    
+                    <div className="bg-surface p-4 rounded-4 border border-secondary border-opacity-10 text-start shadow-inner">
+                        <div className="mb-3">
+                            <label className="smallest fw-800 uppercase tracking-widest text-muted d-block mb-1">Access Identity</label>
+                            <code className="h5 fw-800 text-primary">{registrationResult?.user_code}</code>
+                        </div>
+                        <div>
+                            <label className="smallest fw-800 uppercase tracking-widest text-muted d-block mb-1">Temporary Strategic Key</label>
+                            <code className="h5 fw-800 text-success">{registrationResult?.temporary_password}</code>
+                        </div>
+                    </div>
+                    <p className="smallest text-danger fw-bold mt-4 mb-0 animate-pulse">! DATA WILL BE PURGED FROM THIS VIEW ON CLOSURE !</p>
+                </div>
+            </PremiumModal>
         </div>
     );
 };
