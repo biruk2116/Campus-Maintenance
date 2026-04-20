@@ -245,6 +245,18 @@ switch ($action) {
         markNotificationsRead($pdo);
         break;
 
+    case 'purgeRequests':
+        require_once "middleware/RoleMiddleware.php";
+        require_once "middleware/StatusMiddleware.php";
+        require_once "controllers/RequestController.php";
+
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+
+        purgeRequests($pdo);
+        break;
+
     default:
         echo json_encode([
             "success" => false,
