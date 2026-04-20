@@ -75,7 +75,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-vh-100 d-flex flex-column text-main position-relative overflow-hidden bg-background">
+        <div className="min-vh-100 d-flex flex-column text-main position-relative overflow-hidden bg-transparent">
             <div className="app-backdrop">
                 <div 
                     className="fullscreen-bg-fixed" 
