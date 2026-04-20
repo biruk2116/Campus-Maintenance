@@ -1,22 +1,32 @@
 <?php
 
-require_once "utils/Response.php";
+require_once __DIR__ . "/../utils/Response.php";
 
-function getAssignedRequests($pdo) {
-
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'technician') {
-        response(false, "Unauthorized");
-    }
-
+function getAssignedRequests($pdo)
+{
     $stmt = $pdo->prepare("
-        SELECT r.*, u.name AS student_name
+        SELECT
+            r.*,
+            u.name AS student_name,
+            u.user_code AS student_code,
+            u.phone_number AS student_phone
         FROM requests r
         JOIN users u ON r.student_id = u.id
         WHERE r.technician_id = ?
-        ORDER BY r.created_at DESC
+        ORDER BY
+            CASE
+                WHEN r.status = 'Assigned' THEN 1
+                WHEN r.status = 'In Progress' THEN 2
+                WHEN r.status = 'On Hold' THEN 3
+                WHEN r.status = 'Completed' THEN 4
+                ELSE 5
+            END,
+            r.updated_at DESC
     ");
 
     $stmt->execute([$_SESSION['user_id']]);
 
     response(true, "Assigned requests", $stmt->fetchAll(PDO::FETCH_ASSOC));
 }
+
+?>
