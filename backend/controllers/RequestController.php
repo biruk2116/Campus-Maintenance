@@ -53,7 +53,7 @@ function getStudentRequests($pdo)
     }
 
     $stmt = $pdo->prepare("
-        SELECT r.*, u.name as technician_name, u.skills as technician_skills
+        SELECT r.*, u.name as technician_name, u.skills as technician_skills, u.phone_number as technician_phone
         FROM requests r
         LEFT JOIN users u ON r.technician_id = u.id
         WHERE r.student_id = ?
