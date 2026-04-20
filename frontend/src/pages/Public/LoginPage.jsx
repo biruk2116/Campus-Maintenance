@@ -1,75 +1,104 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../../context/AuthContext';
-import Navbar from '../../components/Navbar';
-import axios from '../../api/axios';
-import PremiumModal from '../../components/PremiumModal';
-
-// Assets
-import campusHero from '../../assets/images/campus-hero.png';
-
-import { 
-    LogIn, AlertCircle, Loader2, User, 
-    Shield, Lock, Sun, Moon,
-    Activity, ChevronRight, Save, X
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import {
+    AlertCircle,
+    KeyRound,
+    Loader2,
+    Lock,
+    LogIn,
+    Save,
+    Shield,
+    User
 } from 'lucide-react';
-import { fadeInUp, staggerContainer, scaleUp } from '../../utils/animations';
+
+import Navbar from '../../components/Navbar';
+import PremiumModal from '../../components/PremiumModal';
+import { useAuth } from '../../context/AuthContext';
+
+import maintHero from '../../assets/images/maint_hero.png';
 
 const LoginPage = () => {
-    const [userCode, setUserCode] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [showChangePassword, setShowChangePassword] = useState(false);
-    const [passwords, setPasswords] = useState({ old: '', new: '', confirm: '' });
-    
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    
-    const { login, isDarkMode } = useAuth();
     const navigate = useNavigate();
+    const { user, login, updatePassword } = useAuth();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
+    const [credentials, setCredentials] = useState({ user_code: '', password: '' });
+    const [passwordForm, setPasswordForm] = useState({
+        user_code: '',
+        old_password: '',
+        new_password: '',
+        confirm_password: ''
+    });
+    const [mode, setMode] = useState('login');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    useEffect(() => {
+        if (user?.role) {
+            navigate(`/${user.role}`);
+        }
+    }, [navigate, user]);
+
+    const handleLogin = async (event) => {
+        event.preventDefault();
         setLoading(true);
+        setError('');
+
         try {
-            const res = await login(userCode, password);
-            // res is { success, message, data } where data has must_change_password
-            if (res.data && res.data.must_change_password === 1) {
-                setPasswords({ ...passwords, old: password });
-                setShowChangePassword(true);
-            } else if (res.data && res.data.role) {
-                navigate(`/${res.data.role.toLowerCase()}`);
+            const res = await login(credentials.user_code, credentials.password);
+            const payload = res.data || {};
+
+            if (payload.must_change_password === 1 || payload.action === 'change_password') {
+                setPasswordForm({
+                    user_code: payload.user_code || credentials.user_code.toUpperCase(),
+                    old_password: credentials.password,
+                    new_password: '',
+                    confirm_password: ''
+                });
+                setMode('change-password');
+                return;
+            }
+
+            if (payload.role) {
+                navigate(`/${payload.role}`);
             }
         } catch (err) {
-            setError(err.message || 'Authentication Protocol Failed. Access Denied.');
+            setError(err.message || 'Login failed');
         } finally {
             setLoading(false);
         }
     };
 
-    const handlePasswordChange = async (e) => {
-        e.preventDefault();
-        if (passwords.new !== passwords.confirm) {
-            setError("Security mismatch: Strategic keys do not match.");
+    const handlePasswordChange = async (event) => {
+        event.preventDefault();
+
+        if (passwordForm.new_password !== passwordForm.confirm_password) {
+            setError('New password and confirmation do not match');
             return;
         }
+
         setLoading(true);
+        setError('');
+
         try {
-            const params = new URLSearchParams();
-            params.append('old_password', passwords.old);
-            params.append('new_password', passwords.new);
-            const res = await axios.post('index.php?action=changePassword', params);
-            if (res.data.success) {
-                setShowSuccessModal(true);
-                setShowChangePassword(false);
-                setError('');
-            } else {
-                setError(res.data.message || "Key update failed.");
-            }
+            await updatePassword({
+                user_code: passwordForm.user_code,
+                old_password: passwordForm.old_password,
+                new_password: passwordForm.new_password
+            });
+
+            setMode('login');
+            setCredentials({ user_code: passwordForm.user_code, password: '' });
+            setPasswordForm({
+                user_code: '',
+                old_password: '',
+                new_password: '',
+                confirm_password: ''
+            });
+            setShowSuccessModal(true);
         } catch (err) {
-            setError("Critical link failure during key update.");
+            setError(err.message || 'Password change failed');
         } finally {
             setLoading(false);
         }
@@ -78,150 +107,157 @@ const LoginPage = () => {
     return (
         <div className="min-vh-100 d-flex flex-column text-main position-relative overflow-hidden bg-transparent">
             <div className="app-backdrop">
-                <div 
-                    className="fullscreen-bg-fixed" 
-                    style={{ backgroundImage: `url(${campusHero})` }}
-                ></div>
+                <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${maintHero})` }}></div>
                 <div className="bg-overlay"></div>
             </div>
 
             <Navbar />
-            
+
             <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
                 <div className="container mt-5">
                     <div className="row justify-content-center">
                         <div className="col-lg-5 col-md-8">
-                            <motion.div 
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="premium-card p-5 shadow-22xl bg-glass border-secondary border-opacity-10"
-                            >
+                            <div className="premium-card p-5 shadow-22xl bg-glass border-secondary border-opacity-10">
                                 <div className="text-center mb-5">
-                                    <div className="bg-primary bg-opacity-10 d-inline-block p-4 rounded-circle text-primary mb-4 shadow-sm">
-                                        {showChangePassword ? <Shield size={36} className="animate-pulse" /> : <Lock size={36} />}
+                                    <div className="bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center p-4 rounded-circle text-primary mb-4 shadow-sm">
+                                        {mode === 'change-password' ? <Shield size={34} /> : <KeyRound size={34} />}
                                     </div>
                                     <h2 className="fw-800 tracking-tighter mb-2 display-6">
-                                        {showChangePassword ? 'Security Protocol Update' : 'Operational Access'}
+                                        {mode === 'change-password' ? 'Change Temporary Password' : 'Sign In'}
                                     </h2>
                                     <p className="smallest text-muted fw-800 tracking-widest uppercase opacity-75">
-                                        {showChangePassword ? 'Mandatory Key Rotation Required' : 'Institutional Gateway Protocol 2.5'}
+                                        {mode === 'change-password'
+                                            ? 'Use the temporary password once, then set your own'
+                                            : 'Campus maintenance dashboard access'}
                                     </p>
                                 </div>
 
                                 <AnimatePresence mode="wait">
                                     {error && (
-                                        <motion.div 
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="alert alert-danger mb-4 p-3 rounded-4 d-flex align-items-center smallest fw-800 border-0 bg-danger bg-opacity-10 text-danger shadow-sm"
-                                        >
-                                            <AlertCircle size={18} className="me-3" /> {error}
-                                        </motion.div>
+                                        <div className="alert alert-danger mb-4 p-3 rounded-4 d-flex align-items-center smallest fw-800 border-0 bg-danger bg-opacity-10 text-danger shadow-sm">
+                                            <AlertCircle size={18} className="me-3" />
+                                            {error}
+                                        </div>
                                     )}
                                 </AnimatePresence>
 
-                                {!showChangePassword ? (
-                                    <form onSubmit={handleSubmit}>
-                                        <motion.div 
-                                            variants={staggerContainer}
-                                            initial="initial"
-                                            animate="animate"
-                                            className="d-flex flex-column gap-4"
-                                        >
-                                            <motion.div variants={fadeInUp}>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User Identification</label>
+                                {mode === 'login' ? (
+                                    <form onSubmit={handleLogin}>
+                                        <div className="d-flex flex-column gap-4">
+                                            <div>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User ID</label>
                                                 <div className="position-relative">
-                                                    <input 
-                                                        type="text" 
-                                                        className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5" 
-                                                        placeholder="DBU-XXXX-XXXX"
-                                                        value={userCode}
-                                                        onChange={(e) => setUserCode(e.target.value)}
-                                                        required 
+                                                    <input
+                                                        type="text"
+                                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5"
+                                                        value={credentials.user_code}
+                                                        onChange={(e) =>
+                                                            setCredentials((prev) => ({
+                                                                ...prev,
+                                                                user_code: e.target.value.toUpperCase()
+                                                            }))
+                                                        }
+                                                        required
                                                     />
                                                     <User size={18} className="position-absolute top-50 translate-middle-y start-0 ms-3 text-primary opacity-50" />
                                                 </div>
-                                            </motion.div>
-                                            <motion.div variants={fadeInUp}>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Strategic Key</label>
+                                            </div>
+
+                                            <div>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Password</label>
                                                 <div className="position-relative">
-                                                    <input 
-                                                        type="password" 
-                                                        className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5" 
-                                                        placeholder="••••••••••••"
-                                                        value={password}
-                                                        onChange={(e) => setPassword(e.target.value)}
-                                                        required 
+                                                    <input
+                                                        type="password"
+                                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5"
+                                                        value={credentials.password}
+                                                        onChange={(e) =>
+                                                            setCredentials((prev) => ({
+                                                                ...prev,
+                                                                password: e.target.value
+                                                            }))
+                                                        }
+                                                        required
                                                     />
                                                     <Lock size={18} className="position-absolute top-50 translate-middle-y start-0 ms-3 text-primary opacity-50" />
                                                 </div>
-                                            </motion.div>
-                                            <motion.button 
-                                                variants={fadeInUp}
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                                type="submit" 
+                                            </div>
+
+                                            <button
+                                                type="submit"
                                                 className="btn btn-primary w-100 py-3 fw-800 shadow-22xl d-flex align-items-center justify-content-center rounded-pill smallest tracking-widest uppercase mt-3"
                                                 disabled={loading}
                                             >
                                                 {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <LogIn size={18} className="me-2" />}
-                                                {loading ? 'Securing Link...' : 'Authorize Entry'}
-                                            </motion.button>
-                                        </motion.div>
+                                                {loading ? 'Signing in...' : 'Login'}
+                                            </button>
+                                        </div>
                                     </form>
                                 ) : (
                                     <form onSubmit={handlePasswordChange}>
-                                        <div className="mb-4">
-                                            <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">New Strategic Key</label>
-                                            <input 
-                                                type="password" 
-                                                className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm" 
-                                                placeholder="••••••••••••"
-                                                value={passwords.new}
-                                                onChange={(e) => setPasswords({...passwords, new: e.target.value})}
-                                                required 
-                                            />
-                                        </div>
-                                        <div className="mb-5">
-                                            <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Confirm New Key</label>
-                                            <input 
-                                                type="password" 
-                                                className="form-control py-3 px-4 bg-surface bg-opacity-50 border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm" 
-                                                placeholder="••••••••••••"
-                                                value={passwords.confirm}
-                                                onChange={(e) => setPasswords({...passwords, confirm: e.target.value})}
-                                                required 
-                                            />
-                                        </div>
-                                        <div className="d-flex gap-3">
-                                            <button 
-                                                type="button" 
-                                                onClick={() => setShowChangePassword(false)}
-                                                className="btn btn-surface px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 border-secondary border-opacity-10"
-                                            >
-                                                Back
-                                            </button>
-                                            <button 
-                                                type="submit" 
-                                                className="btn btn-primary px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 shadow-22xl d-flex align-items-center justify-content-center"
-                                                disabled={loading}
-                                            >
-                                                {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <Save size={18} className="me-2" />}
-                                                {loading ? 'Updating...' : 'Set New Key'}
-                                            </button>
+                                        <div className="d-flex flex-column gap-4">
+                                            <div>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User ID</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm"
+                                                    value={passwordForm.user_code}
+                                                    disabled
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">New Password</label>
+                                                <input
+                                                    type="password"
+                                                    className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm"
+                                                    value={passwordForm.new_password}
+                                                    onChange={(e) =>
+                                                        setPasswordForm((prev) => ({
+                                                            ...prev,
+                                                            new_password: e.target.value
+                                                        }))
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Confirm New Password</label>
+                                                <input
+                                                    type="password"
+                                                    className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm"
+                                                    value={passwordForm.confirm_password}
+                                                    onChange={(e) =>
+                                                        setPasswordForm((prev) => ({
+                                                            ...prev,
+                                                            confirm_password: e.target.value
+                                                        }))
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="d-flex gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMode('login')}
+                                                    className="btn btn-surface px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 border-secondary border-opacity-10"
+                                                >
+                                                    Back
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 shadow-22xl d-flex align-items-center justify-content-center"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <Save size={18} className="me-2" />}
+                                                    {loading ? 'Saving...' : 'Change Password'}
+                                                </button>
+                                            </div>
                                         </div>
                                     </form>
                                 )}
-                                
-                                <div className="mt-5 pt-5 border-top border-secondary border-opacity-10 text-center">
-                                    <p className="smallest text-muted fw-800 mb-2 tracking-widest opacity-50 uppercase">Infrastructure Strategic Command</p>
-                                    <div className="d-flex justify-content-center gap-4">
-                                        <span className="smallest text-muted opacity-30">SECURE: AES-256</span>
-                                        <span className="smallest text-muted opacity-30">GRID: 08-ALPHA</span>
-                                    </div>
-                                </div>
-                            </motion.div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -230,17 +266,19 @@ const LoginPage = () => {
             <PremiumModal
                 isOpen={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
-                title="Security Protocol verified"
+                title="Password Updated"
                 type="success"
-                confirmText="Return to Login"
+                confirmText="Back to Login"
                 onConfirm={() => setShowSuccessModal(false)}
             >
                 <div className="text-center">
                     <div className="bg-success bg-opacity-10 p-4 rounded-circle text-success d-inline-block mb-4 shadow-sm">
                         <Shield size={48} />
                     </div>
-                    <h4 className="fw-800 tracking-tighter mb-2 text-main">Strategic Key Rotated</h4>
-                    <p className="smallest text-muted fw-bold uppercase tracking-widest leading-relaxed">Security credentials have been successfully updated in the institutional grid. Please re-enter your new credentials to gain operational access.</p>
+                    <h4 className="fw-800 tracking-tighter mb-2 text-main">Password changed successfully</h4>
+                    <p className="smallest text-muted fw-bold uppercase tracking-widest leading-relaxed">
+                        Sign in again with the new password to open your dashboard.
+                    </p>
                 </div>
             </PremiumModal>
         </div>
