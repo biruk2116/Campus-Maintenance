@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import 'animate.css';
 
@@ -13,16 +13,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 
 // Page Transition Wrapper
 const PageWrapper = ({ children }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-        >
-            {children}
-        </motion.div>
-    );
+    return <div>{children}</div>;
 };
 
 // Scroll to Top on Route Change
@@ -39,14 +30,9 @@ const ProtectedRoute = ({ children, role }) => {
 
     if (loading) return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-background">
-            <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                className="spinner-border text-primary" 
-                role="status"
-            >
+            <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>
-            </motion.div>
+            </div>
         </div>
     );
     
@@ -65,8 +51,9 @@ function AnimatedRoutes() {
     return (
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<PageWrapper><LandingPage /></PageWrapper>} />
-                <Route path="/login" element={<PageWrapper><LoginPage /></PageWrapper>} />
+                <Route path="/" element={<PageWrapper><LoginPage /></PageWrapper>} />
+                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/landing" element={<PageWrapper><LandingPage /></PageWrapper>} />
                 
                 <Route path="/student/*" element={
                     <ProtectedRoute role="student">
