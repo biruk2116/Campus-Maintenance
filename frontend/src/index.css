@@ -4,7 +4,7 @@
   --primary: #3b82f6;
   --primary-dark: #2563eb;
   --primary-light: #60a5fa;
-  --accent-gold: #f7b718;
+  --accent-gold: f7b718;
   --accent-gold-dark: #d99a08;
   --success: #10b981;
   --danger: #ef4444;
@@ -13,11 +13,14 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+  --shadow-22xl: 0 22px 55px rgba(0, 0, 0, 0.25);
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 8px;
 
-[data-bs-theme='dark'] {
+  /* Default Dark Theme Variables */
   --background: #09090b;
   --surface: #18181b;
   --surface-hover: #27272a;
@@ -37,6 +40,18 @@
   --nav-link-hover: #ffd25e;
   --hero-button-secondary-bg: rgba(255, 255, 255, 0.08);
   --hero-button-secondary-border: rgba(255, 255, 255, 0.16);
+}
+
+[data-bs-theme='dark'] {
+  /* Keeps consistent with root and allows explicit targeting */
+  --background: #09090b;
+  --surface: #18181b;
+  --surface-hover: #27272a;
+  --text-main: #fafafa;
+  --text-muted: #a1a1aa;
+  --border: #27272a;
+  --glass: rgba(24, 24, 27, 0.8);
+  --nav-bg: rgba(6, 18, 35, 0.78);
 }
 
 [data-bs-theme='light'] {
@@ -61,13 +76,50 @@
   --hero-button-secondary-border: rgba(23, 58, 105, 0.16);
 }
 
-body {
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.app-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.fullscreen-bg-fixed {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.6);
+  transform: scale(1.1);
+}
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 0%, var(--background) 100%);
+}
+
+html, body {
   font-family: 'Inter', sans-serif;
+  background-color: #09090b; /* Absolute dark default */
   background-color: var(--background);
   color: var(--text-main);
   transition: background-color var(--transition-normal), color var(--transition-normal);
   overflow-x: hidden;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 h1,
@@ -77,6 +129,24 @@ h4,
 .navbar-brand {
   font-family: 'Outfit', sans-serif;
   letter-spacing: -0.02em;
+}
+
+.bg-background {
+  background-color: var(--background) !important;
+}
+
+.bg-surface {
+  background-color: var(--surface) !important;
+}
+
+.bg-surface-hover {
+  background-color: var(--surface-hover) !important;
+}
+
+.bg-glass {
+  background-color: var(--glass) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .premium-card {
