@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../../components/Sidebar';
 import axios from '../../api/axios';
 import PremiumModal from '../../components/PremiumModal';
+import { fadeInUp, staggerContainer } from '../../utils/animations';
 
 // Assets
 import dbuLogo from '../../assets/images/dbu-logo.png';
@@ -12,7 +13,8 @@ import techBg from '../../assets/images/tech-bg.png';
 import { 
     Users, Trash2, Key, CheckCircle, Clock, TrendingUp, Plus, UserPlus,
     AlertCircle, Search, Bell, Settings, Download, Activity, Shield, Loader2, LogIn, RefreshCcw,
-    Activity as Pulse, MapPin, X, Save, User as UserIcon, UserCheck, Wrench, BarChart2
+    Activity as Pulse, MapPin, X, Save, User as UserIcon, UserCheck, Wrench, BarChart2,
+    PieChart, Layout as LayoutIcon
 } from 'lucide-react';
 import {
     Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
@@ -93,14 +95,20 @@ const AdminOverview = () => {
         <div className="container-fluid">
             <DashboardHeader title="Strategic Command" subtitle="Institutional Infrastructure Pulse Hub" unreadCount={unreadCount} />
             
-            <div className="row g-4 mb-5">
+            <motion.div 
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="whileInView"
+                viewport={{ once: true }}
+                className="row g-4 mb-5"
+            >
                 {[
                     { label: 'Personnel Grid', count: usersCount, color: 'primary', icon: <Users size={24} />, note: 'Verified Assets' },
                     { label: 'Strategic Queue', count: stats.pending, color: 'danger', icon: <Clock size={24} />, note: 'Needs Action' },
                     { label: 'Tactical Pulse', count: Math.round(stats.pulse) + '%', color: 'success', icon: <Pulse size={24} />, note: 'Stability Index' },
                     { label: 'Field Assets', count: stats.active, color: 'warning', icon: <TrendingUp size={24} />, note: 'Engaged Units' }
                 ].map((s, i) => (
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} key={i} className="col-md-3">
+                    <motion.div variants={fadeInUp} key={i} className="col-md-3">
                         <div className="premium-card p-4 border-secondary border-opacity-10 h-100 bg-glass text-center text-md-start">
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <div className={`text-${s.color} bg-${s.color} bg-opacity-10 p-3 rounded-4 shadow-sm`}>{s.icon}</div>
@@ -111,9 +119,9 @@ const AdminOverview = () => {
                         </div>
                     </motion.div>
                 ))}
-            </div>
+            </motion.div>
 
-            <div className="row g-4">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="row g-4">
                 <div className="col-lg-12">
                     <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
                         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -151,7 +159,7 @@ const AdminOverview = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };
