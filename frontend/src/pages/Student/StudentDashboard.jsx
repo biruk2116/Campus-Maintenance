@@ -13,7 +13,7 @@ import techBg from '../../assets/images/tech-bg.png';
 import { 
     Plus, ClipboardList, Clock, CheckCircle, AlertTriangle,
     AlertCircle, Search, Bell, Settings, Activity, Shield, Loader2, LogIn, ArrowUpRight,
-    MapPin, FileText, ChevronRight, X, Radio, Layers, Info, Wrench, BarChart2, Send
+    MapPin, FileText, ChevronRight, X, Radio, Layers, Info, Wrench, BarChart2, Send, Trash2, Trash
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -203,8 +203,12 @@ const NewRequestForm = () => {
 const StudentOverview = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedHistory, setSelectedHistory] = useState(null);
+    const [historyLogs, setHistoryLogs] = useState([]);
+    const [fetchingHistory, setFetchingHistory] = useState(false);
 
     const fetchRequests = useCallback(async () => {
+        setLoading(true);
         try {
             const res = await axios.get('index.php?action=getStudentRequests');
             if (res.data.success) setRequests(res.data.data);
@@ -214,6 +218,34 @@ const StudentOverview = () => {
             setLoading(false);
         }
     }, []);
+
+    const fetchHistory = async (requestId) => {
+        setFetchingHistory(true);
+        try {
+            const res = await axios.get(`index.php?action=getRequestProgress&request_id=${requestId}`);
+            if (res.data.success) {
+                setHistoryLogs(res.data.data);
+                setSelectedHistory(requests.find(r => r.id === requestId));
+            }
+        } catch (err) {
+            console.error("History Fetch Failed");
+        } finally {
+            setFetchingHistory(false);
+        }
+    };
+
+    const handlePurge = async (id) => {
+        try {
+            const params = new URLSearchParams();
+            params.append('id', id);
+            const res = await axios.post('index.php?action=deleteRequest', params);
+            if (res.data.success) {
+                fetchRequests();
+            }
+        } catch (err) {
+            console.error("Purge Link Failure");
+        }
+    };
 
     useEffect(() => {
         fetchRequests();
@@ -312,17 +344,37 @@ const StudentOverview = () => {
                                                     <MapPin size={14} className="text-primary me-2 shadow-sm" /> {r.location}
                                                 </div>
                                             </td>
-                                            <td className="py-4 text-center">
-                                                <span className={`status-badge bg-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} bg-opacity-10 text-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} shadow-sm`}>
-                                                    {r.status}
-                                                </span>
+                                            <td className="py-4">
+                                                <div className="d-flex flex-column align-items-center">
+                                                    <span className={`status-badge bg-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} bg-opacity-10 text-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} shadow-sm mb-2`}>
+                                                        {r.status}
+                                                    </span>
+                                                    {r.technician_name && (
+                                                        <div className="text-center">
+                                                            <div className="smallest fw-800 text-main uppercase tracking-widest">{r.technician_name}</div>
+                                                            <div className="smallest text-muted fw-bold mt-1 opacity-75">{r.technician_phone || 'NO PHONE'}</div>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="py-4 text-end">
-                                                <div className="d-flex flex-column align-items-end">
-                                                    <div className="smallest fw-800 text-main uppercase tracking-widest mb-1">{r.progress_percentage}% Pulse</div>
-                                                    <div className="progress rounded-pill bg-surface shadow-inner" style={{ height: '5px', width: '90px' }}>
-                                                        <div className={`progress-bar bg-${r.status === 'Completed' ? 'success' : 'primary'} shadow-sm`} style={{ width: `${r.progress_percentage}%` }}></div>
-                                                    </div>
+                                                <div className="d-flex align-items-center justify-content-end gap-2">
+                                                    <button 
+                                                        onClick={() => fetchHistory(r.id)} 
+                                                        className="btn btn-surface btn-sm p-3 rounded-circle border-secondary border-opacity-10 text-primary hover-bg-primary hover-text-white transition-all shadow-sm"
+                                                        title="View Restoration History"
+                                                    >
+                                                        {fetchingHistory && selectedHistory?.id === r.id ? <Loader2 size={16} className="animate-spin" /> : <Layers size={16} />}
+                                                    </button>
+                                                    {r.status === 'Completed' && (
+                                                        <button 
+                                                            onClick={() => handlePurge(r.id)} 
+                                                            className="btn btn-surface btn-sm p-3 rounded-circle border-secondary border-opacity-10 text-danger hover-bg-danger hover-text-white transition-all shadow-sm"
+                                                            title="Purge Completed Log"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -333,6 +385,49 @@ const StudentOverview = () => {
                     </motion.div>
                 </div>
             </div>
+
+            {/* History Pulse Modal */}
+            <PremiumModal
+                isOpen={!!selectedHistory}
+                onClose={() => setSelectedHistory(null)}
+                title="Strategic Restoration History"
+                maxWidth="650px"
+                showFooter={false}
+            >
+                <div className="mb-5 p-4 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10">
+                    <div className="d-flex align-items-center gap-3 mb-2">
+                        <Activity size={20} className="text-primary" />
+                        <h5 className="fw-800 mb-0 text-main">{selectedHistory?.title}</h5>
+                    </div>
+                    <p className="smallest text-muted fw-bold uppercase tracking-widest mb-0 opacity-75">Protocol ID: {selectedHistory?.id} | {selectedHistory?.location}</p>
+                </div>
+
+                <div className="history-timeline">
+                    {historyLogs.length > 0 ? historyLogs.map((log, i) => (
+                        <div key={i} className="mb-4 ps-4 border-start border-secondary border-opacity-10 position-relative">
+                            <div className="position-absolute top-0 start-0 translate-middle-x bg-primary rounded-circle" style={{ width: '10px', height: '10px', marginTop: '6px', marginLeft: '-1px' }}></div>
+                            <div className="d-flex justify-content-between align-items-start mb-2">
+                                <span className={`smallest fw-800 uppercase tracking-widest ${log.action_taken.includes('Completed') ? 'text-success' : 'text-primary'}`}>
+                                    {log.action_taken}
+                                </span>
+                                <span className="smallest text-muted opacity-50 fw-bold">{new Date(log.created_at).toLocaleString()}</span>
+                            </div>
+                            <p className="smaller text-main fw-bold mb-1 opacity-90">{log.remarks}</p>
+                            <div className="d-flex align-items-center gap-2">
+                                <span className="smallest text-muted uppercase fw-800 opacity-50 tracking-widest">Logged By:</span>
+                                <span className="smallest fw-800 text-main">{log.action_by}</span>
+                                <span className="badge bg-surface border border-secondary border-opacity-10 rounded-pill text-muted smallest fw-800">{log.progress_percentage}% Pulse</span>
+                            </div>
+                        </div>
+                    )) : (
+                        <div className="text-center py-5 opacity-50 uppercase smallest fw-800 tracking-widest">No historical logs found for this dispatch.</div>
+                    )}
+                </div>
+                
+                <div className="mt-5">
+                    <button onClick={() => setSelectedHistory(null)} className="btn btn-primary w-100 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl">Close Terminal</button>
+                </div>
+            </PremiumModal>
         </div>
     );
 };
