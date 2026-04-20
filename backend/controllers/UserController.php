@@ -28,6 +28,7 @@ function createUser($pdo)
     $email = $_POST['email'] ?? '';
     $role = $_POST['role'] ?? '';
     $user_code = $_POST['user_code'] ?? '';
+    $phone_number = $_POST['phone_number'] ?? '';
     $skills = $_POST['skills'] ?? null;
 
     if (!$name || !$role || !$user_code) {
@@ -55,14 +56,15 @@ function createUser($pdo)
 
     $stmt = $pdo->prepare("
         INSERT INTO users 
-        (user_code, name, email, password, role, must_change_password, status, skills)
-        VALUES (?, ?, ?, ?, ?, 1, 'active', ?)
+        (user_code, name, email, phone_number, password, role, must_change_password, status, skills)
+        VALUES (?, ?, ?, ?, ?, ?, 1, 'active', ?)
     ");
 
     $stmt->execute([
         $user_code,
         $name,
         $email,
+        $phone_number,
         $hashedPassword,
         $role,
         $skills
