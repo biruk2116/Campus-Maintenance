@@ -105,7 +105,7 @@ const Navbar = () => {
                             {user ? (
                                 <Link 
                                     className="btn nav-cta-btn px-4 py-2 smaller fw-800 text-uppercase tracking-widest rounded-pill shadow-lg d-flex align-items-center bg-primary text-white border-0" 
-                                    to={`/${user.role}`}
+                                    to={`/${user.role.toLowerCase()}`}
                                 >
                                     <Activity size={14} className="me-2" /> Live Dashboard
                                 </Link>
