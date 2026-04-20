@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '../../components/Sidebar';
 import axios from '../../api/axios';
 import PremiumModal from '../../components/PremiumModal';
+import { fadeInUp, staggerContainer, scaleUp } from '../../utils/animations';
 
 // Assets
 import dbuLogo from '../../assets/images/dbu-logo.png';
@@ -101,8 +102,13 @@ const ProgressModal = ({ request, onClose, onUpdate }) => {
                     </div>
                 </div>
 
-                <div className="row g-4 mb-5">
-                    <div className="col-md-12">
+                <motion.div 
+                    variants={staggerContainer}
+                    initial="initial"
+                    animate="animate"
+                    className="row g-4 mb-5"
+                >
+                    <motion.div variants={fadeInUp} className="col-md-12">
                         <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Operational Status</label>
                         <select 
                             className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main"
@@ -113,8 +119,8 @@ const ProgressModal = ({ request, onClose, onUpdate }) => {
                             <option value="On Hold">Tactical Delay</option>
                             <option value="Completed">Verified Normalcy</option>
                         </select>
-                    </div>
-                    <div className="col-md-12">
+                    </motion.div>
+                    <motion.div variants={fadeInUp} className="col-md-12">
                         <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Field Remarks & Logs</label>
                         <div className="position-relative">
                             <textarea 
@@ -127,10 +133,10 @@ const ProgressModal = ({ request, onClose, onUpdate }) => {
                             ></textarea>
                             <MessageSquare size={18} className="position-absolute top-0 start-0 m-3 mt-3 text-primary" />
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
 
-                <div className="d-flex gap-3">
+                <motion.div variants={scaleUp} initial="initial" animate="animate" className="d-flex gap-3">
                     <button type="button" onClick={onClose} className="btn btn-surface px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 border-secondary border-opacity-10">Abort</button>
                     <button 
                         type="submit" 
@@ -140,7 +146,7 @@ const ProgressModal = ({ request, onClose, onUpdate }) => {
                         {saving ? <Loader2 size={18} className="me-2 animate-spin" /> : <Save size={18} className="me-2" />}
                         {saving ? 'Transmitting...' : 'Commit Status'}
                     </button>
-                </div>
+                </motion.div>
             </form>
         </PremiumModal>
     );
@@ -180,9 +186,13 @@ const TechnicianDashboard = () => {
             <div className="main-content-area text-main">
                 <DashboardHeader title="Field Terminal" subtitle="Strategic Deployment Platform" />
                 
-                <div className="row g-4 mb-5">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    className="row g-4 mb-5"
+                >
                     <div className="col-lg-12">
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                        <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
                             <div className="d-flex justify-content-between align-items-center mb-5">
                                 <div className="d-flex align-items-center">
                                     <div className="bg-primary bg-opacity-20 p-3 rounded-4 text-primary me-3 shadow-sm"><Wrench size={28} /></div>
@@ -208,7 +218,12 @@ const TechnicianDashboard = () => {
                                         {loading ? (
                                             <tr><td colSpan="4" className="text-center py-5"><Loader2 size={30} className="text-primary animate-spin" /></td></tr>
                                         ) : activeRequests.length > 0 ? activeRequests.map((r, i) => (
-                                            <tr key={r.id}>
+                                            <motion.tr 
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: i * 0.1 }}
+                                                key={r.id}
+                                            >
                                                 <td className="py-4">
                                                     <div className="fw-800 text-main mb-1">{r.title}</div>
                                                     <div className="smallest text-primary text-uppercase tracking-widest fw-800 bg-primary bg-opacity-10 d-inline-block px-2 py-1 rounded-pill">{r.category}</div>
@@ -234,7 +249,7 @@ const TechnicianDashboard = () => {
                                                         Open Comm <ExternalLink size={14} className="ms-2" />
                                                     </button>
                                                 </td>
-                                            </tr>
+                                            </motion.tr>
                                         )) : (
                                             <tr>
                                                 <td colSpan="4" className="text-center py-5">
@@ -245,9 +260,9 @@ const TechnicianDashboard = () => {
                                     </tbody>
                                 </table>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
-                </div>
+                </motion.div>
 
                 <div className="row g-4">
                     <div className="col-12">
