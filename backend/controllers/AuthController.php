@@ -45,7 +45,9 @@ function login($pdo)
     response(true, "Login successful", [
         "user_id" => $user['id'],
         "role" => $user['role'],
-        "name" => $user['name']
+        "name" => $user['name'],
+        "user_code" => $user['user_code'],
+        "must_change_password" => (int)$user['must_change_password']
     ]);
 }
 
