@@ -1,662 +1,1151 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import Sidebar from '../../components/Sidebar';
-import axios from '../../api/axios';
-import PremiumModal from '../../components/PremiumModal';
-import { fadeInUp, staggerContainer } from '../../utils/animations';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import {
+    Activity,
+    Bell,
+    CheckCircle2,
+    ClipboardList,
+    Loader2,
+    LogOut,
+    MapPin,
+    Phone,
+    RefreshCcw,
+    Shield,
+    Trash2,
+    UserPlus,
+    Users,
+    Wrench
+} from 'lucide-react';
+import {
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Legend,
+    LinearScale,
+    Tooltip
+} from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
 
-// Assets
+import Sidebar from '../../components/Sidebar';
+import PremiumModal from '../../components/PremiumModal';
+import axios from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
+
 import dbuLogo from '../../assets/images/dbu-logo.png';
 import techBg from '../../assets/images/tech-bg.png';
 
-import { 
-    Users, Trash2, Key, CheckCircle, Clock, TrendingUp, Plus, UserPlus,
-    AlertCircle, Search, Bell, Settings, Download, Activity, Shield, Loader2, LogIn, RefreshCcw,
-    Activity as Pulse, MapPin, X, Save, User as UserIcon, UserCheck, Wrench, BarChart2,
-    PieChart, Layout as LayoutIcon
-} from 'lucide-react';
-import {
-    Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
-    ArcElement, PointElement, LineElement, Filler
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import { useAuth } from '../../context/AuthContext';
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
-ChartJS.register(
-    CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, 
-    ArcElement, PointElement, LineElement, Filler
-);
+const TECHNICIAN_SKILLS = [
+    'Plumbing',
+    'Electrician',
+    'ICT Technician',
+    'HVAC / Cooling',
+    'Carpentry',
+    'Painting / Finishing'
+];
 
-const DashboardHeader = ({ title, subtitle, unreadCount }) => {
-    useEffect(() => {
-        if (unreadCount > 0) {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.play().catch(e => console.log("Audio Pulse Blocked"));
-        }
-    }, [unreadCount]);
+const REQUEST_CATEGORIES = [
+    'Plumbing',
+    'Electricity',
+    'ICT Technician',
+    'Carpentry',
+    'HVAC / Cooling',
+    'Painting / Finishing'
+];
 
-    return (
-        <div className="d-flex justify-content-between align-items-center mb-5 mt-2">
-            <div className="d-flex align-items-center">
-                <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '55px' }} />
-                <div>
-                    <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
-                    <p className="text-muted smaller mb-0 fw-800 uppercase tracking-widest opacity-75">{subtitle}</p>
-                </div>
-            </div>
-            <div className="d-flex align-items-center gap-4">
-                <div className="position-relative">
-                    <div 
-                        onClick={async () => {
-                            try {
-                                await axios.post('index.php?action=markNotificationsRead');
-                                if (window.location.reload) window.location.reload();
-                            } catch (e) { console.error("Pulse acknowledgment failed"); }
-                        }}
-                        className="bg-glass border border-secondary border-opacity-10 p-2 rounded-circle text-muted shadow-sm cursor-pointer d-flex align-items-center justify-content-center" 
-                        style={{ width: '45px', height: '45px' }}
-                    >
-                        <Bell size={22} className={unreadCount > 0 ? "animate-pulse text-danger" : ""} />
-                    </div>
-                    {unreadCount > 0 && (
-                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger border-2 border-surface shadow-22xl animate__animated animate__heartBeat animate__infinite" style={{ width: '22px', height: '22px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800' }}>
-                            {unreadCount}
-                        </span>
-                    )}
-                </div>
+const statusClassName = (status) => {
+    if (status === 'Completed') return 'bg-success bg-opacity-10 text-success';
+    if (status === 'Pending') return 'bg-danger bg-opacity-10 text-danger';
+    if (status === 'On Hold') return 'bg-secondary bg-opacity-10 text-secondary';
+    return 'bg-warning bg-opacity-10 text-warning';
+};
+
+const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
+    <div className="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap gap-3">
+        <div className="d-flex align-items-center">
+            <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '48px' }} />
+            <div>
+                <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
+                <p className="text-muted smallest fw-800 uppercase tracking-widest opacity-75 mb-0">{subtitle}</p>
             </div>
         </div>
+        <div className="d-flex align-items-center gap-2">
+            <button
+                type="button"
+                onClick={onReadNotifications}
+                className="btn btn-surface position-relative rounded-circle p-3 border-secondary border-opacity-10"
+                style={{ width: '50px', height: '50px' }}
+                title="Open active queue"
+            >
+                <Bell size={20} className={unreadCount > 0 ? 'text-danger' : 'text-muted'} />
+                {unreadCount > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ minWidth: '22px', minHeight: '22px', fontSize: '0.65rem' }}>
+                        {unreadCount}
+                    </span>
+                )}
+            </button>
+            <button type="button" onClick={onLogout} className="btn btn-danger rounded-pill px-4 py-2 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
+                <LogOut size={15} className="me-2" />
+                Logout
+            </button>
+        </div>
+    </div>
+);
+
+const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, onClose }) => {
+    return (
+        <PremiumModal
+            isOpen={!!request}
+            onClose={onClose}
+            title={request ? `Request #${request.id}` : 'Request Details'}
+            maxWidth="860px"
+            showFooter={false}
+            dialogClassName="request-details-modal"
+            bodyClassName="request-details-modal__body"
+        >
+            {request && (
+                <div className="request-details-modal__content">
+                    <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10">
+                        <div className="d-flex justify-content-between flex-wrap gap-3">
+                            <div>
+                                <h5 className="fw-800 text-main mb-1">{request.title}</h5>
+                                <p className="smallest text-muted mb-0">{request.description}</p>
+                            </div>
+                            <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
+                        </div>
+                    </div>
+
+                    <div className="row g-4">
+                        <div className="col-md-6">
+                            <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Student</label>
+                            <div className="fw-800 text-main">{request.student_name}</div>
+                            <div className="smallest text-muted">{request.student_code}</div>
+                            <div className="smallest text-muted d-flex align-items-center mt-1">
+                                <Phone size={13} className="me-2 text-primary" />
+                                {request.student_phone || 'No phone number'}
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Location</label>
+                            <div className="fw-800 text-main d-flex align-items-center">
+                                <MapPin size={14} className="me-2 text-primary" />
+                                {request.location}
+                            </div>
+                            <div className="smallest text-muted mt-2">Priority: {request.priority}</div>
+                            <div className="smallest text-muted">Category: {request.category}</div>
+                        </div>
+                    </div>
+
+                    <div className="row g-4">
+                        <div className="col-lg-6">
+                            {request.status !== 'Completed' ? (
+                                <>
+                                    <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2 d-block">Assign Technician</label>
+                                    <div className="d-flex gap-2">
+                                        <select
+                                            className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                            defaultValue={request.technician_id ? String(request.technician_id) : ''}
+                                            onChange={(event) => event.target.value && onAssign(request.id, event.target.value)}
+                                        >
+                                            <option value="">Select technician</option>
+                                            {technicians.map((technician) => (
+                                                <option key={technician.id} value={technician.id}>
+                                                    {technician.name} - {technician.skills}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </>
+                            ) : (
+                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2 d-block">Assigned Technician</label>
+                            )}
+                            {request.technician_name && (
+                                <div className="mt-3 p-3 rounded-4 bg-surface border border-secondary border-opacity-10">
+                                    <div className="fw-800 text-main">{request.technician_name}</div>
+                                    <div className="smallest text-muted">{request.technician_skills || 'Technician'}</div>
+                                    <div className="smallest text-muted d-flex align-items-center mt-1">
+                                        <Phone size={13} className="me-2 text-primary" />
+                                        {request.technician_phone || 'No phone number'}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="col-lg-6">
+                            <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2 d-block">Progress Timeline</label>
+                            <div className="d-flex flex-column gap-3 request-details-modal__timeline">
+                                {loading ? (
+                                    <div className="text-center py-4">
+                                        <Loader2 size={24} className="animate-spin text-primary" />
+                                    </div>
+                                ) : logs.length > 0 ? (
+                                    logs.map((log) => (
+                                        <div key={log.id} className="p-3 rounded-4 bg-surface border border-secondary border-opacity-10 request-details-modal__timeline-item">
+                                            <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                                <div>
+                                                    <div className="fw-800 text-main">{log.action_taken}</div>
+                                                    <div className="smallest text-muted">{log.action_by}</div>
+                                                </div>
+                                                <span className="smallest text-muted">{new Date(log.created_at).toLocaleString()}</span>
+                                            </div>
+                                            <div className="small text-main">{log.remarks}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-4 text-muted">No timeline entries yet.</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </PremiumModal>
     );
 };
 
-// ========================
-// 1. ADMIN OVERVIEW
-// ========================
-const AdminOverview = () => {
-    const [requests, setRequests] = useState([]);
-    const [usersCount, setUsersCount] = useState(0);
+const useAdminNotifications = () => {
     const [unreadCount, setUnreadCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const { isDarkMode } = useAuth();
 
-    const fetchData = useCallback(async () => {
-        try {
-            const [reqRes, usersRes, unreadRes] = await Promise.all([
-                axios.get('index.php?action=getAllRequests'),
-                axios.get('index.php?action=getAllUsers'),
-                axios.get('index.php?action=getNotificationCounts')
-            ]);
-            
-            if (reqRes.data.success) setRequests(reqRes.data.data);
-            if (usersRes.data.success) setUsersCount(usersRes.data.data.length);
-            if (unreadRes.data.success) setUnreadCount(unreadRes.data.data.unread);
-        } catch (err) { console.error("Operational Fetch failed", err); }
-        finally { setLoading(false); }
+    const refreshNotifications = useCallback(async () => {
+        const res = await axios.get('index.php?action=getNotificationCounts');
+        if (res.data.success) {
+            setUnreadCount(res.data.data.unread || 0);
+        }
     }, []);
 
-    useEffect(() => { fetchData(); }, [fetchData]);
+    const markNotificationsRead = useCallback(async () => {
+        await axios.post('index.php?action=markNotificationsRead');
+        await refreshNotifications();
+    }, [refreshNotifications]);
 
-    const stats = useMemo(() => {
-        const pending = requests.filter(r => r.status === 'Pending').length;
-        const active = requests.filter(r => r.status === 'Assigned' || r.status === 'In Progress').length;
-        const completed = requests.filter(r => r.status === 'Completed').length;
-        const pulse = requests.length > 0 ? (completed / requests.length) * 100 : 0;
-        return { pending, active, completed, pulse };
-    }, [requests]);
+    useEffect(() => {
+        void (async () => {
+            await refreshNotifications();
+        })();
+        const interval = setInterval(refreshNotifications, 15000);
+        return () => clearInterval(interval);
+    }, [refreshNotifications]);
 
-    if (loading) return <div className="p-5 text-center"><Loader2 size={40} className="text-primary animate-spin" /></div>;
+    return { unreadCount, refreshNotifications, markNotificationsRead };
+};
+
+const AdminOverview = () => {
+    const { unreadCount, refreshNotifications, markNotificationsRead } = useAdminNotifications();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const [requests, setRequests] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const refreshData = useCallback(async () => {
+        try {
+            const [requestRes, userRes] = await Promise.all([
+                axios.get('index.php?action=getAllRequests'),
+                axios.get('index.php?action=getAllUsers')
+            ]);
+
+            if (requestRes.data.success) setRequests(requestRes.data.data);
+            if (userRes.data.success) setUsers(userRes.data.data);
+            await refreshNotifications();
+        } finally {
+            setLoading(false);
+        }
+    }, [refreshNotifications]);
+
+    useEffect(() => {
+        refreshData();
+        const interval = setInterval(refreshData, 15000);
+        return () => clearInterval(interval);
+    }, [refreshData]);
+
+    const activeCount = useMemo(() => requests.filter((request) => request.status !== 'Completed').length, [requests]);
+    const completedCount = useMemo(() => requests.filter((request) => request.status === 'Completed').length, [requests]);
+    const technicianCount = useMemo(() => users.filter((user) => user.role === 'technician').length, [users]);
+    const studentCount = useMemo(() => users.filter((user) => user.role === 'student').length, [users]);
+    const categoryCounts = useMemo(
+        () => REQUEST_CATEGORIES.map((category) => requests.filter((request) => request.category === category).length),
+        [requests]
+    );
+    const statusCounts = useMemo(() => [
+        requests.filter((request) => request.status === 'Pending').length,
+        requests.filter((request) => request.status === 'Assigned').length,
+        requests.filter((request) => request.status === 'In Progress').length,
+        requests.filter((request) => request.status === 'On Hold').length,
+        requests.filter((request) => request.status === 'Completed').length
+    ], [requests]);
+
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/admin/requests');
+    };
 
     return (
         <div className="container-fluid">
-            <DashboardHeader title="Strategic Command" subtitle="Institutional Infrastructure Pulse Hub" unreadCount={unreadCount} />
-            
-            <motion.div 
-                variants={staggerContainer}
-                initial="initial"
-                whileInView="whileInView"
-                viewport={{ once: true }}
-                className="row g-4 mb-5"
-            >
-                {[
-                    { label: 'Personnel Grid', count: usersCount, color: 'primary', icon: <Users size={24} />, note: 'Verified Assets' },
-                    { label: 'Strategic Queue', count: stats.pending, color: 'danger', icon: <Clock size={24} />, note: 'Needs Action' },
-                    { label: 'Tactical Pulse', count: Math.round(stats.pulse) + '%', color: 'success', icon: <Pulse size={24} />, note: 'Stability Index' },
-                    { label: 'Field Assets', count: stats.active, color: 'warning', icon: <TrendingUp size={24} />, note: 'Engaged Units' }
-                ].map((s, i) => (
-                    <motion.div variants={fadeInUp} key={i} className="col-md-3">
-                        <div className="premium-card p-4 border-secondary border-opacity-10 h-100 bg-glass text-center text-md-start">
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <div className={`text-${s.color} bg-${s.color} bg-opacity-10 p-3 rounded-4 shadow-sm`}>{s.icon}</div>
-                                <span className="smallest text-muted fw-800 uppercase tracking-widest">{s.note}</span>
-                            </div>
-                            <h1 className="fw-800 mb-1 text-main tracking-tighter" style={{ fontSize: '2.5rem' }}>{s.count}</h1>
-                            <p className="text-muted smallest fw-800 uppercase mb-0 tracking-widest">{s.label}</p>
-                        </div>
-                    </motion.div>
-                ))}
-            </motion.div>
+            <DashboardHeader
+                title="Admin Overview"
+                subtitle="Monitor live maintenance requests, users, and technician workload"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="row g-4">
-                <div className="col-lg-12">
-                    <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="fw-800 mb-0 tracking-tighter text-main">Infrastructure Stability Metrics</h4>
-                            <div className="bg-surface p-2 rounded-3 border border-secondary border-opacity-10 shadow-sm">
-                                <span className="smallest text-muted fw-bold uppercase tracking-widest">Live Pulse</span>
+            <div className="row g-4 mb-4">
+                {[
+                    { label: 'All Users', value: users.length, icon: <Users size={22} />, note: `${studentCount} students` },
+                    { label: 'Technicians', value: technicianCount, icon: <Wrench size={22} />, note: 'Active technicians' },
+                    { label: 'Active Queue', value: activeCount, icon: <ClipboardList size={22} />, note: 'Needs tracking' },
+                    { label: 'Completed', value: completedCount, icon: <CheckCircle2 size={22} />, note: 'Stored in history' }
+                ].map((item) => (
+                    <div key={item.label} className="col-md-6 col-xl-3">
+                        <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <div className="bg-primary bg-opacity-10 text-primary p-3 rounded-4">{item.icon}</div>
+                                <span className="smallest text-muted">{item.note}</span>
                             </div>
+                            <h2 className="fw-800 text-main mb-1">{item.value}</h2>
+                            <p className="smallest text-muted mb-0">{item.label}</p>
                         </div>
-                        <div style={{ height: '300px' }}>
-                            <Bar 
+                    </div>
+                ))}
+            </div>
+
+            <div className="row g-4">
+                <div className="col-xl-7">
+                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h4 className="fw-800 text-main mb-1">Requests by Category</h4>
+                                <p className="smallest text-muted mb-0">Chart.js updates whenever the queue changes</p>
+                            </div>
+                            <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
+                                <Activity size={18} />
+                            </button>
+                        </div>
+                        <div style={{ height: '320px' }}>
+                            <Bar
                                 data={{
-                                    labels: ['Structural', 'Electricity', 'Plumbing', 'ICT / Grid'],
-                                    datasets: [{
-                                        label: 'Maintenance Frequency',
-                                        data: [
-                                            requests.filter(r => r.category === 'Structural').length,
-                                            requests.filter(r => r.category === 'Electricity').length,
-                                            requests.filter(r => r.category === 'Plumbing').length,
-                                            requests.filter(r => r.category === 'ICT Technician' || r.category === 'Network').length,
-                                        ],
-                                        backgroundColor: isDarkMode ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.6)',
-                                        borderRadius: 8,
-                                    }]
+                                    labels: REQUEST_CATEGORIES,
+                                    datasets: [
+                                        {
+                                            label: 'Requests',
+                                            data: categoryCounts,
+                                            backgroundColor: '#3b82f6',
+                                            borderRadius: 10
+                                        }
+                                    ]
                                 }}
                                 options={{
                                     responsive: true,
                                     maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } },
-                                    scales: {
-                                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'gray' } },
-                                        x: { grid: { display: false }, ticks: { color: 'gray' } }
-                                    }
+                                    plugins: { legend: { display: false } }
                                 }}
                             />
                         </div>
                     </div>
                 </div>
-            </motion.div>
+
+                <div className="col-xl-5">
+                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
+                        <div className="mb-4">
+                            <h4 className="fw-800 text-main mb-1">Queue Status</h4>
+                            <p className="smallest text-muted mb-0">Pending, assigned, in progress, on hold, and completed requests</p>
+                        </div>
+                        <Doughnut
+                            data={{
+                                labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                datasets: [
+                                    {
+                                        data: statusCounts,
+                                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
+                                        borderWidth: 0
+                                    }
+                                ]
+                            }}
+                            options={{
+                                responsive: true,
+                                plugins: { legend: { position: 'bottom' } }
+                            }}
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
 
-// ========================
-// 2. STRATEGIC QUEUE (REQUESTS)
-// ========================
-const StrategicQueue = () => {
+const ActiveQueue = () => {
+    const { unreadCount, refreshNotifications, markNotificationsRead } = useAdminNotifications();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [technicians, setTechnicians] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [confirmDelete, setConfirmDelete] = useState(null);
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [selectedLogs, setSelectedLogs] = useState([]);
+    const [logsLoading, setLogsLoading] = useState(false);
+    const [assigningId, setAssigningId] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const fetchData = useCallback(async () => {
+    const refreshData = useCallback(async () => {
         try {
-            const [reqRes, techRes] = await Promise.all([
+            const [requestRes, technicianRes] = await Promise.all([
                 axios.get('index.php?action=getAllRequests'),
                 axios.get('index.php?action=getTechnicians')
             ]);
-            if (reqRes.data.success) setRequests(reqRes.data.data);
-            if (techRes.data.success) setTechnicians(techRes.data.data);
-        } catch (err) { console.error("Link Failure"); }
-        finally { setLoading(false); }
-    }, []);
 
-    useEffect(() => { fetchData(); }, [fetchData]);
+            if (requestRes.data.success) setRequests(requestRes.data.data);
+            if (technicianRes.data.success) setTechnicians(technicianRes.data.data);
+            await refreshNotifications();
+        } finally {
+            setLoading(false);
+        }
+    }, [refreshNotifications]);
 
-    const handleAssign = async (requestId, technicianId) => {
-        if (!technicianId) return;
+    useEffect(() => {
+        refreshData();
+        const interval = setInterval(refreshData, 15000);
+        return () => clearInterval(interval);
+    }, [refreshData]);
+
+    const activeRequests = useMemo(() => requests.filter((request) => request.status !== 'Completed'), [requests]);
+
+    const loadRequestDetails = async (request) => {
+        setSelectedRequest(request);
+        setLogsLoading(true);
+
         try {
-            const params = new URLSearchParams();
-            params.append('request_id', requestId);
-            params.append('technician_id', technicianId);
-            const res = await axios.post('index.php?action=assignTechnician', params);
+            const res = await axios.get(`index.php?action=getRequestProgress&request_id=${request.id}`);
             if (res.data.success) {
-                setSelectedRequest(null);
-                fetchData();
+                setSelectedLogs(res.data.data);
+            } else {
+                setSelectedLogs([]);
             }
-        } catch (err) { console.error("Assignment Interrupted"); }
+        } finally {
+            setLogsLoading(false);
+        }
     };
 
-    const handleDelete = async () => {
-        if (!confirmDelete) return;
+    const assignTechnician = async (requestId, technicianId) => {
+        setAssigningId(requestId);
         try {
-            const params = new URLSearchParams();
-            params.append('id', confirmDelete.id);
-            const res = await axios.post('index.php?action=deleteRequest', params);
-            if (res.data.success) {
-                setConfirmDelete(null);
-                fetchData();
+            await axios.post('index.php?action=assignTechnician', {
+                request_id: requestId,
+                technician_id: technicianId
+            });
+            await refreshData();
+
+            if (selectedRequest?.id === requestId) {
+                const updated = activeRequests.find((request) => request.id === requestId);
+                if (updated) setSelectedRequest(updated);
             }
-        } catch (err) { console.error("Purge Failed"); }
+        } finally {
+            setAssigningId(null);
+        }
     };
 
-    const handlePurge = async () => {
-        try {
-            const res = await axios.post('index.php?action=purgeRequests');
-            if (res.data.success) {
-                fetchData();
-            }
-        } catch (err) { console.error("Purge Link Failure"); }
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/admin/requests');
     };
 
     return (
         <div className="container-fluid">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <DashboardHeader title="Strategic Queue" subtitle="Active Institutional Dispatch Registry" />
-                <button 
-                    onClick={handlePurge} 
-                    className="btn btn-surface btn-sm px-4 py-2 rounded-pill border-danger border-opacity-10 text-danger fw-800 uppercase smallest tracking-widest shadow-sm hover-bg-danger hover-text-white transition-all"
-                >
-                    <Trash2 size={16} className="me-2" /> Purge Completed
-                </button>
-            </div>
-            
-            <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
+            <DashboardHeader
+                title="Active Queue"
+                subtitle="Review request details and assign the right technician"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
+
+            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div>
+                        <h4 className="fw-800 text-main mb-1">Active Requests</h4>
+                        <p className="smallest text-muted mb-0">Every update from students and technicians appears here live</p>
+                    </div>
+                    <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
+                        <RefreshCcw size={18} />
+                    </button>
+                </div>
+
                 <div className="table-responsive">
                     <table className="table align-middle table-borderless">
                         <thead>
                             <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Discovery / Student</th>
-                                <th className="pb-3 text-main">Site ID</th>
-                                <th className="pb-3 text-center text-main">Status</th>
-                                <th className="pb-3 text-main">Assigned Asset</th>
-                                <th className="pb-3 text-end text-main">Action</th>
+                                <th className="pb-3 text-main">Problem</th>
+                                <th className="pb-3 text-main">Student</th>
+                                <th className="pb-3 text-main">Location</th>
+                                <th className="pb-3 text-main">Status</th>
+                                <th className="pb-3 text-main">Assign Technician</th>
+                                <th className="pb-3 text-end text-main">Details</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {requests.map((r, i) => (
-                                <tr key={r.id} className="border-bottom border-secondary border-opacity-5 hover-bg-surface-hover transition-all">
-                                    <td className="py-4">
-                                        <div className="d-flex align-items-center mb-1">
-                                            <div className="fw-800 text-main me-2">{r.title}</div>
-                                            <button onClick={() => setSelectedRequest(r)} className="btn btn-link btn-sm p-0 smallest text-primary border-0"><Info size={14} /></button>
-                                        </div>
-                                        <div className="smallest text-muted fw-bold uppercase tracking-widest">{r.student_name}</div>
-                                    </td>
-                                    <td className="py-4">
-                                        <div className="d-flex align-items-center text-muted fw-bold smaller uppercase tracking-widest">
-                                            <MapPin size={14} className="text-primary me-2 shadow-sm" /> {r.location}
-                                        </div>
-                                    </td>
-                                    <td className="py-4 text-center">
-                                        <span className={`status-badge bg-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} bg-opacity-10 text-${r.status === 'Completed' ? 'success' : (r.status === 'Pending' ? 'danger' : 'warning')} shadow-sm`}>
-                                            {r.status}
-                                        </span>
-                                    </td>
-                                    <td className="py-4">
-                                        {r.technician_name ? (
-                                            <div className="d-flex align-items-center">
-                                                <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary me-3"><Wrench size={14} /></div>
-                                                <div>
-                                                    <div className="smallest fw-800 text-main uppercase tracking-widest">{r.technician_name}</div>
-                                                    <div className="progress rounded-pill bg-surface mt-1" style={{ height: '4px', width: '60px' }}>
-                                                        <div className="progress-bar bg-primary" style={{ width: `${r.progress_percentage}%` }}></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <select 
-                                                className="form-select smallest fw-800 uppercase tracking-widest bg-surface border-secondary border-opacity-10 rounded-pill px-3 py-2 text-muted"
-                                                onChange={(e) => handleAssign(r.id, e.target.value)}
-                                                defaultValue=""
-                                            >
-                                                <option value="" disabled>Assign Field Unit</option>
-                                                {technicians.map(t => (
-                                                    <option key={t.id} value={t.id}>{t.name} ({t.skills})</option>
-                                                ))}
-                                            </select>
-                                        )}
-                                    </td>
-                                    <td className="py-4 text-end">
-                                        <button onClick={() => setConfirmDelete(r)} className="btn btn-surface btn-sm p-3 rounded-circle text-danger border-0 shadow-sm hover-bg-danger hover-text-white transition-all"><Trash2 size={16} /></button>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-5">
+                                        <Loader2 size={28} className="animate-spin text-primary" />
                                     </td>
                                 </tr>
-                            ))}
+                            ) : activeRequests.length > 0 ? (
+                                activeRequests.map((request) => (
+                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.title}</div>
+                                            <div className="smallest text-muted mt-1">{request.category}</div>
+                                        </td>
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.student_name}</div>
+                                            <div className="smallest text-muted">{request.student_code}</div>
+                                            <div className="smallest text-muted d-flex align-items-center mt-1">
+                                                <Phone size={13} className="me-2 text-primary" />
+                                                {request.student_phone || 'No phone number'}
+                                            </div>
+                                        </td>
+                                        <td className="py-4">
+                                            <div className="d-flex align-items-center text-muted">
+                                                <MapPin size={14} className="me-2 text-primary" />
+                                                {request.location}
+                                            </div>
+                                        </td>
+                                        <td className="py-4">
+                                            <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
+                                            <div className="smallest text-muted mt-2">Progress: {request.progress_percentage}%</div>
+                                        </td>
+                                        <td className="py-4">
+                                            <select
+                                                className="form-select py-2 px-3 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                                value={request.technician_id || ''}
+                                                onChange={(event) => assignTechnician(request.id, event.target.value)}
+                                                disabled={assigningId === request.id}
+                                            >
+                                                <option value="">Select technician</option>
+                                                {technicians.map((technician) => (
+                                                    <option key={technician.id} value={technician.id}>
+                                                        {technician.name} - {technician.skills}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </td>
+                                        <td className="py-4 text-end">
+                                            <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => loadRequestDetails(request)}>
+                                                View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-5 text-muted">
+                                        No active requests in the queue.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* Request Detail Modal */}
-            <PremiumModal
-                isOpen={!!selectedRequest}
-                onClose={() => setSelectedRequest(null)}
-                title="Operational Telemetry"
-                maxWidth="700px"
-                showFooter={false}
-            >
-                {selectedRequest && (
-                    <div className="py-2">
-                        <div className="mb-5 p-4 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10">
-                            <div className="d-flex align-items-center gap-3 mb-2">
-                                <Activity size={20} className="text-primary" />
-                                <h5 className="fw-800 mb-0 text-main">{selectedRequest.title}</h5>
-                            </div>
-                            <p className="smallest text-muted fw-bold uppercase tracking-widest mb-0 opacity-75">Discovery ID: {selectedRequest.id} | Priority: {selectedRequest.priority}</p>
-                        </div>
-
-                        <div className="row g-4 mb-5">
-                            <div className="col-md-6">
-                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Reporting Entity</label>
-                                <div className="smaller fw-bold text-main">{selectedRequest.student_name}</div>
-                            </div>
-                            <div className="col-md-6">
-                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Deployment Site</label>
-                                <div className="smaller fw-bold text-main">{selectedRequest.location}</div>
-                            </div>
-                            <div className="col-12">
-                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Technical Description</label>
-                                <div className="smaller text-muted p-4 bg-surface border border-secondary border-opacity-5 rounded-4 border-start border-primary border-3 lh-relaxed fw-medium">
-                                    {selectedRequest.description}
-                                </div>
-                            </div>
-                        </div>
-
-                        {!selectedRequest.technician_id && (
-                            <div className="pt-4 border-top border-secondary border-opacity-5">
-                                <label className="smallest fw-800 uppercase tracking-widest text-primary mb-3 d-block">Assign Strategic Personnel</label>
-                                <div className="row g-3">
-                                    {technicians.length > 0 ? technicians.map(t => (
-                                        <div key={t.id} className="col-md-6">
-                                            <div 
-                                                onClick={() => handleAssign(selectedRequest.id, t.id)}
-                                                className="p-3 rounded-4 bg-surface border border-secondary border-opacity-5 hover-border-primary cursor-pointer transition-all d-flex align-items-center shadow-sm"
-                                            >
-                                                <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary me-3"><UserCheck size={18} /></div>
-                                                <div>
-                                                    <div className="smaller fw-800 text-main uppercase">{t.name}</div>
-                                                    <div className="smallest text-muted fw-bold text-primary">{t.skills}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <div className="col-12 text-center py-4 bg-surface rounded-4">
-                                            <p className="smallest text-muted fw-800 uppercase tracking-widest mb-0 opacity-50">No field engineers available in local grid.</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </PremiumModal>
-
-            <PremiumModal
-                isOpen={!!confirmDelete}
-                onClose={() => setConfirmDelete(null)}
-                onConfirm={handleDelete}
-                title="Strategic Data Purge"
-                type="danger"
-                confirmText="Purge Asset"
-            >
-                <p className="text-muted fw-bold uppercase smallest tracking-widest mb-3">Confirming permanent deletion of:</p>
-                <div className="p-3 rounded-4 bg-danger bg-opacity-10 border border-danger border-opacity-10 mb-2">
-                    <h5 className="fw-800 mb-0 text-main">{confirmDelete?.title}</h5>
-                </div>
-                <p className="smallest text-muted fw-bold">This operation is irreversible and will remove all associated logs from the grid.</p>
-            </PremiumModal>
+            <RequestDetailsModal
+                request={selectedRequest}
+                logs={selectedLogs}
+                loading={logsLoading}
+                technicians={technicians}
+                onAssign={assignTechnician}
+                onClose={() => {
+                    setSelectedRequest(null);
+                    setSelectedLogs([]);
+                }}
+            />
         </div>
     );
 };
 
-// ========================
-// 3. PERSONNEL REGISTRY (USERS)
-// ========================
-const PersonnelRegistry = () => {
+const AdminHistory = () => {
+    const { unreadCount, refreshNotifications, markNotificationsRead } = useAdminNotifications();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const [requests, setRequests] = useState([]);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [selectedLogs, setSelectedLogs] = useState([]);
+    const [logsLoading, setLogsLoading] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const refreshData = useCallback(async () => {
+        try {
+            const requestRes = await axios.get('index.php?action=getAllRequests');
+            if (requestRes.data.success) setRequests(requestRes.data.data);
+            await refreshNotifications();
+        } finally {
+            setLoading(false);
+        }
+    }, [refreshNotifications]);
+
+    useEffect(() => {
+        refreshData();
+        const interval = setInterval(refreshData, 15000);
+        return () => clearInterval(interval);
+    }, [refreshData]);
+
+    const completedRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
+
+    const viewLogs = async (request) => {
+        setSelectedRequest(request);
+        setLogsLoading(true);
+
+        try {
+            const res = await axios.get(`index.php?action=getRequestProgress&request_id=${request.id}`);
+            if (res.data.success) {
+                setSelectedLogs(res.data.data);
+            } else {
+                setSelectedLogs([]);
+            }
+        } finally {
+            setLogsLoading(false);
+        }
+    };
+
+    const deleteRequest = async (requestId) => {
+        setDeletingId(requestId);
+        try {
+            await axios.post('index.php?action=deleteRequest', { id: requestId });
+            await refreshData();
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const purgeAllCompleted = async () => {
+        await axios.post('index.php?action=purgeRequests');
+        await refreshData();
+    };
+
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/admin/requests');
+    };
+
+    return (
+        <div className="container-fluid">
+            <DashboardHeader
+                title="Admin History"
+                subtitle="Completed work that can stay in history or be deleted"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
+
+            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div>
+                        <h4 className="fw-800 text-main mb-1">Completed Requests</h4>
+                        <p className="smallest text-muted mb-0">Admin can keep them in history or delete them permanently</p>
+                    </div>
+                    <button type="button" className="btn btn-danger rounded-pill px-4 py-3 fw-800 uppercase smallest tracking-widest" onClick={purgeAllCompleted}>
+                        <Trash2 size={16} className="me-2" />
+                        Delete All Completed
+                    </button>
+                </div>
+
+                <div className="table-responsive">
+                    <table className="table align-middle table-borderless">
+                        <thead>
+                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
+                                <th className="pb-3 text-main">Problem</th>
+                                <th className="pb-3 text-main">Student</th>
+                                <th className="pb-3 text-main">Technician</th>
+                                <th className="pb-3 text-main">Completed</th>
+                                <th className="pb-3 text-end text-main">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-5">
+                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    </td>
+                                </tr>
+                            ) : completedRequests.length > 0 ? (
+                                completedRequests.map((request) => (
+                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.title}</div>
+                                            <div className="smallest text-muted mt-1">{request.category}</div>
+                                        </td>
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.student_name}</div>
+                                            <div className="smallest text-muted">{request.student_code}</div>
+                                        </td>
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{request.technician_name || 'Not assigned'}</div>
+                                            <div className="smallest text-muted">{request.technician_phone || 'No phone number'}</div>
+                                        </td>
+                                        <td className="py-4">{new Date(request.updated_at).toLocaleString()}</td>
+                                        <td className="py-4 text-end">
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => viewLogs(request)}>
+                                                    View
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger rounded-pill px-3 py-2"
+                                                    onClick={() => deleteRequest(request.id)}
+                                                    disabled={deletingId === request.id}
+                                                >
+                                                    {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-5 text-muted">
+                                        No completed requests in history.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <RequestDetailsModal
+                request={selectedRequest}
+                logs={selectedLogs}
+                loading={logsLoading}
+                technicians={[]}
+                onAssign={() => {}}
+                onClose={() => {
+                    setSelectedRequest(null);
+                    setSelectedLogs([]);
+                }}
+            />
+        </div>
+    );
+};
+
+const UsersPage = () => {
+    const { unreadCount, markNotificationsRead } = useAdminNotifications();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showRegister, setShowRegister] = useState(false);
-    const [confirmDelete, setConfirmDelete] = useState(null);
-    const [registrationResult, setRegistrationResult] = useState(null);
-    const [newUser, setNewUser] = useState({ name: '', user_code: '', email: '', phone_number: '', role: 'technician', skills: '' });
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
+    const [registering, setRegistering] = useState(false);
+    const [registerError, setRegisterError] = useState('');
+    const [feedback, setFeedback] = useState(null);
+    const [generatedCredentials, setGeneratedCredentials] = useState(null);
+    const [newUser, setNewUser] = useState({
+        name: '',
+        user_code: '',
+        role: 'student',
+        skills: ''
+    });
 
     const fetchUsers = useCallback(async () => {
         try {
             const res = await axios.get('index.php?action=getAllUsers');
-            if (res.data.success) setUsers(res.data.data);
-        } catch (err) { console.error("Registry Sync Failed"); }
-        finally { setLoading(false); }
+            if (res.data.success) {
+                setUsers(res.data.data);
+            }
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    useEffect(() => { fetchUsers(); }, [fetchUsers]);
+    useEffect(() => {
+        fetchUsers();
+        const interval = setInterval(fetchUsers, 20000);
+        return () => clearInterval(interval);
+    }, [fetchUsers]);
 
-    const handleResetPassword = async (userCode) => {
+    const registerUser = async (event) => {
+        event.preventDefault();
+        setRegistering(true);
+        setRegisterError('');
+        setFeedback(null);
+
         try {
-            const params = new URLSearchParams();
-            params.append('user_code', userCode);
-            const res = await axios.post('index.php?action=resetUserPassword', params);
-            if (res.data.success) {
-                // Ensure the reset password result is displayed in the strategic modal
-                setRegistrationResult({
-                    user_code: userCode,
-                    temporary_password: res.data.data.temporary_password
-                });
+            const res = await axios.post('index.php?action=createUser', {
+                name: newUser.name,
+                user_code: newUser.user_code,
+                role: newUser.role,
+                skills: newUser.role === 'technician' ? newUser.skills : ''
+            });
+
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Unable to register user');
             }
-        } catch (err) { console.error("Strategic Reset Failed"); }
+
+            setGeneratedCredentials(res.data.data);
+            setFeedback({
+                type: 'success',
+                message: `${res.data.data.name} (${res.data.data.user_code}) registered successfully.`
+            });
+            setShowRegisterModal(false);
+            setNewUser({
+                name: '',
+                user_code: '',
+                role: 'student',
+                skills: ''
+            });
+            await fetchUsers();
+        } catch (error) {
+            const message = error.message || 'Unable to register user';
+            setRegisterError(message);
+            setFeedback({
+                type: 'danger',
+                message
+            });
+        } finally {
+            setRegistering(false);
+        }
     };
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        try {
-            const params = new URLSearchParams();
-            params.append('name', newUser.name);
-            params.append('user_code', newUser.user_code);
-            params.append('email', newUser.email);
-            params.append('phone_number', newUser.phone_number);
-            params.append('role', newUser.role);
-            params.append('skills', newUser.skills);
-            
-            const res = await axios.post('index.php?action=createUser', params);
-            if (res.data.success) {
-                setRegistrationResult(res.data.data);
-                setShowRegister(false);
-                setNewUser({ name: '', user_code: '', email: '', phone_number: '', role: 'technician', skills: '' });
-                fetchUsers();
-            }
-        } catch (err) { console.error("Registration Halted"); }
+    const resetPassword = async (userCode) => {
+        setFeedback(null);
+        const res = await axios.post('index.php?action=resetUserPassword', { user_code: userCode });
+        if (res.data.success) {
+            setGeneratedCredentials(res.data.data);
+            setFeedback({
+                type: 'success',
+                message: `Temporary password generated successfully for ${userCode}.`
+            });
+            await fetchUsers();
+        } else {
+            setFeedback({
+                type: 'danger',
+                message: res.data.message || `Unable to reset password for ${userCode}.`
+            });
+        }
     };
 
-    const deleteUser = async () => {
-        if (!confirmDelete) return;
-        try {
-            const params = new URLSearchParams();
-            params.append('user_id', confirmDelete.id);
-            await axios.post('index.php?action=deleteUser', params);
-            setConfirmDelete(null);
-            fetchUsers();
-        } catch (err) { console.error("Purge Failed"); }
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/admin/requests');
     };
 
     return (
         <div className="container-fluid">
-            <DashboardHeader title="Personnel Registry" subtitle="Operational Asset Management Terminal" />
+            <DashboardHeader
+                title="User Registration"
+                subtitle="Register students and technicians with system-generated default passwords"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
 
             <div className="d-flex justify-content-end mb-4">
-                <button onClick={() => setShowRegister(true)} className="btn btn-primary px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl d-flex align-items-center">
-                    <UserPlus size={18} className="me-2" /> Initialize New Personnel
+                <button
+                    type="button"
+                    className="btn btn-primary rounded-pill px-4 py-3 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center"
+                    onClick={() => {
+                        setRegisterError('');
+                        setShowRegisterModal(true);
+                    }}
+                >
+                    <UserPlus size={16} className="me-2" />
+                    Register User
                 </button>
             </div>
 
-            <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
+            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                {feedback && (
+                    <div className={`alert border-0 rounded-4 mb-4 ${feedback.type === 'success' ? 'alert-success bg-success bg-opacity-10 text-success' : 'alert-danger bg-danger bg-opacity-10 text-danger'}`}>
+                        {feedback.message}
+                    </div>
+                )}
+
                 <div className="table-responsive">
                     <table className="table align-middle table-borderless">
                         <thead>
                             <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Identification / Name</th>
-                                <th className="pb-3 text-main">Strategic Role</th>
-                                <th className="pb-3 text-main">Operational Status</th>
-                                <th className="pb-3 text-end text-main">Registry Action</th>
+                                <th className="pb-3 text-main">Name</th>
+                                <th className="pb-3 text-main">User ID</th>
+                                <th className="pb-3 text-main">Role</th>
+                                <th className="pb-3 text-main">Ability</th>
+                                <th className="pb-3 text-main">Registration</th>
+                                <th className="pb-3 text-end text-main">Password</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((u, i) => (
-                                <tr key={u.id} className="border-bottom border-secondary border-opacity-5 hover-bg-surface-hover transition-all">
-                                    <td className="py-4">
-                                        <div className="fw-800 text-main mb-1">{u.name}</div>
-                                        <div className="smallest text-muted fw-bold uppercase tracking-widest bg-surface px-2 py-1 rounded d-inline-block">{u.user_code}</div>
-                                    </td>
-                                    <td className="py-4">
-                                        <span className={`smallest fw-800 uppercase tracking-widest d-flex align-items-center ${u.role === 'student' ? 'text-info' : 'text-primary'}`}>
-                                            {u.role === 'student' ? <Shield size={14} className="me-2" /> : <Wrench size={14} className="me-2" />} {u.role}
-                                        </span>
-                                    </td>
-                                    <td className="py-4">
-                                        <span className={`status-badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 shadow-sm`}>{u.status}</span>
-                                    </td>
-                                    <td className="py-4 text-end">
-                                        <div className="d-flex align-items-center justify-content-end gap-2">
-                                            <button 
-                                                onClick={() => handleResetPassword(u.user_code)} 
-                                                className="btn btn-surface btn-sm p-3 rounded-circle text-primary border-0 shadow-sm hover-bg-primary hover-text-white transition-all"
-                                                title="Strategic Key Reset"
-                                            >
-                                                <RefreshCcw size={16} />
-                                            </button>
-                                            <button 
-                                                onClick={() => setConfirmDelete(u)} 
-                                                className="btn btn-surface btn-sm p-3 rounded-circle text-danger border-0 shadow-sm hover-bg-danger hover-text-white transition-all"
-                                                title="Purge Personnel"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-5">
+                                        <Loader2 size={28} className="animate-spin text-primary" />
                                     </td>
                                 </tr>
-                            ))}
+                            ) : users.length > 0 ? (
+                                users.map((user) => (
+                                    <tr key={user.id} className="border-bottom border-secondary border-opacity-5">
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{user.name}</div>
+                                            <div className="smallest text-muted text-capitalize">{user.role} account</div>
+                                        </td>
+                                        <td className="py-4">{user.user_code}</td>
+                                        <td className="py-4 text-capitalize">{user.role}</td>
+                                        <td className="py-4">{user.skills || '-'}</td>
+                                        <td className="py-4">
+                                            <div className="d-flex flex-column gap-2">
+                                                <span className={`status-badge ${user.status === 'active' ? 'bg-success bg-opacity-10 text-success' : 'bg-secondary bg-opacity-10 text-secondary'}`}>
+                                                    {user.status === 'active' ? 'Registered' : user.status}
+                                                </span>
+                                                <span className="smallest text-muted">{new Date(user.created_at).toLocaleString()}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 text-end">
+                                            <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10 d-inline-flex align-items-center" onClick={() => resetPassword(user.user_code)}>
+                                                <RefreshCcw size={15} className="me-2" />
+                                                Reset
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-5 text-muted">
+                                        No users found yet. Registered students and technicians will appear here.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <PremiumModal
-                isOpen={!!confirmDelete}
-                onClose={() => setConfirmDelete(null)}
-                onConfirm={deleteUser}
-                title="Personnel Purge Protocol"
-                type="danger"
-                confirmText="Purge Personnel"
+                isOpen={showRegisterModal}
+                onClose={() => setShowRegisterModal(false)}
+                title="Register Student or Technician"
+                showFooter={false}
+                maxWidth="760px"
             >
-                <p className="text-muted fw-bold uppercase smallest tracking-widest mb-3">Permanently purge this personnel asset?</p>
-                <div className="p-3 rounded-4 bg-danger bg-opacity-10 border border-danger border-opacity-10 mb-2">
-                    <h5 className="fw-800 mb-0 text-main">{confirmDelete?.name}</h5>
-                    <p className="smallest text-muted mb-0">{confirmDelete?.user_code}</p>
-                </div>
-                <p className="smallest text-muted fw-bold">This will remove all strategic access for this identity. Operations may be impacted.</p>
-            </PremiumModal>
-
-            {/* Registration Modal Overlay */}
-            <AnimatePresence>
-                {showRegister && (
-                    <div className="modal-backdrop-custom d-flex align-items-center justify-content-center p-4" style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 2000, backdropFilter: 'blur(10px)' }}>
-                        <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl text-main" style={{maxWidth: '600px', width: '100%'}}>
-                            <div className="d-flex justify-content-between align-items-center mb-5">
-                                <h4 className="fw-800 mb-0 tracking-tighter">Personnel Initialization</h4>
-                                <button onClick={() => setShowRegister(false)} className="btn btn-surface btn-sm p-2 rounded-circle border-0"><X size={18} /></button>
+                <form onSubmit={registerUser}>
+                    {registerError && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 rounded-4">{registerError}</div>}
+                    <div className="row g-4">
+                        <div className="col-md-6">
+                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Full Name</label>
+                            <input
+                                type="text"
+                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                value={newUser.name}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, name: event.target.value }))}
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">User ID</label>
+                            <input
+                                type="text"
+                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                placeholder="DBU1601069"
+                                value={newUser.user_code}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, user_code: event.target.value.toUpperCase() }))}
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Role</label>
+                            <select
+                                className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                value={newUser.role}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, role: event.target.value, skills: event.target.value === 'technician' ? prev.skills : '' }))}
+                            >
+                                <option value="student">Student</option>
+                                <option value="technician">Technician</option>
+                            </select>
+                        </div>
+                        {newUser.role === 'technician' && (
+                            <div className="col-md-12">
+                                <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Technician Ability</label>
+                                <select
+                                    className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                    value={newUser.skills}
+                                    onChange={(event) => setNewUser((prev) => ({ ...prev, skills: event.target.value }))}
+                                    required
+                                >
+                                    <option value="">Select ability</option>
+                                    {TECHNICIAN_SKILLS.map((skill) => (
+                                        <option key={skill} value={skill}>
+                                            {skill}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                            <form onSubmit={handleRegister}>
-                                <div className="row g-4">
-                                    <div className="col-12">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Display Name</label>
-                                        <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" required value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Institutional ID</label>
-                                        <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="DBU1601069" required value={newUser.user_code} onChange={e => setNewUser({...newUser, user_code: e.target.value})} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Strategic Phone</label>
-                                        <input type="text" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="+251..." required value={newUser.phone_number || ''} onChange={e => setNewUser({...newUser, phone_number: e.target.value})} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Institutional Email</label>
-                                        <input type="email" className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" placeholder="Optional" value={newUser.email || ''} onChange={e => setNewUser({...newUser, email: e.target.value})} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Role Priority</label>
-                                        <select className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
-                                            <option value="student">Student Investigator</option>
-                                            <option value="technician">Field Engineer</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Technical Expertise</label>
-                                        <select className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm" disabled={newUser.role !== 'technician'} value={newUser.skills} onChange={e => setNewUser({...newUser, skills: e.target.value})}>
-                                            <option value="">N/A</option>
-                                            <option value="Plumbing">Plumbing</option>
-                                            <option value="Electrician">Electrician</option>
-                                            <option value="ICT Technician">ICT Technician</option>
-                                            <option value="HVAC / Cooling">HVAC / Cooling</option>
-                                            <option value="Carpentry">Carpentry</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-12 mt-5">
-                                        <button type="submit" className="btn btn-primary w-100 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl">Commit Entry</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </motion.div>
+                        )}
+                        <div className="col-12">
+                            <div className="p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 smallest text-primary">
+                                The system will generate a default password automatically after registration.
+                            </div>
+                        </div>
+                        <div className="col-12 d-flex gap-3">
+                            <button type="button" className="btn btn-surface flex-grow-1 rounded-pill py-3 border-secondary border-opacity-10" onClick={() => setShowRegisterModal(false)}>
+                                Cancel
+                            </button>
+                            <button type="submit" className="btn btn-primary flex-grow-1 rounded-pill py-3 fw-800 uppercase smallest tracking-widest" disabled={registering}>
+                                {registering ? <Loader2 size={16} className="animate-spin" /> : 'Register'}
+                            </button>
+                        </div>
                     </div>
-                )}
-            </AnimatePresence>
+                </form>
+            </PremiumModal>
 
             <PremiumModal
-                isOpen={!!registrationResult}
-                onClose={() => setRegistrationResult(null)}
-                title="Personnel Credentials Generated"
+                isOpen={!!generatedCredentials}
+                onClose={() => setGeneratedCredentials(null)}
+                onConfirm={() => setGeneratedCredentials(null)}
+                title="Default Password Generated"
                 type="success"
-                confirmText="Securely Copied"
-                onConfirm={() => setRegistrationResult(null)}
+                confirmText="Close"
             >
-                <div className="text-center py-4">
-                    <div className="bg-success bg-opacity-10 p-4 rounded-circle d-inline-block mb-4 shadow-sm border border-success border-opacity-10">
-                        <Key size={48} className="text-success animate-bounce" />
+                <p className="text-muted">The user must sign in with this temporary password and change it immediately on the login page.</p>
+                <div className="p-4 rounded-4 bg-surface border border-secondary border-opacity-10">
+                    <div className="mb-3">
+                        <span className="smallest text-muted d-block">User ID</span>
+                        <strong>{generatedCredentials?.user_code}</strong>
                     </div>
-                    <h5 className="fw-800 mb-0 text-main">Activation Sequence Ready</h5>
-                    <p className="smallest text-muted fw-bold uppercase tracking-widest mt-2 mb-5">Provide these credentials to the field unit.</p>
-                    
-                    <div className="bg-surface p-4 rounded-4 border border-secondary border-opacity-10 text-start shadow-inner">
-                        <div className="mb-3">
-                            <label className="smallest fw-800 uppercase tracking-widest text-muted d-block mb-1">Access Identity</label>
-                            <code className="h5 fw-800 text-primary">{registrationResult?.user_code}</code>
-                        </div>
-                        <div>
-                            <label className="smallest fw-800 uppercase tracking-widest text-muted d-block mb-1">Temporary Strategic Key</label>
-                            <code className="h5 fw-800 text-success">{registrationResult?.temporary_password}</code>
-                        </div>
+                    <div>
+                        <span className="smallest text-muted d-block">Temporary Password</span>
+                        <strong>{generatedCredentials?.temporary_password}</strong>
                     </div>
-                    <p className="smallest text-danger fw-bold mt-4 mb-0 animate-pulse">! DATA WILL BE PURGED FROM THIS VIEW ON CLOSURE !</p>
                 </div>
             </PremiumModal>
         </div>
     );
 };
 
+const SecurityPage = () => {
+    const { unreadCount, markNotificationsRead } = useAdminNotifications();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const [userCode, setUserCode] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [generatedCredentials, setGeneratedCredentials] = useState(null);
 
-const AdminDashboard = () => {
+    const handleReset = async (event) => {
+        event.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await axios.post('index.php?action=resetUserPassword', {
+                user_code: userCode.toUpperCase()
+            });
+
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Unable to reset password');
+            }
+
+            setGeneratedCredentials(res.data.data);
+            setUserCode('');
+        } catch (error) {
+            setError(error.message || 'Unable to reset password');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/admin/requests');
+    };
+
     return (
-        <div className="min-vh-100 position-relative">
-            <div className="app-backdrop">
-                <div 
-                    className="fullscreen-bg-fixed" 
-                    style={{ backgroundImage: `url(${techBg})` }}
-                ></div>
-                <div className="bg-overlay"></div>
+        <div className="container-fluid">
+            <DashboardHeader
+                title="Password Reset"
+                subtitle="Enter a user ID like DBU1601069 and generate a new temporary password"
+                unreadCount={unreadCount}
+                onReadNotifications={handleNotificationClick}
+                onLogout={logout}
+            />
+
+            <div className="row justify-content-center">
+                <div className="col-xl-8">
+                    <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
+                        <div className="d-flex align-items-center gap-3 mb-4">
+                            <Shield size={24} className="text-primary" />
+                            <div>
+                                <h4 className="fw-800 text-main mb-1">Reset Student or Technician Password</h4>
+                                <p className="smallest text-muted mb-0">The generated password will force a password change on the next login</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleReset}>
+                            <div className="row g-3">
+                                <div className="col-md-8">
+                                    <input
+                                        type="text"
+                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                        placeholder="DBU1601069"
+                                        value={userCode}
+                                        onChange={(event) => setUserCode(event.target.value.toUpperCase())}
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <button type="submit" className="btn btn-primary w-100 py-3 rounded-pill fw-800 uppercase smallest tracking-widest" disabled={loading}>
+                                        {loading ? <Loader2 size={16} className="animate-spin" /> : 'Generate Password'}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        {error && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 rounded-4 mt-4 mb-0">{error}</div>}
+                    </div>
+                </div>
             </div>
 
-            <Sidebar />
-            <div className="main-content-area text-main">
-                <AnimatePresence mode="wait">
-                    <Routes>
-                        <Route index element={<motion.div key="analytics" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><AdminOverview /></motion.div>} />
-                        <Route path="requests" element={<motion.div key="requests" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><StrategicQueue /></motion.div>} />
-                        <Route path="users" element={<motion.div key="users" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><PersonnelRegistry /></motion.div>} />
-                    </Routes>
-                </AnimatePresence>
-            </div>
+            <PremiumModal
+                isOpen={!!generatedCredentials}
+                onClose={() => setGeneratedCredentials(null)}
+                onConfirm={() => setGeneratedCredentials(null)}
+                title="Temporary Password Ready"
+                type="success"
+                confirmText="Close"
+            >
+                <p className="text-muted">Give this password to the user. They will be redirected to change it on the login page.</p>
+                <div className="p-4 rounded-4 bg-surface border border-secondary border-opacity-10">
+                    <div className="mb-3">
+                        <span className="smallest text-muted d-block">User ID</span>
+                        <strong>{generatedCredentials?.user_code}</strong>
+                    </div>
+                    <div>
+                        <span className="smallest text-muted d-block">Temporary Password</span>
+                        <strong>{generatedCredentials?.temporary_password}</strong>
+                    </div>
+                </div>
+            </PremiumModal>
         </div>
     );
 };
 
-export default AdminDashboard;
+const AdminDashboard = () => (
+    <div className="min-vh-100 position-relative">
+        <div className="app-backdrop">
+            <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${techBg})` }}></div>
+            <div className="bg-overlay"></div>
+        </div>
 
+        <Sidebar />
+        <div className="main-content-area text-main">
+            <AnimatePresence mode="wait">
+                <Routes>
+                    <Route index element={<div><AdminOverview /></div>} />
+                    <Route path="requests" element={<div><ActiveQueue /></div>} />
+                    <Route path="history" element={<div><AdminHistory /></div>} />
+                    <Route path="users" element={<div><UsersPage /></div>} />
+                    <Route path="security" element={<div><SecurityPage /></div>} />
+                </Routes>
+            </AnimatePresence>
+        </div>
+    </div>
+);
+
+export default AdminDashboard;
