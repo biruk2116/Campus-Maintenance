@@ -71,6 +71,46 @@ function ensureDatabaseSchema(PDO $pdo): void
     ensureColumn($pdo, 'maintenance_logs', 'actor_role', "ALTER TABLE maintenance_logs ADD COLUMN actor_role VARCHAR(30) DEFAULT NULL AFTER actor_name");
     ensureColumn($pdo, 'maintenance_logs', 'actor_code', "ALTER TABLE maintenance_logs ADD COLUMN actor_code VARCHAR(50) DEFAULT NULL AFTER actor_role");
 
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS request_attachments (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            request_id INT NOT NULL,
+            uploaded_by_user_id INT DEFAULT NULL,
+            uploader_name_snapshot VARCHAR(100) DEFAULT NULL,
+            uploader_role_snapshot VARCHAR(30) DEFAULT NULL,
+            uploader_code_snapshot VARCHAR(50) DEFAULT NULL,
+            file_name VARCHAR(255) NOT NULL,
+            file_extension VARCHAR(30) DEFAULT NULL,
+            mime_type VARCHAR(120) DEFAULT NULL,
+            file_category VARCHAR(60) DEFAULT NULL,
+            file_size_bytes BIGINT DEFAULT NULL,
+            file_description TEXT DEFAULT NULL,
+            file_data LONGBLOB NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_request_attachments_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
+            CONSTRAINT fk_request_attachments_user FOREIGN KEY (uploaded_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+        )
+    ");
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS user_files (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT DEFAULT NULL,
+            owner_name_snapshot VARCHAR(100) DEFAULT NULL,
+            owner_role_snapshot VARCHAR(30) DEFAULT NULL,
+            owner_code_snapshot VARCHAR(50) DEFAULT NULL,
+            file_name VARCHAR(255) NOT NULL,
+            file_extension VARCHAR(30) DEFAULT NULL,
+            mime_type VARCHAR(120) DEFAULT NULL,
+            file_category VARCHAR(60) DEFAULT NULL,
+            file_size_bytes BIGINT DEFAULT NULL,
+            file_description TEXT DEFAULT NULL,
+            file_data LONGBLOB NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_user_files_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        )
+    ");
+
     $pdo->exec("ALTER TABLE requests MODIFY COLUMN student_id INT NULL");
     $pdo->exec("ALTER TABLE requests MODIFY COLUMN technician_id INT NULL");
     $pdo->exec("ALTER TABLE maintenance_logs MODIFY COLUMN user_id INT NULL");
