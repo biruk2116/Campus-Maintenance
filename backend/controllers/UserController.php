@@ -29,8 +29,8 @@ function createUser($pdo)
     $phone_number = trim($_POST['phone_number'] ?? '');
     $skills = trim($_POST['skills'] ?? '');
 
-    if (!$name || !$role || !$user_code) {
-        response(false, "Name, user ID, and role are required");
+    if (!$name || !$role || !$user_code || !$email || !$phone_number) {
+        response(false, "Name, user ID, role, email, and phone number are required");
     }
 
     if (!in_array($role, ['student', 'technician'], true)) {
@@ -163,21 +163,32 @@ function deleteUser($pdo)
         response(false, "User not found");
     }
 
-    $usageCheck = $pdo->prepare("
-        SELECT COUNT(*)
-        FROM requests
-        WHERE student_id = ? OR technician_id = ?
-    ");
-    $usageCheck->execute([$user_id, $user_id]);
+    $pdo->beginTransaction();
 
-    if ((int)$usageCheck->fetchColumn() > 0) {
-        response(false, "This user already has maintenance records. Reset or deactivate the account instead.");
+    try {
+        if ($user['role'] === 'student') {
+            $stmt = $pdo->prepare("UPDATE requests SET student_id = NULL WHERE student_id = ?");
+            $stmt->execute([$user_id]);
+        }
+
+        if ($user['role'] === 'technician') {
+            $stmt = $pdo->prepare("UPDATE requests SET technician_id = NULL WHERE technician_id = ?");
+            $stmt->execute([$user_id]);
+        }
+
+        $logStmt = $pdo->prepare("UPDATE maintenance_logs SET user_id = NULL WHERE user_id = ?");
+        $logStmt->execute([$user_id]);
+
+        $delete = $pdo->prepare("DELETE FROM users WHERE id = ?");
+        $delete->execute([$user_id]);
+
+        $pdo->commit();
+    } catch (Throwable $error) {
+        $pdo->rollBack();
+        response(false, "Unable to delete user from the database");
     }
 
-    $delete = $pdo->prepare("DELETE FROM users WHERE id = ?");
-    $delete->execute([$user_id]);
-
-    response(true, "User deleted successfully");
+    response(true, "User deleted successfully from the database");
 }
 
 function getTechnicians($pdo)
