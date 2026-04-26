@@ -19,11 +19,21 @@ const sectionLinks = [
 ];
 
 const LANDING_PATH = '/landing';
+const NAVBAR_OFFSET = 96;
 
 const Navbar = () => {
     const { user, isDarkMode, toggleDarkMode } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const scrollToSection = (id) => {
+        const el = document.querySelector(id);
+        if (!el) return;
+
+        const top = el.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+        window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+        window.history.replaceState(null, '', `${LANDING_PATH}${id}`);
+    };
 
     const handleNavigate = (id) => {
         if (location.pathname === LANDING_PATH) {
@@ -33,13 +43,8 @@ const Navbar = () => {
                 return;
             }
 
-            const el = document.querySelector(id);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                window.history.replaceState(null, '', `${LANDING_PATH}${id}`);
-            }
+            scrollToSection(id);
         } else {
-            // Navigate to landing page with hash
             navigate(`${LANDING_PATH}${id}`);
         }
     };
