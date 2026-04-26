@@ -88,6 +88,42 @@ CREATE TABLE IF NOT EXISTS maintenance_logs (
     CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS request_attachments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL,
+    uploaded_by_user_id INT DEFAULT NULL,
+    uploader_name_snapshot VARCHAR(100) DEFAULT NULL,
+    uploader_role_snapshot VARCHAR(30) DEFAULT NULL,
+    uploader_code_snapshot VARCHAR(50) DEFAULT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_extension VARCHAR(30) DEFAULT NULL,
+    mime_type VARCHAR(120) DEFAULT NULL,
+    file_category VARCHAR(60) DEFAULT NULL,
+    file_size_bytes BIGINT DEFAULT NULL,
+    file_description TEXT DEFAULT NULL,
+    file_data LONGBLOB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_request_attachments_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
+    CONSTRAINT fk_request_attachments_user FOREIGN KEY (uploaded_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_files (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    owner_name_snapshot VARCHAR(100) DEFAULT NULL,
+    owner_role_snapshot VARCHAR(30) DEFAULT NULL,
+    owner_code_snapshot VARCHAR(50) DEFAULT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_extension VARCHAR(30) DEFAULT NULL,
+    mime_type VARCHAR(120) DEFAULT NULL,
+    file_category VARCHAR(60) DEFAULT NULL,
+    file_size_bytes BIGINT DEFAULT NULL,
+    file_description TEXT DEFAULT NULL,
+    file_data LONGBLOB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_files_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 INSERT IGNORE INTO users (
     user_code,
     name,
