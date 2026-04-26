@@ -46,6 +46,7 @@ const staggerContainer = {
 };
 
 const viewportOnce = { once: true, margin: '-80px' };
+const NAVBAR_OFFSET = 96;
 
 const sectionLinks = [
     { label: 'Home', anchor: '#home' },
@@ -164,7 +165,10 @@ const LandingPage = () => {
         if (location.hash) {
             const element = document.querySelector(location.hash);
             if (element) {
-                setTimeout(() => element.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                setTimeout(() => {
+                    const top = element.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+                    window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+                }, 100);
             }
         }
     }, [location]);
@@ -180,7 +184,8 @@ const LandingPage = () => {
     const handleNav = (id) => {
         const element = document.querySelector(id);
         if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const top = element.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+            window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
         }
     };
 
@@ -201,7 +206,6 @@ const LandingPage = () => {
                                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                                 className="landing-hero-copy"
                             >
-                                <div className="landing-hero-copy__label">Campus Maintenance System</div>
                                 <AnimatePresence mode="wait">
                                     <motion.div
                                         key={activeSlide}
@@ -260,7 +264,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section id="about" className="py-5 bg-background">
+            <section id="about" className="landing-section py-5 bg-background">
                 <div className="container py-5">
                     <div className="row align-items-center g-5">
                         <div className="col-lg-5">
@@ -326,7 +330,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section id="features" className="py-5 bg-surface-hover">
+            <section id="features" className="landing-section py-5 bg-surface-hover">
                 <div className="container py-5">
                     <SectionHeading title="System Views" kicker="Gallery" />
                     <motion.div
@@ -354,7 +358,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section id="services" className="py-5 bg-background">
+            <section id="services" className="landing-section py-5 bg-background">
                 <div className="container py-5">
                     <SectionHeading title="Maintenance Areas" kicker="Coverage" />
                     <motion.div
@@ -382,7 +386,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section id="contact" className="py-5 border-top border-secondary border-opacity-10 bg-surface-hover overflow-hidden">
+            <section id="contact" className="landing-section py-5 border-top border-secondary border-opacity-10 bg-surface-hover overflow-hidden">
                 <div className="container py-5">
                     <SectionHeading title="Command Center" kicker="Support" />
                     <div className="row g-4 align-items-stretch">
