@@ -24,11 +24,13 @@ ALTER TABLE users
 
 CREATE TABLE IF NOT EXISTS requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT NOT NULL,
+    student_id INT DEFAULT NULL,
     technician_id INT DEFAULT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     category VARCHAR(100) NOT NULL,
+    dorm VARCHAR(120) DEFAULT NULL,
+    block VARCHAR(120) DEFAULT NULL,
     location VARCHAR(255) NOT NULL,
     priority ENUM('Low', 'Medium', 'High', 'Emergency') DEFAULT 'Medium',
     status ENUM('Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed') DEFAULT 'Pending',
@@ -37,29 +39,53 @@ CREATE TABLE IF NOT EXISTS requests (
     tech_seen TINYINT(1) DEFAULT 1,
     student_seen TINYINT(1) DEFAULT 1,
     student_hidden TINYINT(1) DEFAULT 0,
+    student_name_snapshot VARCHAR(100) DEFAULT NULL,
+    student_code_snapshot VARCHAR(50) DEFAULT NULL,
+    student_phone_snapshot VARCHAR(30) DEFAULT NULL,
+    student_email_snapshot VARCHAR(100) DEFAULT NULL,
+    technician_name_snapshot VARCHAR(100) DEFAULT NULL,
+    technician_code_snapshot VARCHAR(50) DEFAULT NULL,
+    technician_phone_snapshot VARCHAR(30) DEFAULT NULL,
+    technician_email_snapshot VARCHAR(100) DEFAULT NULL,
+    technician_skills_snapshot VARCHAR(120) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_requests_student FOREIGN KEY (student_id) REFERENCES users(id),
+    CONSTRAINT fk_requests_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT fk_requests_technician FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 ALTER TABLE requests
+    MODIFY COLUMN student_id INT DEFAULT NULL,
     MODIFY COLUMN status ENUM('Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed') DEFAULT 'Pending',
+    ADD COLUMN IF NOT EXISTS dorm VARCHAR(120) DEFAULT NULL AFTER category,
+    ADD COLUMN IF NOT EXISTS block VARCHAR(120) DEFAULT NULL AFTER dorm,
     ADD COLUMN IF NOT EXISTS admin_seen TINYINT(1) DEFAULT 0 AFTER progress_percentage,
     ADD COLUMN IF NOT EXISTS tech_seen TINYINT(1) DEFAULT 1 AFTER admin_seen,
     ADD COLUMN IF NOT EXISTS student_seen TINYINT(1) DEFAULT 1 AFTER tech_seen,
-    ADD COLUMN IF NOT EXISTS student_hidden TINYINT(1) DEFAULT 0 AFTER student_seen;
+    ADD COLUMN IF NOT EXISTS student_hidden TINYINT(1) DEFAULT 0 AFTER student_seen,
+    ADD COLUMN IF NOT EXISTS student_name_snapshot VARCHAR(100) DEFAULT NULL AFTER student_hidden,
+    ADD COLUMN IF NOT EXISTS student_code_snapshot VARCHAR(50) DEFAULT NULL AFTER student_name_snapshot,
+    ADD COLUMN IF NOT EXISTS student_phone_snapshot VARCHAR(30) DEFAULT NULL AFTER student_code_snapshot,
+    ADD COLUMN IF NOT EXISTS student_email_snapshot VARCHAR(100) DEFAULT NULL AFTER student_phone_snapshot,
+    ADD COLUMN IF NOT EXISTS technician_name_snapshot VARCHAR(100) DEFAULT NULL AFTER student_email_snapshot,
+    ADD COLUMN IF NOT EXISTS technician_code_snapshot VARCHAR(50) DEFAULT NULL AFTER technician_name_snapshot,
+    ADD COLUMN IF NOT EXISTS technician_phone_snapshot VARCHAR(30) DEFAULT NULL AFTER technician_code_snapshot,
+    ADD COLUMN IF NOT EXISTS technician_email_snapshot VARCHAR(100) DEFAULT NULL AFTER technician_phone_snapshot,
+    ADD COLUMN IF NOT EXISTS technician_skills_snapshot VARCHAR(120) DEFAULT NULL AFTER technician_email_snapshot;
 
 CREATE TABLE IF NOT EXISTS maintenance_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     request_id INT NOT NULL,
-    user_id INT NOT NULL,
+    user_id INT DEFAULT NULL,
+    actor_name VARCHAR(100) DEFAULT NULL,
+    actor_role VARCHAR(30) DEFAULT NULL,
+    actor_code VARCHAR(50) DEFAULT NULL,
     action_taken VARCHAR(255),
     remarks TEXT,
     progress_percentage INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_logs_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
-    CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(id)
+    CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 INSERT IGNORE INTO users (
