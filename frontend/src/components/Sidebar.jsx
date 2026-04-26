@@ -9,15 +9,17 @@ import {
     Activity,
     ClipboardList,
     History,
+    Moon,
     PlusCircle,
     Shield,
+    Sun,
     Target,
     Users,
     Wrench
 } from 'lucide-react';
 
 const Sidebar = () => {
-    const { user } = useAuth();
+    const { user, isDarkMode, toggleDarkMode } = useAuth();
     const [notificationCount, setNotificationCount] = React.useState(0);
 
     const fetchNotifications = React.useCallback(async () => {
@@ -100,6 +102,32 @@ const Sidebar = () => {
                     </li>
                 ))}
             </ul>
+
+            <div className="sidebar-theme-panel mt-4 pt-4 border-top border-secondary border-opacity-10">
+                <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
+                    <div>
+                        <div className="smallest text-muted text-uppercase fw-800 tracking-widest">Appearance</div>
+                        <div className="smaller text-main">{isDarkMode ? 'Dark mode' : 'Light mode'}</div>
+                    </div>
+                    <button
+                        type="button"
+                        className="btn theme-toggle-btn border-0 p-2 rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
+                        onClick={toggleDarkMode}
+                        aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+                        title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+                    >
+                        {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
+                    </button>
+                </div>
+                <button
+                    type="button"
+                    className="btn btn-surface w-100 rounded-pill py-3 border-secondary border-opacity-10 fw-800 smallest tracking-widest text-uppercase d-inline-flex align-items-center justify-content-center gap-2"
+                    onClick={toggleDarkMode}
+                >
+                    {isDarkMode ? <Sun size={15} className="text-warning" /> : <Moon size={15} className="text-primary" />}
+                    {isDarkMode ? 'Switch to Light' : 'Switch to Dark'}
+                </button>
+            </div>
         </aside>
     );
 };
