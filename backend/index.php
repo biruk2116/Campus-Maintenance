@@ -146,7 +146,7 @@ switch ($action) {
 
     case 'deleteRequest':
         requireAuth();
-        requireRole(['admin', 'student']);
+        requireRole(['admin', 'student', 'technician']);
         requireActiveUser($pdo);
         require_once __DIR__ . "/controllers/RequestController.php";
         deleteRequest($pdo);
