@@ -743,6 +743,8 @@ const UsersPage = () => {
     const [deletingUserId, setDeletingUserId] = useState(null);
     const [newUser, setNewUser] = useState({
         name: '',
+        email: '',
+        phone_number: '',
         user_code: '',
         role: 'student',
         skills: ''
@@ -774,6 +776,8 @@ const UsersPage = () => {
         try {
             const res = await axios.post('index.php?action=createUser', {
                 name: newUser.name,
+                email: newUser.email,
+                phone_number: newUser.phone_number,
                 user_code: newUser.user_code,
                 role: newUser.role,
                 skills: newUser.role === 'technician' ? newUser.skills : ''
@@ -791,6 +795,8 @@ const UsersPage = () => {
             setShowRegisterModal(false);
             setNewUser({
                 name: '',
+                email: '',
+                phone_number: '',
                 user_code: '',
                 role: 'student',
                 skills: ''
@@ -893,6 +899,7 @@ const UsersPage = () => {
                             <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
                                 <th className="pb-3 text-main">Name</th>
                                 <th className="pb-3 text-main">User ID</th>
+                                <th className="pb-3 text-main">Contact</th>
                                 <th className="pb-3 text-main">Role</th>
                                 <th className="pb-3 text-main">Ability</th>
                                 <th className="pb-3 text-main">Registration</th>
@@ -902,7 +909,7 @@ const UsersPage = () => {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-5">
+                                    <td colSpan="7" className="text-center py-5">
                                         <Loader2 size={28} className="animate-spin text-primary" />
                                     </td>
                                 </tr>
@@ -914,6 +921,10 @@ const UsersPage = () => {
                                             <div className="smallest text-muted text-capitalize">{user.role} account</div>
                                         </td>
                                         <td className="py-4">{user.user_code}</td>
+                                        <td className="py-4">
+                                            <div className="fw-800 text-main">{user.phone_number || '-'}</div>
+                                            <div className="smallest text-muted">{user.email || 'No email'}</div>
+                                        </td>
                                         <td className="py-4 text-capitalize">{user.role}</td>
                                         <td className="py-4">{user.skills || '-'}</td>
                                         <td className="py-4">
@@ -944,7 +955,7 @@ const UsersPage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-5 text-muted">
+                                    <td colSpan="7" className="text-center py-5 text-muted">
                                         No users found yet. Registered students and technicians will appear here.
                                     </td>
                                 </tr>
@@ -982,6 +993,28 @@ const UsersPage = () => {
                                 placeholder="DBU1601069"
                                 value={newUser.user_code}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, user_code: event.target.value.toUpperCase() }))}
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Phone Number</label>
+                            <input
+                                type="text"
+                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                placeholder="0911000000"
+                                value={newUser.phone_number}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, phone_number: event.target.value }))}
+                                required
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Email</label>
+                            <input
+                                type="email"
+                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                placeholder="student@dbu.edu.et"
+                                value={newUser.email}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
                                 required
                             />
                         </div>
