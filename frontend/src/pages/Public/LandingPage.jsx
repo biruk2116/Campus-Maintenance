@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Activity,
@@ -335,9 +335,6 @@ const LandingPage = () => {
                                         <strong className="text-main d-block mb-1">Ready</strong>
                                         <span className="small text-muted">Open the system and start.</span>
                                     </div>
-                                    <Link to="/" className="btn btn-primary rounded-pill px-4 py-2 fw-800 d-inline-flex align-items-center">
-                                        Sign In
-                                    </Link>
                                 </div>
                             </div>
                         </div>
