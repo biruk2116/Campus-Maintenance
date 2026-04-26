@@ -2,6 +2,18 @@
 
 require_once __DIR__ . "/../utils/Response.php";
 
+function getUserSnapshotById($pdo, $user_id)
+{
+    $stmt = $pdo->prepare("
+        SELECT id, user_code, name, email, phone_number, role, skills
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$user_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 function clampProgress($progress)
 {
     $value = (int)$progress;
@@ -28,11 +40,22 @@ function getRequestById($pdo, $request_id)
 
 function createMaintenanceLog($pdo, $request_id, $user_id, $action, $remarks, $progress = null)
 {
+    $actor = $user_id ? getUserSnapshotById($pdo, $user_id) : null;
+
     $stmt = $pdo->prepare("
-        INSERT INTO maintenance_logs (request_id, user_id, action_taken, remarks, progress_percentage)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO maintenance_logs (request_id, user_id, actor_name, actor_role, actor_code, action_taken, remarks, progress_percentage)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$request_id, $user_id, $action, $remarks, $progress]);
+    $stmt->execute([
+        $request_id,
+        $user_id ?: null,
+        $actor['name'] ?? ($_SESSION['name'] ?? null),
+        $actor['role'] ?? ($_SESSION['role'] ?? null),
+        $actor['user_code'] ?? ($_SESSION['user_code'] ?? null),
+        $action,
+        $remarks,
+        $progress
+    ]);
 }
 
 function createRequest($pdo)
@@ -57,6 +80,11 @@ function createRequest($pdo)
         response(false, "Dorm and block are required");
     }
 
+    $student = getUserSnapshotById($pdo, $_SESSION['user_id']);
+    if (!$student) {
+        response(false, "Student account not found");
+    }
+
     $allowedPriorities = ['Low', 'Medium', 'High', 'Emergency'];
     if (!in_array($priority, $allowedPriorities, true)) {
         $priority = 'Medium';
@@ -67,6 +95,8 @@ function createRequest($pdo)
             title,
             description,
             category,
+            dorm,
+            block,
             location,
             priority,
             student_id,
@@ -75,17 +105,27 @@ function createRequest($pdo)
             admin_seen,
             tech_seen,
             student_seen,
-            student_hidden
-        ) VALUES (?, ?, ?, ?, ?, ?, 'Pending', 0, 0, 1, 1, 0)
+            student_hidden,
+            student_name_snapshot,
+            student_code_snapshot,
+            student_phone_snapshot,
+            student_email_snapshot
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 0, 0, 1, 1, 0, ?, ?, ?, ?)
     ");
 
     $stmt->execute([
         $title,
         $description,
         $category,
+        $dorm,
+        $block,
         $location,
         $priority,
-        $_SESSION['user_id']
+        $_SESSION['user_id'],
+        $student['name'],
+        $student['user_code'],
+        $student['phone_number'] ?: null,
+        $student['email'] ?: null
     ]);
 
     $requestId = (int)$pdo->lastInsertId();
@@ -101,9 +141,9 @@ function getStudentRequests($pdo)
     $stmt = $pdo->prepare("
         SELECT
             r.*,
-            t.name AS technician_name,
-            t.skills AS technician_skills,
-            t.phone_number AS technician_phone
+            COALESCE(t.name, r.technician_name_snapshot) AS technician_name,
+            COALESCE(t.skills, r.technician_skills_snapshot) AS technician_skills,
+            COALESCE(t.phone_number, r.technician_phone_snapshot) AS technician_phone
         FROM requests r
         LEFT JOIN users t ON r.technician_id = t.id
         WHERE r.student_id = ? AND r.student_hidden = 0
@@ -129,15 +169,15 @@ function getAllRequests($pdo)
     $stmt = $pdo->query("
         SELECT
             r.*,
-            s.name AS student_name,
-            s.user_code AS student_code,
-            s.phone_number AS student_phone,
-            t.name AS technician_name,
-            t.user_code AS technician_code,
-            t.phone_number AS technician_phone,
-            t.skills AS technician_skills
+            COALESCE(s.name, r.student_name_snapshot) AS student_name,
+            COALESCE(s.user_code, r.student_code_snapshot) AS student_code,
+            COALESCE(s.phone_number, r.student_phone_snapshot) AS student_phone,
+            COALESCE(t.name, r.technician_name_snapshot) AS technician_name,
+            COALESCE(t.user_code, r.technician_code_snapshot) AS technician_code,
+            COALESCE(t.phone_number, r.technician_phone_snapshot) AS technician_phone,
+            COALESCE(t.skills, r.technician_skills_snapshot) AS technician_skills
         FROM requests r
-        JOIN users s ON r.student_id = s.id
+        LEFT JOIN users s ON r.student_id = s.id
         LEFT JOIN users t ON r.technician_id = t.id
         ORDER BY
             CASE
@@ -173,7 +213,7 @@ function assignTechnician($pdo)
     }
 
     $techStmt = $pdo->prepare("
-        SELECT id, name, phone_number, skills
+        SELECT id, user_code, name, email, phone_number, skills
         FROM users
         WHERE id = ? AND role = 'technician' AND status = 'active'
         LIMIT 1
@@ -188,10 +228,20 @@ function assignTechnician($pdo)
     $progress = max((int)$request['progress_percentage'], 10);
     $stmt = $pdo->prepare("
         UPDATE requests
-        SET technician_id = ?, status = 'Assigned', progress_percentage = ?, tech_seen = 0, admin_seen = 1, student_seen = 0
+        SET technician_id = ?, status = 'Assigned', progress_percentage = ?, tech_seen = 0, admin_seen = 1, student_seen = 0,
+            technician_name_snapshot = ?, technician_code_snapshot = ?, technician_phone_snapshot = ?, technician_email_snapshot = ?, technician_skills_snapshot = ?
         WHERE id = ?
     ");
-    $stmt->execute([$technician_id, $progress, $request_id]);
+    $stmt->execute([
+        $technician_id,
+        $progress,
+        $technician['name'],
+        $technician['user_code'],
+        $technician['phone_number'] ?: null,
+        $technician['email'] ?: null,
+        $technician['skills'] ?: null,
+        $request_id
+    ]);
 
     createMaintenanceLog(
         $pdo,
@@ -282,14 +332,21 @@ function getRequestProgress($pdo)
     $stmt = $pdo->prepare("
         SELECT l.*, u.name AS action_by
         FROM maintenance_logs l
-        JOIN users u ON l.user_id = u.id
+        LEFT JOIN users u ON l.user_id = u.id
         WHERE l.request_id = ?
         ORDER BY l.created_at DESC, l.id DESC
     ");
 
     $stmt->execute([$request_id]);
+    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $logs = array_map(function ($log) {
+        if (!$log['action_by']) {
+            $log['action_by'] = $log['actor_name'] ?: 'Former user';
+        }
+        return $log;
+    }, $logs);
 
-    response(true, "Progress history", $stmt->fetchAll(PDO::FETCH_ASSOC));
+    response(true, "Progress history", $logs);
 }
 
 function deleteRequest($pdo)
