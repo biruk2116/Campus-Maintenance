@@ -140,7 +140,8 @@ const NewRequestForm = () => {
         title: '',
         description: '',
         category: 'Plumbing',
-        location: '',
+        dorm: '',
+        block: '',
         priority: 'Medium'
     });
     const [saving, setSaving] = useState(false);
@@ -153,7 +154,11 @@ const NewRequestForm = () => {
         setError('');
 
         try {
-            const res = await axios.post('index.php?action=createRequest', formData);
+            const payload = {
+                ...formData,
+                location: `${formData.dorm}, Block ${formData.block}`
+            };
+            const res = await axios.post('index.php?action=createRequest', payload);
 
             if (!res.data.success) {
                 throw new Error(res.data.message || 'Unable to submit request');
@@ -164,7 +169,8 @@ const NewRequestForm = () => {
                 title: '',
                 description: '',
                 category: 'Plumbing',
-                location: '',
+                dorm: '',
+                block: '',
                 priority: 'Medium'
             });
         } catch (error) {
@@ -237,14 +243,26 @@ const NewRequestForm = () => {
                                     </select>
                                 </div>
 
-                                <div className="col-12">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Location</label>
+                                <div className="col-md-6">
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Dorm</label>
                                     <input
                                         type="text"
                                         className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        value={formData.location}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, location: event.target.value }))}
-                                        placeholder="Room number, block, or office"
+                                        value={formData.dorm}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, dorm: event.target.value }))}
+                                        placeholder="Example: Dorm A"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="col-md-6">
+                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Block</label>
+                                    <input
+                                        type="text"
+                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                        value={formData.block}
+                                        onChange={(event) => setFormData((prev) => ({ ...prev, block: event.target.value }))}
+                                        placeholder="Example: Block B"
                                         required
                                     />
                                 </div>
@@ -334,14 +352,15 @@ const StudentOverview = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [historyLogs, setHistoryLogs] = useState([]);
     const [timelineLoading, setTimelineLoading] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
 
     const activeRequests = useMemo(() => requests.filter((request) => request.status !== 'Completed'), [requests]);
     const historyRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
 
     const statusCounts = useMemo(() => ({
-        pending: requests.filter((request) => request.status === 'Pending').length,
         assigned: requests.filter((request) => request.status === 'Assigned').length,
         progress: requests.filter((request) => request.status === 'In Progress').length,
+        holding: requests.filter((request) => request.status === 'On Hold').length,
         completed: historyRequests.length
     }), [historyRequests.length, requests]);
 
@@ -363,6 +382,16 @@ const StudentOverview = () => {
             }
         } finally {
             setTimelineLoading(false);
+        }
+    };
+
+    const deleteRequest = async (requestId) => {
+        setDeletingId(requestId);
+        try {
+            await axios.post('index.php?action=deleteRequest', { id: requestId });
+            await refreshData();
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -393,11 +422,11 @@ const StudentOverview = () => {
                         </div>
                         <Doughnut
                             data={{
-                                labels: ['Pending', 'Assigned', 'In Progress', 'Completed'],
+                                labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
                                 datasets: [
                                     {
-                                        data: [statusCounts.pending, statusCounts.assigned, statusCounts.progress, statusCounts.completed],
-                                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+                                        data: [statusCounts.assigned, statusCounts.progress, statusCounts.holding, statusCounts.completed],
+                                        backgroundColor: ['#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
                                         borderWidth: 0
                                     }
                                 ]
@@ -467,7 +496,7 @@ const StudentOverview = () => {
                                         <th className="pb-3 text-main">Location</th>
                                         <th className="pb-3 text-main">Status</th>
                                         <th className="pb-3 text-main">Assigned Technician</th>
-                                        <th className="pb-3 text-end text-main">Timeline</th>
+                                        <th className="pb-3 text-end text-main">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -512,9 +541,19 @@ const StudentOverview = () => {
                                                     )}
                                                 </td>
                                                 <td className="py-4 text-end">
-                                                    <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => openTimeline(request)}>
-                                                        View
-                                                    </button>
+                                                    <div className="d-flex justify-content-end gap-2">
+                                                        <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => openTimeline(request)}>
+                                                            View
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-danger rounded-pill px-3 py-2"
+                                                            onClick={() => deleteRequest(request.id)}
+                                                            disabled={deletingId === request.id}
+                                                        >
+                                                            {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -573,7 +612,7 @@ const StudentHistory = () => {
         }
     };
 
-    const removeFromHistory = async (requestId) => {
+    const deleteRequest = async (requestId) => {
         setDeletingId(requestId);
         try {
             await axios.post('index.php?action=deleteRequest', { id: requestId });
@@ -592,7 +631,7 @@ const StudentHistory = () => {
         <div className="container-fluid text-main">
             <DashboardHeader
                 title="Request History"
-                subtitle="Completed tasks that you can keep as history or remove from your dashboard"
+                subtitle="Completed tasks you can review or delete permanently"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
@@ -603,7 +642,7 @@ const StudentHistory = () => {
                     <CheckCircle size={22} className="text-success" />
                     <div>
                         <h4 className="fw-800 text-main mb-1">Completed Requests</h4>
-                        <p className="smallest text-muted mb-0">Students can remove completed tasks from their dashboard here</p>
+                        <p className="smallest text-muted mb-0">Deleting a request here removes it from admin and technician dashboards too</p>
                     </div>
                 </div>
 
@@ -652,7 +691,7 @@ const StudentHistory = () => {
                                                 <button
                                                     type="button"
                                                     className="btn btn-danger rounded-pill px-3 py-2"
-                                                    onClick={() => removeFromHistory(request.id)}
+                                                    onClick={() => deleteRequest(request.id)}
                                                     disabled={deletingId === request.id}
                                                 >
                                                     {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
