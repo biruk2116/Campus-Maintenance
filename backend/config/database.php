@@ -30,6 +30,22 @@ function foreignKeyDeleteRule(PDO $pdo, string $constraintName): ?string
     return $rule !== false ? $rule : null;
 }
 
+function findForeignKeyName(PDO $pdo, string $table, string $column): ?string
+{
+    $stmt = $pdo->prepare("
+        SELECT kcu.CONSTRAINT_NAME
+        FROM information_schema.KEY_COLUMN_USAGE kcu
+        WHERE kcu.TABLE_SCHEMA = DATABASE()
+          AND kcu.TABLE_NAME = ?
+          AND kcu.COLUMN_NAME = ?
+          AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
+        LIMIT 1
+    ");
+    $stmt->execute([$table, $column]);
+    $name = $stmt->fetchColumn();
+    return $name !== false ? $name : null;
+}
+
 function ensureColumn(PDO $pdo, string $table, string $column, string $sql): void
 {
     if (!columnExists($pdo, $table, $column)) {
@@ -59,18 +75,21 @@ function ensureDatabaseSchema(PDO $pdo): void
     $pdo->exec("ALTER TABLE requests MODIFY COLUMN technician_id INT NULL");
     $pdo->exec("ALTER TABLE maintenance_logs MODIFY COLUMN user_id INT NULL");
 
-    if (foreignKeyDeleteRule($pdo, 'fk_requests_student') !== 'SET NULL') {
-        $pdo->exec("ALTER TABLE requests DROP FOREIGN KEY fk_requests_student");
+    $studentRequestKey = findForeignKeyName($pdo, 'requests', 'student_id');
+    if ($studentRequestKey && foreignKeyDeleteRule($pdo, $studentRequestKey) !== 'SET NULL') {
+        $pdo->exec("ALTER TABLE requests DROP FOREIGN KEY `{$studentRequestKey}`");
         $pdo->exec("ALTER TABLE requests ADD CONSTRAINT fk_requests_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE SET NULL");
     }
 
-    if (foreignKeyDeleteRule($pdo, 'fk_requests_technician') !== 'SET NULL') {
-        $pdo->exec("ALTER TABLE requests DROP FOREIGN KEY fk_requests_technician");
+    $technicianRequestKey = findForeignKeyName($pdo, 'requests', 'technician_id');
+    if ($technicianRequestKey && foreignKeyDeleteRule($pdo, $technicianRequestKey) !== 'SET NULL') {
+        $pdo->exec("ALTER TABLE requests DROP FOREIGN KEY `{$technicianRequestKey}`");
         $pdo->exec("ALTER TABLE requests ADD CONSTRAINT fk_requests_technician FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL");
     }
 
-    if (foreignKeyDeleteRule($pdo, 'fk_logs_user') !== 'SET NULL') {
-        $pdo->exec("ALTER TABLE maintenance_logs DROP FOREIGN KEY fk_logs_user");
+    $logUserKey = findForeignKeyName($pdo, 'maintenance_logs', 'user_id');
+    if ($logUserKey && foreignKeyDeleteRule($pdo, $logUserKey) !== 'SET NULL') {
+        $pdo->exec("ALTER TABLE maintenance_logs DROP FOREIGN KEY `{$logUserKey}`");
         $pdo->exec("ALTER TABLE maintenance_logs ADD CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL");
     }
 
