@@ -41,10 +41,20 @@ function createRequest($pdo)
     $description = trim($_POST['description'] ?? '');
     $category = trim($_POST['category'] ?? '');
     $location = trim($_POST['location'] ?? '');
+    $dorm = trim($_POST['dorm'] ?? '');
+    $block = trim($_POST['block'] ?? '');
     $priority = $_POST['priority'] ?? 'Medium';
+
+    if (!$location && $dorm && $block) {
+        $location = "{$dorm}, Block {$block}";
+    }
 
     if (!$title || !$description || !$category || !$location) {
         response(false, "Title, description, category, and location are required");
+    }
+
+    if (!$dorm || !$block) {
+        response(false, "Dorm and block are required");
     }
 
     $allowedPriorities = ['Low', 'Medium', 'High', 'Emergency'];
@@ -310,18 +320,28 @@ function deleteRequest($pdo)
     }
 
     if ($role === 'student') {
+        $stmt = $pdo->prepare("DELETE FROM requests WHERE id = ? AND student_id = ?");
+        $stmt->execute([$id, $user_id]);
+
+        if ($stmt->rowCount() === 0) {
+            response(false, "You can only delete your own requests");
+        }
+
+        response(true, "Request deleted successfully");
+    }
+
+    if ($role === 'technician') {
         $stmt = $pdo->prepare("
-            UPDATE requests
-            SET student_hidden = 1
-            WHERE id = ? AND student_id = ? AND status = 'Completed'
+            DELETE FROM requests
+            WHERE id = ? AND technician_id = ? AND status = 'Completed'
         ");
         $stmt->execute([$id, $user_id]);
 
         if ($stmt->rowCount() === 0) {
-            response(false, "You can only remove your own completed requests");
+            response(false, "You can only delete completed tasks from your history");
         }
 
-        response(true, "Completed request removed from your history");
+        response(true, "Completed task deleted successfully");
     }
 
     response(false, "Unauthorized");
