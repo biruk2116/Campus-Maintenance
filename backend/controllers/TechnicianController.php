@@ -7,11 +7,11 @@ function getAssignedRequests($pdo)
     $stmt = $pdo->prepare("
         SELECT
             r.*,
-            u.name AS student_name,
-            u.user_code AS student_code,
-            u.phone_number AS student_phone
+            COALESCE(u.name, r.student_name_snapshot) AS student_name,
+            COALESCE(u.user_code, r.student_code_snapshot) AS student_code,
+            COALESCE(u.phone_number, r.student_phone_snapshot) AS student_phone
         FROM requests r
-        JOIN users u ON r.student_id = u.id
+        LEFT JOIN users u ON r.student_id = u.id
         WHERE r.technician_id = ?
         ORDER BY
             CASE
