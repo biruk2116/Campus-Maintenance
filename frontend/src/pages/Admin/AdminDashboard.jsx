@@ -740,6 +740,7 @@ const UsersPage = () => {
     const [registerError, setRegisterError] = useState('');
     const [feedback, setFeedback] = useState(null);
     const [generatedCredentials, setGeneratedCredentials] = useState(null);
+    const [deletingUserId, setDeletingUserId] = useState(null);
     const [newUser, setNewUser] = useState({
         name: '',
         user_code: '',
@@ -825,6 +826,31 @@ const UsersPage = () => {
         }
     };
 
+    const deleteUser = async (userId) => {
+        setDeletingUserId(userId);
+        setFeedback(null);
+
+        try {
+            const res = await axios.post('index.php?action=deleteUser', { user_id: userId });
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Unable to delete user');
+            }
+
+            setFeedback({
+                type: 'success',
+                message: 'User deleted successfully.'
+            });
+            await fetchUsers();
+        } catch (error) {
+            setFeedback({
+                type: 'danger',
+                message: error.message || 'Unable to delete user'
+            });
+        } finally {
+            setDeletingUserId(null);
+        }
+    };
+
     const handleNotificationClick = async () => {
         await markNotificationsRead();
         navigate('/admin/requests');
@@ -870,7 +896,7 @@ const UsersPage = () => {
                                 <th className="pb-3 text-main">Role</th>
                                 <th className="pb-3 text-main">Ability</th>
                                 <th className="pb-3 text-main">Registration</th>
-                                <th className="pb-3 text-end text-main">Password</th>
+                                <th className="pb-3 text-end text-main">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -899,10 +925,20 @@ const UsersPage = () => {
                                             </div>
                                         </td>
                                         <td className="py-4 text-end">
-                                            <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10 d-inline-flex align-items-center" onClick={() => resetPassword(user.user_code)}>
-                                                <RefreshCcw size={15} className="me-2" />
-                                                Reset
-                                            </button>
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10 d-inline-flex align-items-center" onClick={() => resetPassword(user.user_code)}>
+                                                    <RefreshCcw size={15} className="me-2" />
+                                                    Reset
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger rounded-pill px-3 py-2"
+                                                    onClick={() => deleteUser(user.id)}
+                                                    disabled={deletingUserId === user.id}
+                                                >
+                                                    {deletingUserId === user.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
