@@ -10,6 +10,7 @@ import {
     MapPin,
     Phone,
     Save,
+    Trash2,
 } from 'lucide-react';
 import {
     ArcElement,
@@ -388,11 +389,22 @@ const TechnicianOverview = () => {
 };
 
 const TechnicianHistory = () => {
-    const { requests, unreadCount, loading, markNotificationsRead } = useTechnicianData();
+    const { requests, unreadCount, loading, refreshData, markNotificationsRead } = useTechnicianData();
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const [deletingId, setDeletingId] = useState(null);
 
     const completedRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
+
+    const deleteCompletedTask = async (requestId) => {
+        setDeletingId(requestId);
+        try {
+            await axios.post('index.php?action=deleteRequest', { id: requestId });
+            await refreshData();
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     const handleNotificationClick = async () => {
         await markNotificationsRead();
@@ -403,7 +415,7 @@ const TechnicianHistory = () => {
         <div className="container-fluid">
             <DashboardHeader
                 title="Technician History"
-                subtitle="Completed assignments stored in your dashboard history"
+                subtitle="Completed assignments you can review or remove from history"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
@@ -426,12 +438,13 @@ const TechnicianHistory = () => {
                                 <th className="pb-3 text-main">Student</th>
                                 <th className="pb-3 text-main">Location</th>
                                 <th className="pb-3 text-main">Completed</th>
+                                <th className="pb-3 text-end text-main">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="4" className="text-center py-5">
+                                    <td colSpan="5" className="text-center py-5">
                                         <Loader2 size={28} className="animate-spin text-primary" />
                                     </td>
                                 </tr>
@@ -453,11 +466,21 @@ const TechnicianHistory = () => {
                                             </div>
                                         </td>
                                         <td className="py-4">{new Date(request.updated_at).toLocaleString()}</td>
+                                        <td className="py-4 text-end">
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger rounded-pill px-3 py-2"
+                                                onClick={() => deleteCompletedTask(request.id)}
+                                                disabled={deletingId === request.id}
+                                            >
+                                                {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="text-center py-5 text-muted">
+                                    <td colSpan="5" className="text-center py-5 text-muted">
                                         No completed requests in history.
                                     </td>
                                 </tr>
