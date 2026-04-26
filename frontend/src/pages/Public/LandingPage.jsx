@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     Activity,
+    ArrowRight,
     ChevronRight,
     Globe,
     Mail,
@@ -13,11 +14,9 @@ import {
     Zap
 } from 'lucide-react';
 
-import heroPoster from '../../assets/images/Hero.png';
+import heroOne from '../../assets/images/hero1.webp';
 import maintIllustration from '../../assets/images/maint_illustration.png';
-import techBg from '../../assets/images/tech-bg.png';
 import techPc from '../../assets/images/tech_pc.png';
-import lockDetail from '../../assets/images/lock_detail.png';
 import safetyKit from '../../assets/images/safety_kit.png';
 import fireEmergency from '../../assets/images/fire_emergency.png';
 import dbuLogo from '../../assets/images/dbu-logo.png';
@@ -121,6 +120,27 @@ const contactCards = [
     }
 ];
 
+const heroSlides = [
+    {
+        eyebrow: 'Fast reporting',
+        title: 'Track campus maintenance from report to resolution.',
+        text: 'Students report issues clearly, admins assign faster, and technicians update progress without losing the thread.',
+        metric: 'Live request flow'
+    },
+    {
+        eyebrow: 'Cleaner coordination',
+        title: 'Give every classroom, dorm, and office a visible support pipeline.',
+        text: 'The platform keeps request details, ownership, and updates in one operational view that teams can trust.',
+        metric: 'Dorm and block ready'
+    },
+    {
+        eyebrow: 'Better follow-through',
+        title: 'See what is assigned, in progress, on hold, and completed in one rhythm.',
+        text: 'Campus teams can move from scattered follow-up to a more deliberate, accountable maintenance cycle.',
+        metric: 'Student to technician clarity'
+    }
+];
+
 const SectionHeading = ({ title, kicker }) => (
     <motion.div
         variants={revealUp}
@@ -138,6 +158,7 @@ const SectionHeading = ({ title, kicker }) => (
 
 const LandingPage = () => {
     const location = useLocation();
+    const [activeSlide, setActiveSlide] = useState(0);
 
     useEffect(() => {
         if (location.hash) {
@@ -148,6 +169,14 @@ const LandingPage = () => {
         }
     }, [location]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+        }, 4200);
+
+        return () => clearInterval(interval);
+    }, []);
+
     const handleNav = (id) => {
         const element = document.querySelector(id);
         if (element) {
@@ -155,31 +184,88 @@ const LandingPage = () => {
         }
     };
 
+    const currentSlide = heroSlides[activeSlide];
+
     return (
         <div className="landing-page position-relative">
             <Navbar />
 
             <section id="home" className="landing-poster-hero">
-                <motion.img
-                    src={heroPoster}
-                    alt="Campus maintenance hero"
-                    className="landing-poster-hero__image"
-                    initial={{ scale: 1.02, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                />
                 <div className="landing-poster-hero__veil"></div>
-                <div className="landing-poster-hero__text-mask"></div>
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.15 }}
-                    className="landing-poster-hero__copy"
-                >
-                    <p className="landing-poster-hero__subtitle mb-0">
-                        Beautiful campus maintenance coordination for labs, classrooms, offices, and student spaces.
-                    </p>
-                </motion.div>
+                <div className="container landing-hero-shell">
+                    <div className="row align-items-center g-5 landing-hero-grid">
+                        <div className="col-lg-6">
+                            <motion.div
+                                initial={{ opacity: 0, y: 22 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="landing-hero-copy"
+                            >
+                                <div className="landing-hero-copy__label">Campus Maintenance System</div>
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={activeSlide}
+                                        initial={{ opacity: 0, x: -28, filter: 'blur(6px)' }}
+                                        animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                                        exit={{ opacity: 0, x: 26, filter: 'blur(6px)' }}
+                                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                        className="landing-hero-copy__stage"
+                                    >
+                                        <span className="landing-hero-copy__eyebrow">{currentSlide.eyebrow}</span>
+                                        <h1 className="landing-hero-copy__title text-main">{currentSlide.title}</h1>
+                                        <p className="landing-hero-copy__text mb-0">{currentSlide.text}</p>
+                                        <div className="landing-hero-copy__metric">
+                                            <Activity size={16} className="text-primary" />
+                                            <span>{currentSlide.metric}</span>
+                                        </div>
+                                    </motion.div>
+                                </AnimatePresence>
+
+                                <div className="landing-hero-copy__actions">
+                                    <button type="button" className="btn btn-primary rounded-pill px-4 py-3 fw-800 d-inline-flex align-items-center" onClick={() => handleNav('#about')}>
+                                        Explore System
+                                        <ArrowRight size={16} className="ms-2" />
+                                    </button>
+                                    <button type="button" className="btn btn-surface rounded-pill px-4 py-3 fw-800 border-secondary border-opacity-10" onClick={() => handleNav('#contact')}>
+                                        Contact Team
+                                    </button>
+                                </div>
+
+                                <div className="landing-hero-copy__dots" aria-label="Hero slideshow navigation">
+                                    {heroSlides.map((slide, index) => (
+                                        <button
+                                            key={slide.eyebrow}
+                                            type="button"
+                                            className={`landing-hero-copy__dot ${index === activeSlide ? 'is-active' : ''}`}
+                                            onClick={() => setActiveSlide(index)}
+                                            aria-label={`Show slide ${index + 1}`}
+                                        />
+                                    ))}
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        <div className="col-lg-6">
+                            <motion.div
+                                initial={{ opacity: 0, x: 36, scale: 0.96 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                                className="landing-hero-visual premium-card border-secondary border-opacity-10 shadow-22xl"
+                            >
+                                <img src={heroOne} alt="Campus maintenance team coordination" className="landing-hero-visual__image" />
+                                <div className="landing-hero-visual__overlay"></div>
+                                <div className="landing-hero-visual__card landing-hero-visual__card--top">
+                                    <span className="landing-hero-visual__card-label">Response</span>
+                                    <strong>Report issues with clearer location detail</strong>
+                                </div>
+                                <div className="landing-hero-visual__card landing-hero-visual__card--bottom">
+                                    <span className="landing-hero-visual__card-label">Workflow</span>
+                                    <strong>Assignment and updates stay visible across the whole cycle</strong>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="about" className="py-5 bg-background">
