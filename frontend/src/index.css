@@ -594,24 +594,6 @@ h4,
   max-width: 34rem;
 }
 
-.landing-hero-copy__label {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.7rem 1rem;
-  margin-bottom: 1.35rem;
-  border-radius: 999px;
-  background: var(--landing-hero-chip-bg);
-  border: 1px solid var(--landing-hero-chip-border);
-  color: var(--landing-hero-text);
-  font-size: 0.73rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
 .landing-hero-copy__stage {
   min-height: 17rem;
 }
@@ -745,6 +727,20 @@ h4,
   pointer-events: none;
   z-index: -1;
   animation: grid-drift 22s linear infinite;
+}
+
+.landing-section {
+  position: relative;
+  scroll-margin-top: 110px;
+}
+
+.landing-section .container {
+  position: relative;
+}
+
+.landing-section .container.py-5 {
+  padding-top: clamp(4.5rem, 6vw, 6rem) !important;
+  padding-bottom: clamp(4.5rem, 6vw, 6rem) !important;
 }
 
 .landing-gallery-card {
@@ -1578,6 +1574,11 @@ section {
     width: min(28rem, 100%);
   }
 
+  .landing-section .container.py-5 {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+
   .landing-poster-hero::before {
     width: 18rem;
     height: 18rem;
@@ -1696,6 +1697,15 @@ section {
 
   .landing-page::before {
     background-size: 42px 42px;
+  }
+
+  .landing-section {
+    scroll-margin-top: 96px;
+  }
+
+  .landing-section .container.py-5 {
+    padding-top: 3.25rem !important;
+    padding-bottom: 3.25rem !important;
   }
 
   .hero-stage {
