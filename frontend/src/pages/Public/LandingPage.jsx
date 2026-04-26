@@ -254,14 +254,6 @@ const LandingPage = () => {
                             >
                                 <img src={heroOne} alt="Campus maintenance team coordination" className="landing-hero-visual__image" />
                                 <div className="landing-hero-visual__overlay"></div>
-                                <div className="landing-hero-visual__card landing-hero-visual__card--top">
-                                    <span className="landing-hero-visual__card-label">Response</span>
-                                    <strong>Report issues with clearer location detail</strong>
-                                </div>
-                                <div className="landing-hero-visual__card landing-hero-visual__card--bottom">
-                                    <span className="landing-hero-visual__card-label">Workflow</span>
-                                    <strong>Assignment and updates stay visible across the whole cycle</strong>
-                                </div>
                             </motion.div>
                         </div>
                     </div>
