@@ -1894,3 +1894,156 @@ table.table td {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary-light);
 }
+
+/* =========================================
+   DRAMATIC ANIMATED UI & EXPERT UX ADDITIONS
+   ========================================= */
+
+/* 1. Dramatic Moving Aurora Background */
+body::after {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(79, 70, 229, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 40%);
+  animation: auroraSpin 30s linear infinite;
+  z-index: -2;
+  pointer-events: none;
+}
+
+@keyframes auroraSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* 2. Global Staggered Entry Animations */
+@keyframes dramaticSlideUp {
+  0% { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(10px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.premium-card {
+  animation: dramaticSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger, 0) * 0.1s) forwards;
+  opacity: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(30, 41, 59, 0.35) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+}
+
+.premium-card:nth-child(1) { --stagger: 1; }
+.premium-card:nth-child(2) { --stagger: 2; }
+.premium-card:nth-child(3) { --stagger: 3; }
+.premium-card:nth-child(4) { --stagger: 4; }
+.premium-card:nth-child(5) { --stagger: 5; }
+.col-md-6:nth-child(1) .premium-card { --stagger: 1; }
+.col-md-6:nth-child(2) .premium-card { --stagger: 2; }
+.col-md-6:nth-child(3) .premium-card { --stagger: 3; }
+.col-md-6:nth-child(4) .premium-card { --stagger: 4; }
+
+table.table tbody tr {
+  animation: dramaticSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger, 0) * 0.08s) forwards;
+  opacity: 0;
+}
+table.table tbody tr:nth-child(1) { --stagger: 1; }
+table.table tbody tr:nth-child(2) { --stagger: 2; }
+table.table tbody tr:nth-child(3) { --stagger: 3; }
+table.table tbody tr:nth-child(4) { --stagger: 4; }
+table.table tbody tr:nth-child(5) { --stagger: 5; }
+table.table tbody tr:nth-child(n+6) { --stagger: 6; }
+
+/* 3. Button Pulse and Shimmer Effects */
+@keyframes buttonGlow {
+  0% { box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
+  50% { box-shadow: 0 0 35px rgba(79, 70, 229, 0.6); transform: scale(1.02); }
+  100% { box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
+}
+
+@keyframes shimmerShine {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:not(:disabled):hover {
+  animation: buttonGlow 2s infinite ease-in-out;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: skewX(-20deg);
+  animation: shimmerShine 3s infinite;
+}
+
+/* 4. Hover 3D Tilt illusion on Cards */
+.premium-card:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 30px 60px -12px rgba(79, 70, 229, 0.3), 0 0 30px rgba(139, 92, 246, 0.15) !important;
+  border-color: rgba(139, 92, 246, 0.5) !important;
+}
+
+/* 5. Smooth dramatic focus styles */
+.form-select, .form-control {
+  background: rgba(30, 41, 59, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+}
+.form-select:focus, .form-control:focus {
+  background: rgba(30, 41, 59, 0.8) !important;
+  box-shadow: 0 0 25px rgba(79, 70, 229, 0.4) !important;
+  transform: translateY(-2px);
+  border-color: var(--primary) !important;
+}
+
+/* 6. Typography Pop */
+h1, h2, h3, h4, .text-main, .fw-800 {
+  text-shadow: 0 2px 15px rgba(255, 255, 255, 0.1);
+  letter-spacing: -0.02em;
+}
+
+/* 7. Animated Status Badges */
+.status-badge {
+  position: relative;
+  z-index: 1;
+}
+.status-badge.text-success {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+  animation: pulseSuccess 3s infinite alternate;
+}
+@keyframes pulseSuccess {
+  to { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6) !important; }
+}
+
+.status-badge.text-danger {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3) !important;
+  animation: pulseDanger 3s infinite alternate;
+}
+@keyframes pulseDanger {
+  to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6) !important; }
+}
+
+/* Glowing line across the top of the app */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6, #ec4899, #f59e0b, #4f46e5);
+  background-size: 200% auto;
+  animation: rgbGlowLine 4s linear infinite;
+  z-index: 9999;
+}
+@keyframes rgbGlowLine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
