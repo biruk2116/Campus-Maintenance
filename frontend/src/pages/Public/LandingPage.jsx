@@ -15,10 +15,8 @@ import {
 } from 'lucide-react';
 
 
-import maintIllustration from '../../assets/images/maint_illustration.png';
-import techPc from '../../assets/images/tech_pc.png';
-import safetyKit from '../../assets/images/safety_kit.png';
-import fireEmergency from '../../assets/images/fire_emergency.png';
+
+
 import dbuLogo from '../../assets/images/dbu-logo.png';
 import Navbar from '../../components/Navbar';
 
@@ -64,17 +62,23 @@ const aboutHighlights = [
 
 const featureCards = [
     {
-        image: techPc,
+        icon: Activity,
+        color: 'from-primary/20 to-primary/5',
+        textColor: 'text-primary',
         title: 'ICT and power',
         description: 'Labs and offices'
     },
     {
-        image: safetyKit,
+        icon: Shield,
+        color: 'from-success/20 to-success/5',
+        textColor: 'text-success',
         title: 'Safety care',
         description: 'Clean shared spaces'
     },
     {
-        image: fireEmergency,
+        icon: Zap,
+        color: 'from-warning/20 to-warning/5',
+        textColor: 'text-warning',
         title: 'Emergency support',
         description: 'Critical response'
     }
@@ -385,27 +389,67 @@ const LandingPage = () => {
                             viewport={viewportOnce}
                             className="relative"
                         >
-                            <div className="glass-card overflow-hidden">
-                                <img src={maintIllustration} alt="Maintenance illustration" className="w-full h-auto object-cover opacity-90 mix-blend-lighten" />
+                            <div className="glass-card overflow-hidden p-6 relative min-h-[300px] flex flex-col justify-center gap-6">
+                                {/* Flow line connecting the nodes */}
+                                <div className="absolute left-1/2 top-10 bottom-10 w-0.5 bg-gradient-to-b from-primary/50 via-success/50 to-warning/50 -translate-x-1/2 z-0"></div>
+                                
+                                {/* Node 1: Report */}
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                    className="relative z-10 w-3/4 self-start glass-panel p-4 rounded-2xl border-l-4 border-l-primary flex items-center gap-4"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                                        <Activity size={16} />
+                                    </div>
+                                    <div>
+                                        <div className="h-3 w-24 bg-textPrimary/80 rounded-full mb-2"></div>
+                                        <div className="h-2 w-32 bg-overlay/20 rounded-full"></div>
+                                    </div>
+                                </motion.div>
+
+                                {/* Node 2: Assign */}
+                                <motion.div 
+                                    initial={{ opacity: 0, x: 20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.4 }}
+                                    className="relative z-10 w-3/4 self-end glass-panel p-4 rounded-2xl border-r-4 border-r-success flex items-center gap-4 justify-end text-right"
+                                >
+                                    <div>
+                                        <div className="h-3 w-24 bg-textPrimary/80 rounded-full ml-auto mb-2"></div>
+                                        <div className="h-2 w-32 bg-overlay/20 rounded-full ml-auto"></div>
+                                    </div>
+                                    <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center text-success shrink-0">
+                                        <Shield size={16} />
+                                    </div>
+                                </motion.div>
+
+                                {/* Node 3: Resolve */}
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.6 }}
+                                    className="relative z-10 w-3/4 self-start glass-panel p-4 rounded-2xl border-l-4 border-l-warning flex items-center gap-4"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center text-warning shrink-0">
+                                        <Wrench size={16} />
+                                    </div>
+                                    <div>
+                                        <div className="h-3 w-24 bg-textPrimary/80 rounded-full mb-2"></div>
+                                        <div className="h-2 w-32 bg-overlay/20 rounded-full"></div>
+                                    </div>
+                                </motion.div>
                             </div>
                             
                             {/* Floating Badges */}
                             <motion.div 
                                 animate={{ y: [0, -10, 0] }} 
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute -top-6 -left-6 glass-panel px-5 py-3 rounded-xl flex items-center gap-3 shadow-xl"
+                                className="absolute -top-4 -left-4 glass-panel px-4 py-2 rounded-xl flex items-center gap-2 shadow-xl z-20 border border-primary/20"
                             >
-                                <div className="p-2 bg-primary/20 text-primary rounded-lg"><Activity size={18} /></div>
-                                <span className="font-bold text-sm">Live workflow</span>
-                            </motion.div>
-                            
-                            <motion.div 
-                                animate={{ y: [0, 15, 0] }} 
-                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                                className="absolute -bottom-8 -right-8 glass-panel px-5 py-3 rounded-xl flex items-center gap-3 shadow-xl"
-                            >
-                                <div className="p-2 bg-success/20 text-success rounded-lg"><Shield size={18} /></div>
-                                <span className="font-bold text-sm">Better campus care</span>
+                                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                <span className="font-bold text-xs uppercase tracking-wider text-textPrimary">Syncing</span>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -423,21 +467,27 @@ const LandingPage = () => {
                         viewport={viewportOnce}
                         className="grid md:grid-cols-3 gap-8"
                     >
-                        {featureCards.map((card, idx) => (
+                        {featureCards.map((card, idx) => {
+                            const Icon = card.icon;
+                            return (
                             <motion.div 
                                 key={idx} 
                                 variants={revealUp}
                                 whileHover={{ y: -10 }}
-                                className="glass-card group overflow-hidden relative min-h-[320px]"
+                                className={`glass-card group relative min-h-[280px] p-8 flex flex-col justify-end overflow-hidden bg-gradient-to-t ${card.color}`}
                             >
-                                <img src={card.image} alt={card.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
-                                <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
-                                    <span className="text-primary font-bold text-xs uppercase tracking-widest mb-2 block">{card.description}</span>
-                                    <h4 className="text-2xl font-extrabold text-white">{card.title}</h4>
+                                {/* Abstract large background icon */}
+                                <Icon size={180} strokeWidth={1} className={`absolute -top-10 -right-10 opacity-10 ${card.textColor} transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700`} />
+                                
+                                <div className="relative z-10">
+                                    <div className={`w-12 h-12 rounded-xl bg-surface shadow-md flex items-center justify-center ${card.textColor} mb-6 border border-overlay/5`}>
+                                        <Icon size={24} />
+                                    </div>
+                                    <span className={`font-bold text-xs uppercase tracking-widest mb-2 block ${card.textColor}`}>{card.description}</span>
+                                    <h4 className="text-2xl font-extrabold text-textPrimary">{card.title}</h4>
                                 </div>
                             </motion.div>
-                        ))}
+                        )})}
                     </motion.div>
                 </div>
             </section>
