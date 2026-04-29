@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertCircle,
     KeyRound,
@@ -105,162 +105,193 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-vh-100 d-flex flex-column text-main position-relative overflow-hidden bg-transparent">
-            <div className="app-backdrop">
-                <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${maintHero})` }}></div>
-                <div className="bg-overlay"></div>
+        <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-cover bg-center opacity-40 blur-md scale-105 transition-all duration-500" style={{ backgroundImage: `url(${maintHero})` }}></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
             </div>
 
             <Navbar />
 
-            <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
-                <div className="container mt-5">
-                    <div className="row justify-content-center">
-                        <div className="col-lg-5 col-md-8">
-                            <div className="premium-card p-5 shadow-22xl bg-glass border-secondary border-opacity-10">
-                                <div className="text-center mb-5">
-                                    <div className="bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center p-4 rounded-circle text-primary mb-4 shadow-sm">
-                                        {mode === 'change-password' ? <Shield size={34} /> : <KeyRound size={34} />}
-                                    </div>
-                                    <h2 className="fw-800 tracking-tighter mb-2 display-6">
-                                        {mode === 'change-password' ? 'Change Temporary Password' : 'Sign In'}
-                                    </h2>
-                                    <p className="smallest text-muted fw-800 tracking-widest uppercase opacity-75">
-                                        {mode === 'change-password'
-                                            ? 'Use the temporary password once, then set your own'
-                                            : 'Campus maintenance dashboard access'}
-                                    </p>
-                                </div>
-
-                                <AnimatePresence mode="wait">
-                                    {error && (
-                                        <div className="alert alert-danger mb-4 p-3 rounded-4 d-flex align-items-center smallest fw-800 border-0 bg-danger bg-opacity-10 text-danger shadow-sm">
-                                            <AlertCircle size={18} className="me-3" />
-                                            {error}
-                                        </div>
-                                    )}
-                                </AnimatePresence>
-
-                                {mode === 'login' ? (
-                                    <form onSubmit={handleLogin}>
-                                        <div className="d-flex flex-column gap-4">
-                                            <div>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User ID</label>
-                                                <div className="position-relative">
-                                                    <input
-                                                        type="text"
-                                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5"
-                                                        value={credentials.user_code}
-                                                        onChange={(e) =>
-                                                            setCredentials((prev) => ({
-                                                                ...prev,
-                                                                user_code: e.target.value.toUpperCase()
-                                                            }))
-                                                        }
-                                                        required
-                                                    />
-                                                    <User size={18} className="position-absolute top-50 translate-middle-y start-0 ms-3 text-primary opacity-50" />
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Password</label>
-                                                <div className="position-relative">
-                                                    <input
-                                                        type="password"
-                                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm ps-5"
-                                                        value={credentials.password}
-                                                        onChange={(e) =>
-                                                            setCredentials((prev) => ({
-                                                                ...prev,
-                                                                password: e.target.value
-                                                            }))
-                                                        }
-                                                        required
-                                                    />
-                                                    <Lock size={18} className="position-absolute top-50 translate-middle-y start-0 ms-3 text-primary opacity-50" />
-                                                </div>
-                                            </div>
-
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary w-100 py-3 fw-800 shadow-22xl d-flex align-items-center justify-content-center rounded-pill smallest tracking-widest uppercase mt-3"
-                                                disabled={loading}
-                                            >
-                                                {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <LogIn size={18} className="me-2" />}
-                                                {loading ? 'Signing in...' : 'Login'}
-                                            </button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <form onSubmit={handlePasswordChange}>
-                                        <div className="d-flex flex-column gap-4">
-                                            <div>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">User ID</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm"
-                                                    value={passwordForm.user_code}
-                                                    disabled
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">New Password</label>
-                                                <input
-                                                    type="password"
-                                                    className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm"
-                                                    value={passwordForm.new_password}
-                                                    onChange={(e) =>
-                                                        setPasswordForm((prev) => ({
-                                                            ...prev,
-                                                            new_password: e.target.value
-                                                        }))
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="form-label smallest fw-800 text-muted mb-2 uppercase tracking-widest">Confirm New Password</label>
-                                                <input
-                                                    type="password"
-                                                    className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 text-main rounded-4 fw-bold shadow-sm"
-                                                    value={passwordForm.confirm_password}
-                                                    onChange={(e) =>
-                                                        setPasswordForm((prev) => ({
-                                                            ...prev,
-                                                            confirm_password: e.target.value
-                                                        }))
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div className="d-flex gap-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setMode('login')}
-                                                    className="btn btn-surface px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 border-secondary border-opacity-10"
-                                                >
-                                                    Back
-                                                </button>
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn-primary px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest flex-grow-1 shadow-22xl d-flex align-items-center justify-content-center"
-                                                    disabled={loading}
-                                                >
-                                                    {loading ? <Loader2 size={18} className="me-2 animate-spin" /> : <Save size={18} className="me-2" />}
-                                                    {loading ? 'Saving...' : 'Change Password'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                )}
-                            </div>
+            <div className="flex-1 flex items-center justify-center py-20 px-4 relative z-10">
+                <motion.div 
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+                    className="w-full max-w-md"
+                >
+                    <div className="glass-card p-8 md:p-10 shadow-2xl">
+                        <div className="text-center mb-8">
+                            <motion.div 
+                                initial={{ rotate: -180, scale: 0 }}
+                                animate={{ rotate: 0, scale: 1 }}
+                                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                                className="inline-flex items-center justify-center p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 text-primary mb-6 shadow-inner border border-primary/20"
+                            >
+                                {mode === 'change-password' ? <Shield size={36} /> : <KeyRound size={36} />}
+                            </motion.div>
+                            <h2 className="text-3xl font-extrabold text-textPrimary tracking-tight mb-3">
+                                {mode === 'change-password' ? 'Change Password' : 'Welcome Back'}
+                            </h2>
+                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest">
+                                {mode === 'change-password'
+                                    ? 'Set your own secure password'
+                                    : 'Sign in to access your dashboard'}
+                            </p>
                         </div>
+
+                        <AnimatePresence mode="wait">
+                            {error && (
+                                <motion.div 
+                                    initial={{ opacity: 0, height: 0, y: -10 }}
+                                    animate={{ opacity: 1, height: 'auto', y: 0 }}
+                                    exit={{ opacity: 0, height: 0, y: -10 }}
+                                    className="mb-6 p-4 rounded-xl flex items-center bg-danger/10 text-danger text-sm font-bold border border-danger/20"
+                                >
+                                    <AlertCircle size={20} className="mr-3 shrink-0" />
+                                    {error}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <AnimatePresence mode="wait">
+                            {mode === 'login' ? (
+                                <motion.form 
+                                    key="login"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ duration: 0.3 }}
+                                    onSubmit={handleLogin} 
+                                    className="flex flex-col gap-5"
+                                >
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
+                                        <div className="relative group">
+                                            <input
+                                                type="text"
+                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                                value={credentials.user_code}
+                                                onChange={(e) =>
+                                                    setCredentials((prev) => ({
+                                                        ...prev,
+                                                        user_code: e.target.value.toUpperCase()
+                                                    }))
+                                                }
+                                                placeholder="Enter your ID"
+                                                required
+                                            />
+                                            <User size={20} className="absolute top-1/2 -translate-y-1/2 left-4 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Password</label>
+                                        <div className="relative group">
+                                            <input
+                                                type="password"
+                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                                value={credentials.password}
+                                                onChange={(e) =>
+                                                    setCredentials((prev) => ({
+                                                        ...prev,
+                                                        password: e.target.value
+                                                    }))
+                                                }
+                                                placeholder="••••••••"
+                                                required
+                                            />
+                                            <Lock size={20} className="absolute top-1/2 -translate-y-1/2 left-4 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                        </div>
+                                    </div>
+
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="submit"
+                                        className="btn-primary w-full py-4 mt-2 flex items-center justify-center text-sm font-extrabold tracking-widest uppercase rounded-xl"
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Loader2 size={20} className="mr-3 animate-spin" /> : <LogIn size={20} className="mr-3" />}
+                                        {loading ? 'Signing in...' : 'Sign In'}
+                                    </motion.button>
+                                </motion.form>
+                            ) : (
+                                <motion.form 
+                                    key="password"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                    onSubmit={handlePasswordChange} 
+                                    className="flex flex-col gap-5"
+                                >
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
+                                        <input
+                                            type="text"
+                                            className="w-full py-3 px-4 bg-surface/30 border border-white/5 text-textSecondary rounded-xl font-bold cursor-not-allowed"
+                                            value={passwordForm.user_code}
+                                            disabled
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">New Password</label>
+                                        <input
+                                            type="password"
+                                            className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            value={passwordForm.new_password}
+                                            onChange={(e) =>
+                                                setPasswordForm((prev) => ({
+                                                    ...prev,
+                                                    new_password: e.target.value
+                                                }))
+                                            }
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Confirm New Password</label>
+                                        <input
+                                            type="password"
+                                            className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            value={passwordForm.confirm_password}
+                                            onChange={(e) =>
+                                                setPasswordForm((prev) => ({
+                                                    ...prev,
+                                                    confirm_password: e.target.value
+                                                }))
+                                            }
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="flex gap-4 mt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('login')}
+                                            className="btn-secondary flex-1 py-4 text-xs font-extrabold tracking-widest uppercase rounded-xl"
+                                        >
+                                            Back
+                                        </button>
+                                        <motion.button
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            type="submit"
+                                            className="btn-primary flex-1 py-4 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl"
+                                            disabled={loading}
+                                        >
+                                            {loading ? <Loader2 size={18} className="mr-2 animate-spin" /> : <Save size={18} className="mr-2" />}
+                                            {loading ? 'Saving...' : 'Update'}
+                                        </motion.button>
+                                    </div>
+                                </motion.form>
+                            )}
+                        </AnimatePresence>
                     </div>
-                </div>
+                </motion.div>
             </div>
 
             <PremiumModal
@@ -271,13 +302,18 @@ const LoginPage = () => {
                 confirmText="Back to Login"
                 onConfirm={() => setShowSuccessModal(false)}
             >
-                <div className="text-center">
-                    <div className="bg-success bg-opacity-10 p-4 rounded-circle text-success d-inline-block mb-4 shadow-sm">
+                <div className="text-center py-4">
+                    <motion.div 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", bounce: 0.5 }}
+                        className="inline-flex p-5 rounded-full bg-success/20 text-success mb-6 shadow-inner border border-success/20"
+                    >
                         <Shield size={48} />
-                    </div>
-                    <h4 className="fw-800 tracking-tighter mb-2 text-main">Password changed successfully</h4>
-                    <p className="smallest text-muted fw-bold uppercase tracking-widest leading-relaxed">
-                        Sign in again with the new password to open your dashboard.
+                    </motion.div>
+                    <h4 className="text-2xl font-extrabold tracking-tight mb-3 text-textPrimary">Password Changed</h4>
+                    <p className="text-sm text-textSecondary font-medium leading-relaxed max-w-xs mx-auto">
+                        Your password has been successfully updated. You can now sign in with your new credentials.
                     </p>
                 </div>
             </PremiumModal>
