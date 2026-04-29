@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity,
     Bell,
@@ -45,40 +45,45 @@ const REQUEST_CATEGORIES = [
 ];
 
 const statusClassName = (status) => {
-    if (status === 'Completed') return 'bg-success bg-opacity-10 text-success';
-    if (status === 'Pending') return 'bg-danger bg-opacity-10 text-danger';
-    if (status === 'On Hold') return 'bg-secondary bg-opacity-10 text-secondary';
-    return 'bg-warning bg-opacity-10 text-warning';
+    if (status === 'Completed') return 'bg-success/10 text-success border border-success/20';
+    if (status === 'Pending') return 'bg-danger/10 text-danger border border-danger/20';
+    if (status === 'On Hold') return 'bg-textSecondary/10 text-textSecondary border border-textSecondary/20';
+    return 'bg-warning/10 text-warning border border-warning/20';
 };
 
 const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap gap-3">
-        <div className="d-flex align-items-center">
-            <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '46px' }} />
+    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 mt-2">
+        <div className="flex items-center gap-4">
+            <img src={dbuLogo} alt="DBU" className="hidden md:block h-12" />
             <div>
-                <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
-                <p className="text-muted smallest fw-800 uppercase tracking-widest opacity-75 mb-0">{subtitle}</p>
+                <h2 className="text-3xl font-extrabold tracking-tight text-textPrimary mb-1">{title}</h2>
+                <p className="text-xs text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
             </div>
         </div>
-        <div className="d-flex align-items-center gap-2">
-            <button
-                type="button"
+        <div className="flex items-center gap-3">
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="btn btn-surface position-relative rounded-circle p-3 border-secondary border-opacity-10"
-                style={{ width: '48px', height: '48px' }}
+                className="relative p-3 rounded-full bg-surface/50 border border-white/10 hover:bg-surface transition-colors"
                 title="Open requests"
             >
-                <Bell size={20} className={unreadCount > 0 ? 'text-danger' : 'text-muted'} />
+                <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
                 {unreadCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ minWidth: '22px', minHeight: '22px', fontSize: '0.65rem' }}>
+                    <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
                         {unreadCount}
                     </span>
                 )}
-            </button>
-            <button type="button" onClick={onLogout} className="btn btn-danger rounded-pill px-4 py-2 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
-                <LogOut size={15} className="me-2" />
+            </motion.button>
+            <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onLogout} 
+                className="flex items-center gap-2 px-5 py-2.5 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-xs font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+            >
+                <LogOut size={16} />
                 Logout
-            </button>
+            </motion.button>
         </div>
     </div>
 );
@@ -93,38 +98,44 @@ const RequestTimelineModal = ({ request, logs, loading, onClose }) => (
     >
         {request && (
             <div>
-                <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 mb-4">
-                    <div className="d-flex justify-content-between flex-wrap gap-3">
+                <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 mb-6">
+                    <div className="flex flex-wrap justify-between items-start gap-4">
                         <div>
-                            <h5 className="fw-800 text-main mb-1">{request.title}</h5>
-                            <p className="smallest text-muted mb-0">{request.location}</p>
+                            <h5 className="text-lg font-extrabold text-textPrimary mb-1">{request.title}</h5>
+                            <p className="text-xs text-textSecondary mb-0 font-medium">{request.location}</p>
                         </div>
-                        <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClassName(request.status)}`}>{request.status}</span>
                     </div>
-                    <p className="smallest text-muted mt-3 mb-0">{request.description}</p>
+                    <p className="text-sm text-textSecondary mt-4 mb-0">{request.description}</p>
                 </div>
 
-                <div className="d-flex flex-column gap-3">
+                <div className="flex flex-col gap-4">
                     {loading ? (
-                        <div className="text-center py-4">
-                            <Loader2 size={24} className="animate-spin text-primary" />
+                        <div className="flex justify-center py-8">
+                            <Loader2 size={32} className="animate-spin text-primary" />
                         </div>
                     ) : logs.length > 0 ? (
-                        logs.map((log) => (
-                            <div key={log.id} className="p-3 rounded-4 bg-surface border border-secondary border-opacity-10">
-                                <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                        logs.map((log, idx) => (
+                            <motion.div 
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                key={log.id} 
+                                className="p-4 rounded-xl bg-surface/50 border border-white/5 shadow-sm"
+                            >
+                                <div className="flex justify-between items-start gap-4 mb-3">
                                     <div>
-                                        <div className="fw-800 text-main">{log.action_taken}</div>
-                                        <div className="smallest text-muted">{log.action_by}</div>
+                                        <div className="font-extrabold text-textPrimary text-sm">{log.action_taken}</div>
+                                        <div className="text-xs text-textSecondary mt-1">{log.action_by}</div>
                                     </div>
-                                    <span className="smallest text-muted">{new Date(log.created_at).toLocaleString()}</span>
+                                    <span className="text-xs text-textSecondary font-medium">{new Date(log.created_at).toLocaleString()}</span>
                                 </div>
-                                <p className="small text-main mb-2">{log.remarks}</p>
-                                <span className="smallest text-primary fw-bold">Progress: {log.progress_percentage ?? 0}%</span>
-                            </div>
+                                <p className="text-sm text-textPrimary mb-3">{log.remarks}</p>
+                                <span className="inline-block px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-bold border border-primary/20">Progress: {log.progress_percentage ?? 0}%</span>
+                            </motion.div>
                         ))
                     ) : (
-                        <div className="text-center py-4 text-muted">No updates yet.</div>
+                        <div className="text-center py-8 text-textSecondary font-medium">No updates yet.</div>
                     )}
                 </div>
             </div>
@@ -180,114 +191,129 @@ const NewRequestForm = () => {
         }
     };
 
-    const handleNotificationClick = async () => {
-        await markNotificationsRead();
-        navigate('/student');
-    };
-
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="New Request"
                 subtitle="Send a maintenance problem to the admin team"
                 unreadCount={unreadCount}
-                onReadNotifications={handleNotificationClick}
+                onReadNotifications={markNotificationsRead}
                 onLogout={logout}
             />
 
-            <div className="row justify-content-center">
-                <div className="col-xl-8">
-                    <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        {error && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 rounded-4">{error}</div>}
+            <div className="max-w-4xl mx-auto">
+                <div className="glass-card p-8 shadow-2xl">
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="mb-6 p-4 rounded-xl bg-danger/10 text-danger text-sm font-bold border border-danger/20"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="row g-4">
-                                <div className="col-12">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Problem Title</label>
-                                    <input
-                                        type="text"
-                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        value={formData.title}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
-                                        placeholder="Example: Water leakage in Block B"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="col-md-6">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Category</label>
-                                    <select
-                                        className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        value={formData.category}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
-                                    >
-                                        {REQUEST_CATEGORIES.map((category) => (
-                                            <option key={category} value={category}>
-                                                {category}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="col-md-6">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Priority</label>
-                                    <select
-                                        className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        value={formData.priority}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, priority: event.target.value }))}
-                                    >
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="High">High</option>
-                                        <option value="Emergency">Emergency</option>
-                                    </select>
-                                </div>
-
-                                <div className="col-md-6">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Dorm</label>
-                                    <input
-                                        type="text"
-                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        value={formData.dorm}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, dorm: event.target.value }))}
-                                        placeholder="Example: Dorm A"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="col-md-6">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Block</label>
-                                    <input
-                                        type="text"
-                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        value={formData.block}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, block: event.target.value }))}
-                                        placeholder="Example: Block B"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="col-12">
-                                    <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Description</label>
-                                    <textarea
-                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        rows="5"
-                                        value={formData.description}
-                                        onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
-                                        placeholder="Describe the maintenance problem clearly"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="col-12">
-                                    <button type="submit" className="btn btn-primary px-4 py-3 rounded-pill fw-800 uppercase smallest tracking-widest shadow-22xl d-inline-flex align-items-center" disabled={saving}>
-                                        {saving ? <Loader2 size={18} className="me-2 animate-spin" /> : <Send size={18} className="me-2" />}
-                                        {saving ? 'Sending...' : 'Submit Request'}
-                                    </button>
-                                </div>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Problem Title</label>
+                                <input
+                                    type="text"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    value={formData.title}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
+                                    placeholder="Example: Water leakage in Block B"
+                                    required
+                                />
                             </div>
-                        </form>
-                    </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Category</label>
+                                <select
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    value={formData.category}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
+                                >
+                                    {REQUEST_CATEGORIES.map((category) => (
+                                        <option key={category} value={category} className="bg-surface text-textPrimary">
+                                            {category}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Priority</label>
+                                <select
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    value={formData.priority}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, priority: event.target.value }))}
+                                >
+                                    <option value="Low" className="bg-surface">Low</option>
+                                    <option value="Medium" className="bg-surface">Medium</option>
+                                    <option value="High" className="bg-surface">High</option>
+                                    <option value="Emergency" className="bg-surface">Emergency</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Dorm</label>
+                                <input
+                                    type="text"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    value={formData.dorm}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, dorm: event.target.value }))}
+                                    placeholder="Example: Dorm A"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Block</label>
+                                <input
+                                    type="text"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    value={formData.block}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, block: event.target.value }))}
+                                    placeholder="Example: Block B"
+                                    required
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Description</label>
+                                <textarea
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    rows="5"
+                                    value={formData.description}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
+                                    placeholder="Describe the maintenance problem clearly"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="pt-4">
+                            <motion.button 
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                type="submit" 
+                                className="btn-primary w-full md:w-auto px-8 py-4 rounded-xl text-sm font-extrabold tracking-widest uppercase flex items-center justify-center gap-2" 
+                                disabled={saving}
+                            >
+                                {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                {saving ? 'Sending...' : 'Submit Request'}
+                            </motion.button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -299,9 +325,13 @@ const NewRequestForm = () => {
                 type="success"
                 confirmText="Go to Dashboard"
             >
-                <p className="mb-0 text-muted">Your maintenance request was sent to the admin queue successfully.</p>
+                <div className="text-center py-4">
+                    <p className="text-textSecondary font-medium leading-relaxed">
+                        Your maintenance request was sent to the admin queue successfully. You can track its status on your dashboard.
+                    </p>
+                </div>
             </PremiumModal>
-        </div>
+        </motion.div>
     );
 };
 
@@ -395,62 +425,76 @@ const StudentOverview = () => {
         }
     };
 
-    const handleNotificationClick = async () => {
-        await markNotificationsRead();
-        navigate('/student');
-    };
-
     return (
-        <div className="container-fluid text-main">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Student Dashboard"
                 subtitle="Track the problem you reported and see technician updates"
                 unreadCount={unreadCount}
-                onReadNotifications={handleNotificationClick}
+                onReadNotifications={markNotificationsRead}
                 onLogout={logout}
             />
 
-            <div className="row g-4 mb-4">
-                <div className="col-xl-4">
-                    <div className="premium-card p-4 h-100 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                <div className="xl:col-span-1">
+                    <div className="glass-card p-6 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h4 className="fw-800 text-main mb-1">My Request Summary</h4>
-                                <p className="smallest text-muted mb-0">Live counts from your dashboard</p>
+                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Request Summary</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0">Live status distribution</p>
                             </div>
-                            <Activity size={22} className="text-primary" />
+                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                <Activity size={20} />
+                            </div>
                         </div>
-                        <Doughnut
-                            data={{
-                                labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
-                                datasets: [
-                                    {
-                                        data: [statusCounts.assigned, statusCounts.progress, statusCounts.holding, statusCounts.completed],
-                                        backgroundColor: ['#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
-                                        borderWidth: 0
-                                    }
-                                ]
-                            }}
-                            options={{
-                                responsive: true,
-                                plugins: { legend: { position: 'bottom' } }
-                            }}
-                        />
+                        <div className="flex-1 flex items-center justify-center min-h-[250px]">
+                            <Doughnut
+                                data={{
+                                    labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                    datasets: [
+                                        {
+                                            data: [statusCounts.assigned, statusCounts.progress, statusCounts.holding, statusCounts.completed],
+                                            backgroundColor: ['#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
+                                            borderWidth: 0,
+                                            hoverOffset: 4
+                                        }
+                                    ]
+                                }}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { 
+                                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } 
+                                    },
+                                    cutout: '70%'
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <div className="col-xl-8">
-                    <div className="premium-card p-4 h-100 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
+                <div className="xl:col-span-2">
+                    <div className="glass-card p-6 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h4 className="fw-800 text-main mb-1">Category Activity</h4>
-                                <p className="smallest text-muted mb-0">Chart.js updates whenever your requests change</p>
+                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Category Activity</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0">Requests by department</p>
                             </div>
-                            <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
-                                <Activity size={18} />
-                            </button>
+                            <motion.button 
+                                whileHover={{ scale: 1.1, rotate: 15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={refreshData}
+                                className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                            >
+                                <Activity size={20} />
+                            </motion.button>
                         </div>
-                        <div style={{ height: '300px' }}>
+                        <div className="flex-1 min-h-[250px]">
                             <Bar
                                 data={{
                                     labels: REQUEST_CATEGORIES,
@@ -458,15 +502,20 @@ const StudentOverview = () => {
                                         {
                                             label: 'Requests',
                                             data: categoryCounts,
-                                            backgroundColor: '#3b82f6',
-                                            borderRadius: 10
+                                            backgroundColor: '#6366f1',
+                                            borderRadius: 6,
+                                            hoverBackgroundColor: '#8b5cf6'
                                         }
                                     ]
                                 }}
                                 options={{
                                     responsive: true,
                                     maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } }
+                                    plugins: { legend: { display: false } },
+                                    scales: {
+                                        y: { ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                                    }
                                 }}
                             />
                         </div>
@@ -474,101 +523,108 @@ const StudentOverview = () => {
                 </div>
             </div>
 
-            <div className="row g-4">
-                <div className="col-12">
-                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                            <div>
-                                <h4 className="fw-800 text-main mb-1">Active Requests</h4>
-                                <p className="smallest text-muted mb-0">See the current status, assigned technician name, and phone number</p>
-                            </div>
-                            <Link to="/student/new-request" className="btn btn-primary rounded-pill px-4 py-3 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
-                                <Plus size={16} className="me-2" />
-                                New Request
-                            </Link>
-                        </div>
-
-                        <div className="table-responsive">
-                            <table className="table align-middle table-borderless">
-                                <thead>
-                                    <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                        <th className="pb-3 text-main">Problem</th>
-                                        <th className="pb-3 text-main">Location</th>
-                                        <th className="pb-3 text-main">Status</th>
-                                        <th className="pb-3 text-main">Assigned Technician</th>
-                                        <th className="pb-3 text-end text-main">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {loading ? (
-                                        <tr>
-                                            <td colSpan="5" className="text-center py-5">
-                                                <Loader2 size={28} className="animate-spin text-primary" />
-                                            </td>
-                                        </tr>
-                                    ) : activeRequests.length > 0 ? (
-                                        activeRequests.map((request) => (
-                                            <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
-                                                <td className="py-4">
-                                                    <div className="fw-800 text-main">{request.title}</div>
-                                                    <div className="smallest text-muted mt-1">{request.category}</div>
-                                                </td>
-                                                <td className="py-4">
-                                                    <div className="d-flex align-items-center text-muted">
-                                                        <MapPin size={14} className="me-2 text-primary" />
-                                                        {request.location}
-                                                    </div>
-                                                </td>
-                                                <td className="py-4">
-                                                    <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
-                                                    <div className="smallest text-muted mt-2">Progress: {request.progress_percentage}%</div>
-                                                </td>
-                                                <td className="py-4">
-                                                    {request.technician_name ? (
-                                                        <>
-                                                            <div className="fw-800 text-main">{request.technician_name}</div>
-                                                            <div className="smallest text-muted d-flex align-items-center mt-1">
-                                                                <Phone size={13} className="me-2 text-primary" />
-                                                                {request.technician_phone || 'No phone number'}
-                                                            </div>
-                                                            <div className="smallest text-muted d-flex align-items-center mt-1">
-                                                                <Wrench size={13} className="me-2 text-primary" />
-                                                                {request.technician_skills || 'Technician'}
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <span className="smallest text-muted">Waiting for admin assignment</span>
-                                                    )}
-                                                </td>
-                                                <td className="py-4 text-end">
-                                                    <div className="d-flex justify-content-end gap-2">
-                                                        <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => openTimeline(request)}>
-                                                            View
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-danger rounded-pill px-3 py-2"
-                                                            onClick={() => deleteRequest(request.id)}
-                                                            disabled={deletingId === request.id}
-                                                        >
-                                                            {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className="text-center py-5 text-muted">
-                                                No active requests right now.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-
+            <div className="glass-card p-6">
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h4 className="text-lg font-extrabold text-textPrimary mb-1">Active Requests</h4>
+                        <p className="text-xs text-textSecondary font-medium m-0">Monitor your ongoing maintenance reports</p>
                     </div>
+                    <Link to="/student/new-request" className="btn-primary flex items-center gap-2 text-xs font-extrabold tracking-widest uppercase py-3 rounded-xl">
+                        <Plus size={16} />
+                        New Request
+                    </Link>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Location</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Status</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Technician</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
+                                    </td>
+                                </tr>
+                            ) : activeRequests.length > 0 ? (
+                                activeRequests.map((request, idx) => (
+                                    <motion.tr 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={request.id} 
+                                        className="hover:bg-white/[0.02] transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <div className="flex items-center text-xs text-textSecondary font-medium">
+                                                <MapPin size={14} className="mr-2 text-primary shrink-0" />
+                                                <span className="truncate max-w-[150px]">{request.location}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>
+                                                {request.status}
+                                            </span>
+                                            <div className="text-[10px] text-textSecondary mt-2 font-bold uppercase tracking-wider">
+                                                Progress: {request.progress_percentage}%
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            {request.technician_name ? (
+                                                <div>
+                                                    <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.technician_name}</div>
+                                                    <div className="flex items-center text-[10px] text-textSecondary mt-1 font-medium whitespace-nowrap">
+                                                        <Phone size={12} className="mr-1.5 text-primary" />
+                                                        {request.technician_phone || 'No phone'}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-textSecondary font-medium italic">Pending assignment</span>
+                                            )}
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <motion.button 
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => openTimeline(request)}
+                                                    className="btn-secondary px-4 py-2 rounded-lg text-xs font-bold"
+                                                >
+                                                    View
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => deleteRequest(request.id)}
+                                                    disabled={deletingId === request.id}
+                                                    className="p-2 rounded-lg bg-danger/10 text-danger hover:bg-danger hover:text-white border border-danger/20 transition-colors"
+                                                >
+                                                    {deletingId === request.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                                </motion.button>
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="py-12 text-center text-textSecondary font-medium">
+                                        No active requests right now.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -581,7 +637,7 @@ const StudentOverview = () => {
                     setHistoryLogs([]);
                 }}
             />
-        </div>
+        </motion.div>
     );
 };
 
@@ -622,87 +678,103 @@ const StudentHistory = () => {
         }
     };
 
-    const handleNotificationClick = async () => {
-        await markNotificationsRead();
-        navigate('/student');
-    };
-
     return (
-        <div className="container-fluid text-main">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Request History"
                 subtitle="Completed tasks you can review or delete permanently"
                 unreadCount={unreadCount}
-                onReadNotifications={handleNotificationClick}
+                onReadNotifications={markNotificationsRead}
                 onLogout={logout}
             />
 
-            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                <div className="d-flex align-items-center gap-3 mb-4">
-                    <CheckCircle size={22} className="text-success" />
+            <div className="glass-card p-6">
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 rounded-xl bg-success/20 text-success shadow-inner border border-success/20">
+                        <CheckCircle size={24} />
+                    </div>
                     <div>
-                        <h4 className="fw-800 text-main mb-1">Completed Requests</h4>
-                        <p className="smallest text-muted mb-0">Deleting a request here removes it from admin and technician dashboards too</p>
+                        <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completed Requests</h4>
+                        <p className="text-xs text-textSecondary font-medium m-0">Deleting a request here removes it permanently.</p>
                     </div>
                 </div>
 
-                <div className="table-responsive">
-                    <table className="table align-middle table-borderless">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Problem</th>
-                                <th className="pb-3 text-main">Technician</th>
-                                <th className="pb-3 text-main">Completed</th>
-                                <th className="pb-3 text-end text-main">Actions</th>
+                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Technician</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Completed On</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="4" className="text-center py-5">
-                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    <td colSpan="4" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
                                     </td>
                                 </tr>
                             ) : completedRequests.length > 0 ? (
-                                completedRequests.map((request) => (
-                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.title}</div>
-                                            <div className="smallest text-muted d-flex align-items-center mt-1">
-                                                <MapPin size={13} className="me-2 text-primary" />
+                                completedRequests.map((request, idx) => (
+                                    <motion.tr 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={request.id} 
+                                        className="hover:bg-white/[0.02] transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                            <div className="flex items-center text-xs text-textSecondary mt-1 font-medium">
+                                                <MapPin size={12} className="mr-1.5 text-primary" />
                                                 {request.location}
                                             </div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.technician_name || 'Not assigned'}</div>
-                                            <div className="smallest text-muted d-flex align-items-center mt-1">
-                                                <Phone size={13} className="me-2 text-primary" />
-                                                {request.technician_phone || 'No phone number'}
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.technician_name || 'Not assigned'}</div>
+                                            <div className="flex items-center text-[10px] text-textSecondary mt-1 font-medium whitespace-nowrap">
+                                                <Phone size={12} className="mr-1.5 text-primary" />
+                                                {request.technician_phone || 'No phone'}
                                             </div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="small text-main">{new Date(request.updated_at).toLocaleString()}</div>
+                                        <td className="py-4 px-4">
+                                            <div className="text-sm text-textSecondary font-medium whitespace-nowrap">
+                                                {new Date(request.updated_at).toLocaleDateString()}
+                                            </div>
                                         </td>
-                                        <td className="py-4 text-end">
-                                            <div className="d-flex justify-content-end gap-2">
-                                                <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => openTimeline(request)}>
+                                        <td className="py-4 px-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <motion.button 
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => openTimeline(request)}
+                                                    className="btn-secondary px-4 py-2 rounded-lg text-xs font-bold"
+                                                >
                                                     View
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger rounded-pill px-3 py-2"
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
                                                     onClick={() => deleteRequest(request.id)}
                                                     disabled={deletingId === request.id}
+                                                    className="p-2 rounded-lg bg-danger/10 text-danger hover:bg-danger hover:text-white border border-danger/20 transition-colors"
                                                 >
-                                                    {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-                                                </button>
+                                                    {deletingId === request.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                                </motion.button>
                                             </div>
                                         </td>
-                                    </tr>
+                                    </motion.tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="text-center py-5 text-muted">
+                                    <td colSpan="4" className="py-12 text-center text-textSecondary font-medium">
                                         No completed requests in history.
                                     </td>
                                 </tr>
@@ -721,24 +793,28 @@ const StudentHistory = () => {
                     setHistoryLogs([]);
                 }}
             />
-        </div>
+        </motion.div>
     );
 };
 
 const StudentDashboard = () => (
-    <div className="min-vh-100 position-relative">
-        <div className="app-backdrop">
-            <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${techBg})` }}></div>
-            <div className="bg-overlay"></div>
+    <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-cover bg-center opacity-30 blur-md scale-105" style={{ backgroundImage: `url(${techBg})` }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/80 to-surface/90"></div>
+            <div className="absolute top-[10%] left-[20%] w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px] animate-pulse-slow"></div>
+            <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] rounded-full bg-secondary/10 blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
         </div>
 
         <Sidebar />
-        <div className="main-content-area text-main">
+        
+        <div className="relative z-10 lg:pl-[280px] min-h-screen">
             <AnimatePresence mode="wait">
                 <Routes>
-                    <Route index element={<div><StudentOverview /></div>} />
-                    <Route path="new-request" element={<div><NewRequestForm /></div>} />
-                    <Route path="history" element={<div><StudentHistory /></div>} />
+                    <Route index element={<StudentOverview />} />
+                    <Route path="new-request" element={<NewRequestForm />} />
+                    <Route path="history" element={<StudentHistory />} />
                 </Routes>
             </AnimatePresence>
         </div>
