@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity,
     Bell,
@@ -57,40 +57,45 @@ const REQUEST_CATEGORIES = [
 ];
 
 const statusClassName = (status) => {
-    if (status === 'Completed') return 'bg-success bg-opacity-10 text-success';
-    if (status === 'Pending') return 'bg-danger bg-opacity-10 text-danger';
-    if (status === 'On Hold') return 'bg-secondary bg-opacity-10 text-secondary';
-    return 'bg-warning bg-opacity-10 text-warning';
+    if (status === 'Completed') return 'bg-success/10 text-success border border-success/20';
+    if (status === 'Pending') return 'bg-danger/10 text-danger border border-danger/20';
+    if (status === 'On Hold') return 'bg-textSecondary/10 text-textSecondary border border-textSecondary/20';
+    return 'bg-warning/10 text-warning border border-warning/20';
 };
 
 const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap gap-3">
-        <div className="d-flex align-items-center">
-            <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '48px' }} />
+    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 mt-2">
+        <div className="flex items-center gap-4">
+            <img src={dbuLogo} alt="DBU" className="hidden md:block h-12" />
             <div>
-                <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
-                <p className="text-muted smallest fw-800 uppercase tracking-widest opacity-75 mb-0">{subtitle}</p>
+                <h2 className="text-3xl font-extrabold tracking-tight text-textPrimary mb-1">{title}</h2>
+                <p className="text-xs text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
             </div>
         </div>
-        <div className="d-flex align-items-center gap-2">
-            <button
-                type="button"
+        <div className="flex items-center gap-3">
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="btn btn-surface position-relative rounded-circle p-3 border-secondary border-opacity-10"
-                style={{ width: '50px', height: '50px' }}
+                className="relative p-3 rounded-full bg-surface/50 border border-white/10 hover:bg-surface transition-colors"
                 title="Open active queue"
             >
-                <Bell size={20} className={unreadCount > 0 ? 'text-danger' : 'text-muted'} />
+                <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
                 {unreadCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ minWidth: '22px', minHeight: '22px', fontSize: '0.65rem' }}>
+                    <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
                         {unreadCount}
                     </span>
                 )}
-            </button>
-            <button type="button" onClick={onLogout} className="btn btn-danger rounded-pill px-4 py-2 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
-                <LogOut size={15} className="me-2" />
+            </motion.button>
+            <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onLogout} 
+                className="flex items-center gap-2 px-5 py-2.5 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-xs font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+            >
+                <LogOut size={16} />
                 Logout
-            </button>
+            </motion.button>
         </div>
     </div>
 );
@@ -103,99 +108,102 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
             title={request ? `Request #${request.id}` : 'Request Details'}
             maxWidth="860px"
             showFooter={false}
-            dialogClassName="request-details-modal"
-            bodyClassName="request-details-modal__body"
         >
             {request && (
-                <div className="request-details-modal__content">
-                    <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10">
-                        <div className="d-flex justify-content-between flex-wrap gap-3">
+                <div>
+                    <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 mb-6">
+                        <div className="flex flex-wrap justify-between items-start gap-4">
                             <div>
-                                <h5 className="fw-800 text-main mb-1">{request.title}</h5>
-                                <p className="smallest text-muted mb-0">{request.description}</p>
+                                <h5 className="text-lg font-extrabold text-textPrimary mb-1">{request.title}</h5>
+                                <p className="text-sm text-textSecondary mb-0 font-medium">{request.description}</p>
                             </div>
-                            <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>{request.status}</span>
                         </div>
                     </div>
 
-                    <div className="row g-4">
-                        <div className="col-md-6">
-                            <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Student</label>
-                            <div className="fw-800 text-main">{request.student_name}</div>
-                            <div className="smallest text-muted">{request.student_code}</div>
-                            <div className="smallest text-muted d-flex align-items-center mt-1">
-                                <Phone size={13} className="me-2 text-primary" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Student</label>
+                            <div className="font-extrabold text-textPrimary text-sm">{request.student_name}</div>
+                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.student_code}</div>
+                            <div className="flex items-center text-xs text-textSecondary mt-2 font-medium">
+                                <Phone size={14} className="mr-2 text-primary" />
                                 {request.student_phone || 'No phone number'}
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2">Location</label>
-                            <div className="fw-800 text-main d-flex align-items-center">
-                                <MapPin size={14} className="me-2 text-primary" />
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Location</label>
+                            <div className="flex items-center font-extrabold text-textPrimary text-sm">
+                                <MapPin size={16} className="mr-2 text-primary" />
                                 {request.location}
                             </div>
-                            <div className="smallest text-muted mt-2">Priority: {request.priority}</div>
-                            <div className="smallest text-muted">Category: {request.category}</div>
+                            <div className="text-xs text-textSecondary mt-2 font-medium">Priority: <span className="font-bold">{request.priority}</span></div>
+                            <div className="text-xs text-textSecondary mt-1 font-medium">Category: <span className="font-bold">{request.category}</span></div>
                         </div>
                     </div>
 
-                    <div className="row g-4">
-                        <div className="col-lg-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
                             {request.status !== 'Completed' ? (
                                 <>
-                                    <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2 d-block">Assign Technician</label>
-                                    <div className="d-flex gap-2">
-                                        <select
-                                            className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                            defaultValue={request.technician_id ? String(request.technician_id) : ''}
-                                            onChange={(event) => event.target.value && onAssign(request.id, event.target.value)}
-                                        >
-                                            <option value="">Select technician</option>
-                                            {technicians.map((technician) => (
-                                                <option key={technician.id} value={technician.id}>
-                                                    {technician.name} - {technician.skills}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                    <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Assign Technician</label>
+                                    <select
+                                        className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                        defaultValue={request.technician_id ? String(request.technician_id) : ''}
+                                        onChange={(event) => event.target.value && onAssign(request.id, event.target.value)}
+                                    >
+                                        <option value="" className="bg-surface text-textSecondary">Select technician</option>
+                                        {technicians.map((technician) => (
+                                            <option key={technician.id} value={technician.id} className="bg-surface text-textPrimary">
+                                                {technician.name} - {technician.skills}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </>
                             ) : (
-                                <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2 d-block">Assigned Technician</label>
+                                <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Assigned Technician</label>
                             )}
+                            
                             {request.technician_name && (
-                                <div className="mt-3 p-3 rounded-4 bg-surface border border-secondary border-opacity-10">
-                                    <div className="fw-800 text-main">{request.technician_name}</div>
-                                    <div className="smallest text-muted">{request.technician_skills || 'Technician'}</div>
-                                    <div className="smallest text-muted d-flex align-items-center mt-1">
-                                        <Phone size={13} className="me-2 text-primary" />
+                                <div className="mt-4 p-4 rounded-xl bg-surface/30 border border-white/5 shadow-sm">
+                                    <div className="font-extrabold text-textPrimary text-sm">{request.technician_name}</div>
+                                    <div className="text-xs text-textSecondary mt-1 font-medium">{request.technician_skills || 'Technician'}</div>
+                                    <div className="flex items-center text-xs text-textSecondary mt-2 font-medium">
+                                        <Phone size={14} className="mr-2 text-primary" />
                                         {request.technician_phone || 'No phone number'}
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        <div className="col-lg-6">
-                            <label className="smallest fw-800 uppercase tracking-widest text-muted mb-2 d-block">Progress Timeline</label>
-                            <div className="d-flex flex-column gap-3 request-details-modal__timeline">
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Progress Timeline</label>
+                            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                                 {loading ? (
-                                    <div className="text-center py-4">
-                                        <Loader2 size={24} className="animate-spin text-primary" />
+                                    <div className="flex justify-center py-8">
+                                        <Loader2 size={32} className="animate-spin text-primary" />
                                     </div>
                                 ) : logs.length > 0 ? (
-                                    logs.map((log) => (
-                                        <div key={log.id} className="p-3 rounded-4 bg-surface border border-secondary border-opacity-10 request-details-modal__timeline-item">
-                                            <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                    logs.map((log, idx) => (
+                                        <motion.div 
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: idx * 0.1 }}
+                                            key={log.id} 
+                                            className="p-4 rounded-xl bg-surface/30 border border-white/5 shadow-sm"
+                                        >
+                                            <div className="flex justify-between items-start gap-4 mb-2">
                                                 <div>
-                                                    <div className="fw-800 text-main">{log.action_taken}</div>
-                                                    <div className="smallest text-muted">{log.action_by}</div>
+                                                    <div className="font-extrabold text-textPrimary text-sm">{log.action_taken}</div>
+                                                    <div className="text-xs text-textSecondary mt-1">{log.action_by}</div>
                                                 </div>
-                                                <span className="smallest text-muted">{new Date(log.created_at).toLocaleString()}</span>
+                                                <span className="text-[10px] font-bold text-textSecondary">{new Date(log.created_at).toLocaleString()}</span>
                                             </div>
-                                            <div className="small text-main">{log.remarks}</div>
-                                        </div>
+                                            <div className="text-sm text-textPrimary">{log.remarks}</div>
+                                        </motion.div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-4 text-muted">No timeline entries yet.</div>
+                                    <div className="text-center py-6 text-sm text-textSecondary font-medium">No timeline entries yet.</div>
                                 )}
                             </div>
                         </div>
@@ -283,7 +291,12 @@ const AdminOverview = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Admin Overview"
                 subtitle="Monitor live maintenance requests, users, and technician workload"
@@ -292,39 +305,50 @@ const AdminOverview = () => {
                 onLogout={logout}
             />
 
-            <div className="row g-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
                 {[
-                    { label: 'All Users', value: users.length, icon: <Users size={22} />, note: `${studentCount} students` },
-                    { label: 'Technicians', value: technicianCount, icon: <Wrench size={22} />, note: 'Active technicians' },
-                    { label: 'Active Queue', value: activeCount, icon: <ClipboardList size={22} />, note: 'Needs tracking' },
-                    { label: 'Completed', value: completedCount, icon: <CheckCircle2 size={22} />, note: 'Stored in history' }
-                ].map((item) => (
-                    <div key={item.label} className="col-md-6 col-xl-3">
-                        <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <div className="bg-primary bg-opacity-10 text-primary p-3 rounded-4">{item.icon}</div>
-                                <span className="smallest text-muted">{item.note}</span>
+                    { label: 'All Users', value: users.length, icon: <Users size={24} />, note: `${studentCount} students` },
+                    { label: 'Technicians', value: technicianCount, icon: <Wrench size={24} />, note: 'Active technicians' },
+                    { label: 'Active Queue', value: activeCount, icon: <ClipboardList size={24} />, note: 'Needs tracking' },
+                    { label: 'Completed', value: completedCount, icon: <CheckCircle2 size={24} />, note: 'Stored in history' }
+                ].map((item, idx) => (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        key={item.label} 
+                        className="glass-card p-6"
+                    >
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-primary/10 text-primary rounded-xl shadow-inner border border-primary/20">
+                                {item.icon}
                             </div>
-                            <h2 className="fw-800 text-main mb-1">{item.value}</h2>
-                            <p className="smallest text-muted mb-0">{item.label}</p>
+                            <span className="text-xs font-bold text-textSecondary uppercase tracking-wider">{item.note}</span>
                         </div>
-                    </div>
+                        <h2 className="text-4xl font-extrabold text-textPrimary mb-1 tracking-tight">{item.value}</h2>
+                        <p className="text-sm font-medium text-textSecondary m-0">{item.label}</p>
+                    </motion.div>
                 ))}
             </div>
 
-            <div className="row g-4">
-                <div className="col-xl-7">
-                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div className="xl:col-span-7">
+                    <div className="glass-card p-6 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h4 className="fw-800 text-main mb-1">Requests by Category</h4>
-                                <p className="smallest text-muted mb-0">Chart.js updates whenever the queue changes</p>
+                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Requests by Category</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0">Live queue breakdown</p>
                             </div>
-                            <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
-                                <Activity size={18} />
-                            </button>
+                            <motion.button 
+                                whileHover={{ scale: 1.1, rotate: 15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={refreshData}
+                                className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                            >
+                                <Activity size={20} />
+                            </motion.button>
                         </div>
-                        <div style={{ height: '320px' }}>
+                        <div className="flex-1 min-h-[300px]">
                             <Bar
                                 data={{
                                     labels: REQUEST_CATEGORIES,
@@ -332,47 +356,57 @@ const AdminOverview = () => {
                                         {
                                             label: 'Requests',
                                             data: categoryCounts,
-                                            backgroundColor: '#3b82f6',
-                                            borderRadius: 10
+                                            backgroundColor: '#6366f1',
+                                            borderRadius: 6,
+                                            hoverBackgroundColor: '#8b5cf6'
                                         }
                                     ]
                                 }}
                                 options={{
                                     responsive: true,
                                     maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } }
+                                    plugins: { legend: { display: false } },
+                                    scales: {
+                                        y: { ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                                    }
                                 }}
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="col-xl-5">
-                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
-                        <div className="mb-4">
-                            <h4 className="fw-800 text-main mb-1">Queue Status</h4>
-                            <p className="smallest text-muted mb-0">Pending, assigned, in progress, on hold, and completed requests</p>
+                <div className="xl:col-span-5">
+                    <div className="glass-card p-6 h-full flex flex-col">
+                        <div className="mb-6">
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Queue Status</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Overall request status distribution</p>
                         </div>
-                        <Doughnut
-                            data={{
-                                labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
-                                datasets: [
-                                    {
-                                        data: statusCounts,
-                                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
-                                        borderWidth: 0
-                                    }
-                                ]
-                            }}
-                            options={{
-                                responsive: true,
-                                plugins: { legend: { position: 'bottom' } }
-                            }}
-                        />
+                        <div className="flex-1 flex items-center justify-center min-h-[300px]">
+                            <Doughnut
+                                data={{
+                                    labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                    datasets: [
+                                        {
+                                            data: statusCounts,
+                                            backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
+                                            borderWidth: 0,
+                                            hoverOffset: 4
+                                        }
+                                    ]
+                                }}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
+                                    cutout: '70%'
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -451,7 +485,12 @@ const ActiveQueue = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Active Queue"
                 subtitle="Review request details and assign the right technician"
@@ -460,86 +499,106 @@ const ActiveQueue = () => {
                 onLogout={logout}
             />
 
-            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div className="glass-card p-6">
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
-                        <h4 className="fw-800 text-main mb-1">Active Requests</h4>
-                        <p className="smallest text-muted mb-0">Every update from students and technicians appears here live</p>
+                        <h4 className="text-lg font-extrabold text-textPrimary mb-1">Active Requests</h4>
+                        <p className="text-xs text-textSecondary font-medium m-0">Live updates from all campuses</p>
                     </div>
-                    <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
-                        <RefreshCcw size={18} />
-                    </button>
+                    <motion.button 
+                        whileHover={{ scale: 1.1, rotate: 15 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={refreshData}
+                        className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                    >
+                        <RefreshCcw size={20} />
+                    </motion.button>
                 </div>
 
-                <div className="table-responsive">
-                    <table className="table align-middle table-borderless">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Problem</th>
-                                <th className="pb-3 text-main">Student</th>
-                                <th className="pb-3 text-main">Location</th>
-                                <th className="pb-3 text-main">Status</th>
-                                <th className="pb-3 text-main">Assign Technician</th>
-                                <th className="pb-3 text-end text-main">Details</th>
+                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Student</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Location</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Status</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Assign Technician</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Details</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-5">
-                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    <td colSpan="6" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
                                     </td>
                                 </tr>
                             ) : activeRequests.length > 0 ? (
-                                activeRequests.map((request) => (
-                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.title}</div>
-                                            <div className="smallest text-muted mt-1">{request.category}</div>
+                                activeRequests.map((request, idx) => (
+                                    <motion.tr 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={request.id} 
+                                        className="hover:bg-white/[0.02] transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.student_name}</div>
-                                            <div className="smallest text-muted">{request.student_code}</div>
-                                            <div className="smallest text-muted d-flex align-items-center mt-1">
-                                                <Phone size={13} className="me-2 text-primary" />
-                                                {request.student_phone || 'No phone number'}
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
+                                            <div className="text-xs text-textSecondary font-medium">{request.student_code}</div>
+                                            <div className="flex items-center text-[10px] text-textSecondary mt-1 font-medium whitespace-nowrap">
+                                                <Phone size={12} className="mr-1.5 text-primary" />
+                                                {request.student_phone || 'No phone'}
                                             </div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="d-flex align-items-center text-muted">
-                                                <MapPin size={14} className="me-2 text-primary" />
-                                                {request.location}
+                                        <td className="py-4 px-4">
+                                            <div className="flex items-center text-xs text-textSecondary font-medium">
+                                                <MapPin size={14} className="mr-2 text-primary shrink-0" />
+                                                <span className="truncate max-w-[120px]">{request.location}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4">
-                                            <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
-                                            <div className="smallest text-muted mt-2">Progress: {request.progress_percentage}%</div>
+                                        <td className="py-4 px-4">
+                                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>
+                                                {request.status}
+                                            </span>
+                                            <div className="text-[10px] text-textSecondary mt-2 font-bold uppercase tracking-wider">
+                                                Progress: {request.progress_percentage}%
+                                            </div>
                                         </td>
-                                        <td className="py-4">
+                                        <td className="py-4 px-4">
                                             <select
-                                                className="form-select py-2 px-3 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                                className="w-full py-2 px-3 bg-surface border border-white/10 text-textPrimary text-xs rounded-lg font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none disabled:opacity-50"
                                                 value={request.technician_id || ''}
                                                 onChange={(event) => assignTechnician(request.id, event.target.value)}
                                                 disabled={assigningId === request.id}
                                             >
-                                                <option value="">Select technician</option>
+                                                <option value="" className="bg-surface">Select technician</option>
                                                 {technicians.map((technician) => (
-                                                    <option key={technician.id} value={technician.id}>
+                                                    <option key={technician.id} value={technician.id} className="bg-surface">
                                                         {technician.name} - {technician.skills}
                                                     </option>
                                                 ))}
                                             </select>
                                         </td>
-                                        <td className="py-4 text-end">
-                                            <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => loadRequestDetails(request)}>
+                                        <td className="py-4 px-4 text-right">
+                                            <motion.button 
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => loadRequestDetails(request)}
+                                                className="btn-secondary px-4 py-2 rounded-lg text-xs font-bold"
+                                            >
                                                 View
-                                            </button>
+                                            </motion.button>
                                         </td>
-                                    </tr>
+                                    </motion.tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-5 text-muted">
+                                    <td colSpan="6" className="py-12 text-center text-textSecondary font-medium">
                                         No active requests in the queue.
                                     </td>
                                 </tr>
@@ -560,7 +619,7 @@ const ActiveQueue = () => {
                     setSelectedLogs([]);
                 }}
             />
-        </div>
+        </motion.div>
     );
 };
 
@@ -630,7 +689,12 @@ const AdminHistory = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Admin History"
                 subtitle="Completed work that can stay in history or be deleted"
@@ -639,72 +703,96 @@ const AdminHistory = () => {
                 onLogout={logout}
             />
 
-            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div className="glass-card p-6">
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
                     <div>
-                        <h4 className="fw-800 text-main mb-1">Completed Requests</h4>
-                        <p className="smallest text-muted mb-0">Admin can keep them in history or delete them permanently</p>
+                        <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completed Requests</h4>
+                        <p className="text-xs text-textSecondary font-medium m-0">Permanent record of resolved issues</p>
                     </div>
-                    <button type="button" className="btn btn-danger rounded-pill px-4 py-3 fw-800 uppercase smallest tracking-widest" onClick={purgeAllCompleted}>
-                        <Trash2 size={16} className="me-2" />
-                        Delete All Completed
-                    </button>
+                    <motion.button 
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={purgeAllCompleted}
+                        className="flex items-center gap-2 px-5 py-3 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-xl text-xs font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+                    >
+                        <Trash2 size={16} />
+                        Purge All Completed
+                    </motion.button>
                 </div>
 
-                <div className="table-responsive">
-                    <table className="table align-middle table-borderless">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Problem</th>
-                                <th className="pb-3 text-main">Student</th>
-                                <th className="pb-3 text-main">Technician</th>
-                                <th className="pb-3 text-main">Completed</th>
-                                <th className="pb-3 text-end text-main">Actions</th>
+                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Student</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Technician</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Completed On</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="text-center py-5">
-                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    <td colSpan="5" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
                                     </td>
                                 </tr>
                             ) : completedRequests.length > 0 ? (
-                                completedRequests.map((request) => (
-                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.title}</div>
-                                            <div className="smallest text-muted mt-1">{request.category}</div>
+                                completedRequests.map((request, idx) => (
+                                    <motion.tr 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={request.id} 
+                                        className="hover:bg-white/[0.02] transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.student_name}</div>
-                                            <div className="smallest text-muted">{request.student_code}</div>
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
+                                            <div className="text-xs text-textSecondary font-medium">{request.student_code}</div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.technician_name || 'Not assigned'}</div>
-                                            <div className="smallest text-muted">{request.technician_phone || 'No phone number'}</div>
-                                        </td>
-                                        <td className="py-4">{new Date(request.updated_at).toLocaleString()}</td>
-                                        <td className="py-4 text-end">
-                                            <div className="d-flex justify-content-end gap-2">
-                                                <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10" onClick={() => viewLogs(request)}>
-                                                    View
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger rounded-pill px-3 py-2"
-                                                    onClick={() => deleteRequest(request.id)}
-                                                    disabled={deletingId === request.id}
-                                                >
-                                                    {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-                                                </button>
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.technician_name || 'Not assigned'}</div>
+                                            <div className="flex items-center text-[10px] text-textSecondary mt-1 font-medium whitespace-nowrap">
+                                                <Phone size={12} className="mr-1.5 text-primary" />
+                                                {request.technician_phone || 'No phone'}
                                             </div>
                                         </td>
-                                    </tr>
+                                        <td className="py-4 px-4">
+                                            <div className="text-sm text-textSecondary font-medium whitespace-nowrap">
+                                                {new Date(request.updated_at).toLocaleString()}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <motion.button 
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => viewLogs(request)}
+                                                    className="btn-secondary px-4 py-2 rounded-lg text-xs font-bold"
+                                                >
+                                                    View
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => deleteRequest(request.id)}
+                                                    disabled={deletingId === request.id}
+                                                    className="p-2 rounded-lg bg-danger/10 text-danger hover:bg-danger hover:text-white border border-danger/20 transition-colors"
+                                                >
+                                                    {deletingId === request.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                                </motion.button>
+                                            </div>
+                                        </td>
+                                    </motion.tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center py-5 text-muted">
+                                    <td colSpan="5" className="py-12 text-center text-textSecondary font-medium">
                                         No completed requests in history.
                                     </td>
                                 </tr>
@@ -725,7 +813,7 @@ const AdminHistory = () => {
                     setSelectedLogs([]);
                 }}
             />
-        </div>
+        </motion.div>
     );
 };
 
@@ -863,100 +951,125 @@ const UsersPage = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
-                title="User Registration"
-                subtitle="Register students and technicians with system-generated default passwords"
+                title="User Management"
+                subtitle="Register students and technicians with auto-generated passwords"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
 
-            <div className="d-flex justify-content-end mb-4">
-                <button
-                    type="button"
-                    className="btn btn-primary rounded-pill px-4 py-3 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center"
+            <div className="flex justify-end mb-6">
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => {
                         setRegisterError('');
                         setShowRegisterModal(true);
                     }}
+                    className="btn-primary flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-extrabold uppercase tracking-widest shadow-md"
                 >
-                    <UserPlus size={16} className="me-2" />
+                    <UserPlus size={18} />
                     Register User
-                </button>
+                </motion.button>
             </div>
 
-            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                {feedback && (
-                    <div className={`alert border-0 rounded-4 mb-4 ${feedback.type === 'success' ? 'alert-success bg-success bg-opacity-10 text-success' : 'alert-danger bg-danger bg-opacity-10 text-danger'}`}>
-                        {feedback.message}
-                    </div>
-                )}
+            <div className="glass-card p-6">
+                <AnimatePresence>
+                    {feedback && (
+                        <motion.div 
+                            initial={{ opacity: 0, height: 0, mb: 0 }}
+                            animate={{ opacity: 1, height: 'auto', mb: 24 }}
+                            exit={{ opacity: 0, height: 0, mb: 0 }}
+                            className={`p-4 rounded-xl text-sm font-bold border ${feedback.type === 'success' ? 'bg-success/10 text-success border-success/20' : 'bg-danger/10 text-danger border-danger/20'}`}
+                        >
+                            {feedback.message}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                <div className="table-responsive">
-                    <table className="table align-middle table-borderless">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Name</th>
-                                <th className="pb-3 text-main">User ID</th>
-                                <th className="pb-3 text-main">Contact</th>
-                                <th className="pb-3 text-main">Role</th>
-                                <th className="pb-3 text-main">Ability</th>
-                                <th className="pb-3 text-main">Registration</th>
-                                <th className="pb-3 text-end text-main">Actions</th>
+                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">User</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">ID Code</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Contact</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Role</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Ability</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Status</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="7" className="text-center py-5">
-                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    <td colSpan="7" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
                                     </td>
                                 </tr>
                             ) : users.length > 0 ? (
-                                users.map((user) => (
-                                    <tr key={user.id} className="border-bottom border-secondary border-opacity-5">
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{user.name}</div>
-                                            <div className="smallest text-muted text-capitalize">{user.role} account</div>
+                                users.map((user, idx) => (
+                                    <motion.tr 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={user.id} 
+                                        className="hover:bg-white/[0.02] transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{user.name}</div>
+                                            <div className="text-[10px] text-textSecondary mt-1 font-bold uppercase tracking-wider">{user.role} account</div>
                                         </td>
-                                        <td className="py-4">{user.user_code}</td>
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{user.phone_number || '-'}</div>
-                                            <div className="smallest text-muted">{user.email || 'No email'}</div>
+                                        <td className="py-4 px-4 font-bold text-textPrimary text-sm">{user.user_code}</td>
+                                        <td className="py-4 px-4">
+                                            <div className="font-bold text-textPrimary text-sm whitespace-nowrap">{user.phone_number || '-'}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium whitespace-nowrap">{user.email || 'No email'}</div>
                                         </td>
-                                        <td className="py-4 text-capitalize">{user.role}</td>
-                                        <td className="py-4">{user.skills || '-'}</td>
-                                        <td className="py-4">
-                                            <div className="d-flex flex-column gap-2">
-                                                <span className={`status-badge ${user.status === 'active' ? 'bg-success bg-opacity-10 text-success' : 'bg-secondary bg-opacity-10 text-secondary'}`}>
+                                        <td className="py-4 px-4 capitalize text-sm font-medium text-textSecondary">{user.role}</td>
+                                        <td className="py-4 px-4 text-sm font-medium text-textSecondary whitespace-nowrap">{user.skills || '-'}</td>
+                                        <td className="py-4 px-4">
+                                            <div className="flex flex-col gap-2">
+                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${user.status === 'active' ? 'bg-success/10 text-success border-success/20' : 'bg-textSecondary/10 text-textSecondary border-textSecondary/20'}`}>
                                                     {user.status === 'active' ? 'Registered' : user.status}
                                                 </span>
-                                                <span className="smallest text-muted">{new Date(user.created_at).toLocaleString()}</span>
+                                                <span className="text-[10px] text-textSecondary font-bold whitespace-nowrap">{new Date(user.created_at).toLocaleDateString()}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4 text-end">
-                                            <div className="d-flex justify-content-end gap-2">
-                                                <button type="button" className="btn btn-surface rounded-pill px-3 py-2 border-secondary border-opacity-10 d-inline-flex align-items-center" onClick={() => resetPassword(user.user_code)}>
-                                                    <RefreshCcw size={15} className="me-2" />
+                                        <td className="py-4 px-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <motion.button 
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => resetPassword(user.user_code)}
+                                                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface border border-white/10 hover:border-white/20 text-textPrimary text-xs font-bold transition-colors"
+                                                >
+                                                    <RefreshCcw size={14} />
                                                     Reset
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger rounded-pill px-3 py-2"
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
                                                     onClick={() => deleteUser(user.id)}
                                                     disabled={deletingUserId === user.id}
+                                                    className="p-2 rounded-lg bg-danger/10 text-danger hover:bg-danger hover:text-white border border-danger/20 transition-colors"
                                                 >
-                                                    {deletingUserId === user.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-                                                </button>
+                                                    {deletingUserId === user.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                                </motion.button>
                                             </div>
                                         </td>
-                                    </tr>
+                                    </motion.tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="text-center py-5 text-muted">
-                                        No users found yet. Registered students and technicians will appear here.
+                                    <td colSpan="7" className="py-12 text-center text-textSecondary font-medium">
+                                        No users found yet.
                                     </td>
                                 </tr>
                             )}
@@ -968,97 +1081,118 @@ const UsersPage = () => {
             <PremiumModal
                 isOpen={showRegisterModal}
                 onClose={() => setShowRegisterModal(false)}
-                title="Register Student or Technician"
+                title="Register User"
                 showFooter={false}
                 maxWidth="760px"
             >
-                <form onSubmit={registerUser}>
-                    {registerError && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 rounded-4">{registerError}</div>}
-                    <div className="row g-4">
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Full Name</label>
+                <form onSubmit={registerUser} className="space-y-6">
+                    <AnimatePresence>
+                        {registerError && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="p-4 rounded-xl bg-danger/10 text-danger text-sm font-bold border border-danger/20"
+                            >
+                                {registerError}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Full Name</label>
                             <input
                                 type="text"
-                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 value={newUser.name}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, name: event.target.value }))}
                                 required
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">User ID</label>
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
                             <input
                                 type="text"
-                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
                                 placeholder="DBU1601069"
                                 value={newUser.user_code}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, user_code: event.target.value.toUpperCase() }))}
                                 required
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Phone Number</label>
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Phone Number</label>
                             <input
                                 type="text"
-                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 placeholder="0911000000"
                                 value={newUser.phone_number}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, phone_number: event.target.value }))}
                                 required
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Email</label>
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Email</label>
                             <input
                                 type="email"
-                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                placeholder="student@dbu.edu.et"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                placeholder="user@dbu.edu.et"
                                 value={newUser.email}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
                                 required
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Role</label>
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Role</label>
                             <select
-                                className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                 value={newUser.role}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, role: event.target.value, skills: event.target.value === 'technician' ? prev.skills : '' }))}
                             >
-                                <option value="student">Student</option>
-                                <option value="technician">Technician</option>
+                                <option value="student" className="bg-surface text-textPrimary">Student</option>
+                                <option value="technician" className="bg-surface text-textPrimary">Technician</option>
                             </select>
                         </div>
                         {newUser.role === 'technician' && (
-                            <div className="col-md-12">
-                                <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Technician Ability</label>
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Technician Ability</label>
                                 <select
-                                    className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                     value={newUser.skills}
                                     onChange={(event) => setNewUser((prev) => ({ ...prev, skills: event.target.value }))}
                                     required
                                 >
-                                    <option value="">Select ability</option>
+                                    <option value="" className="bg-surface text-textSecondary">Select ability</option>
                                     {TECHNICIAN_SKILLS.map((skill) => (
-                                        <option key={skill} value={skill}>
+                                        <option key={skill} value={skill} className="bg-surface text-textPrimary">
                                             {skill}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                         )}
-                        <div className="col-12">
-                            <div className="p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 smallest text-primary">
-                                The system will generate a default password automatically after registration.
+                        
+                        <div className="md:col-span-2">
+                            <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-bold flex items-center gap-3">
+                                <Shield size={18} className="shrink-0" />
+                                The system will generate a temporary password automatically after registration.
                             </div>
                         </div>
-                        <div className="col-12 d-flex gap-3">
-                            <button type="button" className="btn btn-surface flex-grow-1 rounded-pill py-3 border-secondary border-opacity-10" onClick={() => setShowRegisterModal(false)}>
+
+                        <div className="md:col-span-2 flex gap-4 mt-2">
+                            <button type="button" className="btn-secondary flex-1 py-4 text-xs font-extrabold tracking-widest uppercase rounded-xl" onClick={() => setShowRegisterModal(false)}>
                                 Cancel
                             </button>
-                            <button type="submit" className="btn btn-primary flex-grow-1 rounded-pill py-3 fw-800 uppercase smallest tracking-widest" disabled={registering}>
-                                {registering ? <Loader2 size={16} className="animate-spin" /> : 'Register'}
-                            </button>
+                            <motion.button 
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                type="submit" 
+                                className="btn-primary flex-1 py-4 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl" 
+                                disabled={registering}
+                            >
+                                {registering ? <Loader2 size={16} className="animate-spin mr-2" /> : 'Register User'}
+                            </motion.button>
                         </div>
                     </div>
                 </form>
@@ -1068,23 +1202,27 @@ const UsersPage = () => {
                 isOpen={!!generatedCredentials}
                 onClose={() => setGeneratedCredentials(null)}
                 onConfirm={() => setGeneratedCredentials(null)}
-                title="Default Password Generated"
+                title="Credentials Generated"
                 type="success"
-                confirmText="Close"
+                confirmText="Done"
             >
-                <p className="text-muted">The user must sign in with this temporary password and change it immediately on the login page.</p>
-                <div className="p-4 rounded-4 bg-surface border border-secondary border-opacity-10">
-                    <div className="mb-3">
-                        <span className="smallest text-muted d-block">User ID</span>
-                        <strong>{generatedCredentials?.user_code}</strong>
-                    </div>
-                    <div>
-                        <span className="smallest text-muted d-block">Temporary Password</span>
-                        <strong>{generatedCredentials?.temporary_password}</strong>
+                <div className="text-center py-4">
+                    <p className="text-textSecondary font-medium leading-relaxed mb-6">
+                        Provide these credentials to the user. They must use them to sign in and will be prompted to change their password immediately.
+                    </p>
+                    <div className="p-6 rounded-2xl bg-surface/50 border border-white/10 shadow-inner max-w-sm mx-auto text-left">
+                        <div className="mb-4">
+                            <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-1">User ID</span>
+                            <span className="block text-2xl font-extrabold text-textPrimary tracking-wider">{generatedCredentials?.user_code}</span>
+                        </div>
+                        <div>
+                            <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-1">Temporary Password</span>
+                            <span className="block text-2xl font-extrabold text-primary tracking-wider">{generatedCredentials?.temporary_password}</span>
+                        </div>
                     </div>
                 </div>
             </PremiumModal>
-        </div>
+        </motion.div>
     );
 };
 
@@ -1126,47 +1264,74 @@ const SecurityPage = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
-                title="Password Reset"
-                subtitle="Enter a user ID like DBU1601069 and generate a new temporary password"
+                title="Security Hub"
+                subtitle="Reset user credentials manually"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
 
-            <div className="row justify-content-center">
-                <div className="col-xl-8">
-                    <div className="premium-card p-5 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                        <div className="d-flex align-items-center gap-3 mb-4">
-                            <Shield size={24} className="text-primary" />
+            <div className="max-w-3xl mx-auto mt-8">
+                <div className="glass-card p-8 md:p-10 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <Shield size={200} className="text-primary" />
+                    </div>
+                    
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-4 rounded-2xl bg-primary/20 text-primary shadow-inner border border-primary/20">
+                                <Shield size={32} />
+                            </div>
                             <div>
-                                <h4 className="fw-800 text-main mb-1">Reset Student or Technician Password</h4>
-                                <p className="smallest text-muted mb-0">The generated password will force a password change on the next login</p>
+                                <h4 className="text-2xl font-extrabold text-textPrimary mb-1">Credential Regeneration</h4>
+                                <p className="text-sm text-textSecondary font-medium m-0">Generate a new temporary password for any user</p>
                             </div>
                         </div>
 
-                        <form onSubmit={handleReset}>
-                            <div className="row g-3">
-                                <div className="col-md-8">
+                        <form onSubmit={handleReset} className="space-y-6">
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Target User ID</label>
+                                <div className="flex flex-col md:flex-row gap-4">
                                     <input
                                         type="text"
-                                        className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
-                                        placeholder="DBU1601069"
+                                        className="flex-1 py-4 px-5 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
+                                        placeholder="E.g. DBU1601069"
                                         value={userCode}
                                         onChange={(event) => setUserCode(event.target.value.toUpperCase())}
                                         required
                                     />
-                                </div>
-                                <div className="col-md-4">
-                                    <button type="submit" className="btn btn-primary w-100 py-3 rounded-pill fw-800 uppercase smallest tracking-widest" disabled={loading}>
-                                        {loading ? <Loader2 size={16} className="animate-spin" /> : 'Generate Password'}
-                                    </button>
+                                    <motion.button 
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="submit" 
+                                        className="btn-primary py-4 px-8 rounded-xl font-extrabold text-xs uppercase tracking-widest whitespace-nowrap flex items-center justify-center min-w-[200px]" 
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Loader2 size={18} className="animate-spin" /> : 'Generate Password'}
+                                    </motion.button>
                                 </div>
                             </div>
                         </form>
 
-                        {error && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 rounded-4 mt-4 mb-0">{error}</div>}
+                        <AnimatePresence>
+                            {error && (
+                                <motion.div 
+                                    initial={{ opacity: 0, height: 0, mt: 0 }}
+                                    animate={{ opacity: 1, height: 'auto', mt: 24 }}
+                                    exit={{ opacity: 0, height: 0, mt: 0 }}
+                                    className="p-4 rounded-xl bg-danger/10 text-danger text-sm font-bold border border-danger/20"
+                                >
+                                    {error}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
@@ -1175,42 +1340,50 @@ const SecurityPage = () => {
                 isOpen={!!generatedCredentials}
                 onClose={() => setGeneratedCredentials(null)}
                 onConfirm={() => setGeneratedCredentials(null)}
-                title="Temporary Password Ready"
+                title="Credentials Generated"
                 type="success"
-                confirmText="Close"
+                confirmText="Done"
             >
-                <p className="text-muted">Give this password to the user. They will be redirected to change it on the login page.</p>
-                <div className="p-4 rounded-4 bg-surface border border-secondary border-opacity-10">
-                    <div className="mb-3">
-                        <span className="smallest text-muted d-block">User ID</span>
-                        <strong>{generatedCredentials?.user_code}</strong>
-                    </div>
-                    <div>
-                        <span className="smallest text-muted d-block">Temporary Password</span>
-                        <strong>{generatedCredentials?.temporary_password}</strong>
+                <div className="text-center py-4">
+                    <p className="text-textSecondary font-medium leading-relaxed mb-6">
+                        Provide these credentials to the user. They must use them to sign in and will be prompted to change their password immediately.
+                    </p>
+                    <div className="p-6 rounded-2xl bg-surface/50 border border-white/10 shadow-inner max-w-sm mx-auto text-left">
+                        <div className="mb-4">
+                            <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-1">User ID</span>
+                            <span className="block text-2xl font-extrabold text-textPrimary tracking-wider">{generatedCredentials?.user_code}</span>
+                        </div>
+                        <div>
+                            <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-1">Temporary Password</span>
+                            <span className="block text-2xl font-extrabold text-primary tracking-wider">{generatedCredentials?.temporary_password}</span>
+                        </div>
                     </div>
                 </div>
             </PremiumModal>
-        </div>
+        </motion.div>
     );
 };
 
 const AdminDashboard = () => (
-    <div className="min-vh-100 position-relative">
-        <div className="app-backdrop">
-            <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${techBg})` }}></div>
-            <div className="bg-overlay"></div>
+    <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-cover bg-center opacity-30 blur-md scale-105" style={{ backgroundImage: `url(${techBg})` }}></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-background/90 via-background/80 to-surface/90"></div>
+            <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow"></div>
+            <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
         </div>
 
         <Sidebar />
-        <div className="main-content-area text-main">
+        
+        <div className="relative z-10 lg:pl-[280px] min-h-screen">
             <AnimatePresence mode="wait">
                 <Routes>
-                    <Route index element={<div><AdminOverview /></div>} />
-                    <Route path="requests" element={<div><ActiveQueue /></div>} />
-                    <Route path="history" element={<div><AdminHistory /></div>} />
-                    <Route path="users" element={<div><UsersPage /></div>} />
-                    <Route path="security" element={<div><SecurityPage /></div>} />
+                    <Route index element={<AdminOverview />} />
+                    <Route path="requests" element={<ActiveQueue />} />
+                    <Route path="history" element={<AdminHistory />} />
+                    <Route path="users" element={<UsersPage />} />
+                    <Route path="security" element={<SecurityPage />} />
                 </Routes>
             </AnimatePresence>
         </div>
