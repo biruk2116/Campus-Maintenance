@@ -148,12 +148,12 @@ const SectionHeading = ({ title, kicker }) => (
         initial="hidden"
         whileInView="visible"
         viewport={viewportOnce}
-        className="text-center mb-5"
+        className="text-center mb-12"
     >
-        <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 text-uppercase fw-bold smaller">
+        <span className="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full mb-4 text-xs uppercase font-bold tracking-wider">
             {kicker}
         </span>
-        <h2 className="display-5 fw-800 text-main mb-0">{title}</h2>
+        <h2 className="text-4xl md:text-5xl font-extrabold text-textPrimary tracking-tight">{title}</h2>
     </motion.div>
 );
 
@@ -176,7 +176,7 @@ const LandingPage = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             setActiveSlide((prev) => (prev + 1) % heroSlides.length);
-        }, 4200);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, []);
@@ -192,165 +192,184 @@ const LandingPage = () => {
     const currentSlide = heroSlides[activeSlide];
 
     return (
-        <div className="landing-page position-relative">
+        <div className="relative min-h-screen bg-background">
             <Navbar />
 
-            <section id="home" className="landing-poster-hero">
-                <div className="landing-poster-hero__veil"></div>
-                <div className="container landing-hero-shell">
-                    <div className="row align-items-center g-5 landing-hero-grid">
-                        <div className="col-lg-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 22 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                                className="landing-hero-copy"
-                            >
-                                <AnimatePresence mode="wait">
-                                    <motion.div
-                                        key={activeSlide}
-                                        initial={{ opacity: 0, x: -28, filter: 'blur(6px)' }}
-                                        animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-                                        exit={{ opacity: 0, x: 26, filter: 'blur(6px)' }}
-                                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                                        className="landing-hero-copy__stage"
-                                    >
-                                        <span className="landing-hero-copy__eyebrow">{currentSlide.eyebrow}</span>
-                                        <h1 className="landing-hero-copy__title text-main">{currentSlide.title}</h1>
-                                        <p className="landing-hero-copy__text mb-0">{currentSlide.text}</p>
-                                        <div className="landing-hero-copy__metric">
-                                            <Activity size={16} className="text-primary" />
-                                            <span>{currentSlide.metric}</span>
-                                        </div>
-                                    </motion.div>
-                                </AnimatePresence>
-
-                                <div className="landing-hero-copy__actions">
-                                    <button type="button" className="btn btn-primary rounded-pill px-4 py-3 fw-800 d-inline-flex align-items-center" onClick={() => handleNav('#about')}>
-                                        Explore System
-                                        <ArrowRight size={16} className="ms-2" />
-                                    </button>
-                                    <button type="button" className="btn btn-surface rounded-pill px-4 py-3 fw-800 border-secondary border-opacity-10" onClick={() => handleNav('#contact')}>
-                                        Contact Team
-                                    </button>
-                                </div>
-
-                                <div className="landing-hero-copy__dots" aria-label="Hero slideshow navigation">
-                                    {heroSlides.map((slide, index) => (
-                                        <button
-                                            key={slide.eyebrow}
-                                            type="button"
-                                            className={`landing-hero-copy__dot ${index === activeSlide ? 'is-active' : ''}`}
-                                            onClick={() => setActiveSlide(index)}
-                                            aria-label={`Show slide ${index + 1}`}
-                                        />
-                                    ))}
-                                </div>
-                            </motion.div>
-                        </div>
-
-                        <div className="col-lg-6">
-                            <motion.div
-                                initial={{ opacity: 0, x: 36, scale: 0.96 }}
-                                animate={{ opacity: 1, x: 0, scale: 1 }}
-                                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                                className="landing-hero-visual premium-card border-secondary border-opacity-10 shadow-22xl"
-                            >
-                                <img src={heroOne} alt="Campus maintenance team coordination" className="landing-hero-visual__image" />
-                                <div className="landing-hero-visual__overlay"></div>
-                            </motion.div>
-                        </div>
-                    </div>
+            {/* Hero Section */}
+            <section id="home" className="relative min-h-screen pt-24 pb-16 flex items-center overflow-hidden">
+                {/* Background effects */}
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]"></div>
+                    <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/20 blur-[120px] animate-pulse-slow"></div>
+                    <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-accent/20 blur-[150px] animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
                 </div>
-            </section>
 
-            <section id="about" className="landing-section py-5 bg-background">
-                <div className="container py-5">
-                    <div className="row align-items-center g-5">
-                        <div className="col-lg-5">
-                            <motion.div
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={viewportOnce}
-                                variants={staggerContainer}
-                                className="landing-about-copy"
-                            >
-                                <motion.div variants={revealUp}>
-                                    <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 text-uppercase fw-bold smaller">
-                                        About Us
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                            className="max-w-2xl"
+                        >
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeSlide}
+                                    initial={{ opacity: 0, x: -20, filter: 'blur(10px)' }}
+                                    animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                                    exit={{ opacity: 0, x: 20, filter: 'blur(10px)' }}
+                                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                    className="min-h-[280px]"
+                                >
+                                    <span className="inline-flex items-center text-primary font-extrabold text-sm tracking-widest uppercase mb-4">
+                                        {currentSlide.eyebrow}
                                     </span>
+                                    <h1 className="text-5xl md:text-6xl font-extrabold text-textPrimary leading-[1.1] tracking-tight mb-6 text-balance">
+                                        {currentSlide.title}
+                                    </h1>
+                                    <p className="text-lg text-textSecondary leading-relaxed mb-8 max-w-xl">
+                                        {currentSlide.text}
+                                    </p>
+                                    <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl glass-panel text-sm font-bold shadow-lg">
+                                        <Activity size={18} className="text-primary" />
+                                        <span className="text-textPrimary">{currentSlide.metric}</span>
+                                    </div>
                                 </motion.div>
-                                <motion.h2 variants={revealUp} className="landing-about-title text-main">
-                                    Real campus maintenance flow with a cleaner visual experience.
-                                </motion.h2>
-                                <motion.p variants={revealUp} className="landing-about-text">
-                                    The system connects reporting, assignment, and technician updates in one smooth maintenance experience for the whole campus.
-                                </motion.p>
-                                <motion.div variants={revealUp} className="d-flex flex-column gap-3 mt-4">
-                                    {aboutHighlights.map((item) => (
-                                        <div key={item} className="landing-about-highlight">
-                                            <span className="landing-about-highlight__dot"></span>
-                                            <span className="text-main">{item}</span>
-                                        </div>
-                                    ))}
-                                </motion.div>
-                                <motion.div variants={revealUp} className="landing-about-links mt-4">
-                                    <button
-                                        type="button"
-                                        className="btn btn-link p-0 text-decoration-none landing-about-link"
-                                        onClick={() => handleNav('#features')}
-                                    >
-                                        See Visual Flow
-                                    </button>
-                                </motion.div>
-                            </motion.div>
-                        </div>
+                            </AnimatePresence>
 
-                        <div className="col-lg-7">
-                            <motion.div
-                                initial={{ opacity: 0, x: 30, scale: 0.97 }}
-                                whileInView={{ opacity: 1, x: 0, scale: 1 }}
-                                transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-                                viewport={viewportOnce}
-                                className="landing-about-visual premium-card border-secondary border-opacity-10 shadow-22xl"
-                            >
-                                <img src={maintIllustration} alt="Campus maintenance coordination" className="img-standard" />
-                                <div className="landing-about-visual__tint"></div>
-                                <div className="landing-about-visual__badge landing-about-visual__badge--top">
-                                    <Activity size={15} className="me-2" />
-                                    Live workflow
-                                </div>
-                                <div className="landing-about-visual__badge landing-about-visual__badge--bottom">
-                                    <Shield size={15} className="me-2" />
-                                    Better campus care
-                                </div>
-                            </motion.div>
-                        </div>
+                            <div className="flex flex-wrap gap-4 mt-10">
+                                <button onClick={() => handleNav('#about')} className="btn-primary px-8 py-4 text-base flex items-center gap-2">
+                                    Explore System
+                                    <ArrowRight size={18} />
+                                </button>
+                                <button onClick={() => handleNav('#contact')} className="btn-secondary px-8 py-4 text-base">
+                                    Contact Team
+                                </button>
+                            </div>
+
+                            <div className="flex gap-3 mt-12">
+                                {heroSlides.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setActiveSlide(index)}
+                                        className={`h-2 rounded-full transition-all duration-500 ${
+                                            index === activeSlide ? 'w-10 bg-primary' : 'w-2 bg-white/20 hover:bg-white/40'
+                                        }`}
+                                        aria-label={`Go to slide ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, rotateY: 15 }}
+                            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                            className="relative perspective-1000"
+                        >
+                            <div className="relative rounded-3xl overflow-hidden glass-panel p-2 shadow-2xl shadow-primary/20 transform-gpu hover:scale-[1.02] transition-transform duration-500">
+                                <img src={heroOne} alt="Dashboard preview" className="w-full h-auto rounded-2xl object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-primary/10 rounded-2xl pointer-events-none"></div>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
 
-            <section id="features" className="landing-section py-5 bg-surface-hover">
-                <div className="container py-5">
+            {/* About Section */}
+            <section id="about" className="py-24 bg-surface relative">
+                <div className="container mx-auto px-6">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={viewportOnce}
+                            className="max-w-xl"
+                        >
+                            <motion.div variants={revealUp}>
+                                <span className="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full mb-6 text-xs uppercase font-bold tracking-wider">
+                                    About Us
+                                </span>
+                            </motion.div>
+                            <motion.h2 variants={revealUp} className="text-4xl md:text-5xl font-extrabold text-textPrimary leading-tight mb-6">
+                                Real campus maintenance flow with a cleaner visual experience.
+                            </motion.h2>
+                            <motion.p variants={revealUp} className="text-lg text-textSecondary mb-8">
+                                The system connects reporting, assignment, and technician updates in one smooth maintenance experience for the whole campus.
+                            </motion.p>
+                            <motion.ul variants={revealUp} className="space-y-4 mb-10">
+                                {aboutHighlights.map((item, idx) => (
+                                    <li key={idx} className="flex items-center gap-3 text-textPrimary font-medium">
+                                        <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
+                                        {item}
+                                    </li>
+                                ))}
+                            </motion.ul>
+                            <motion.div variants={revealUp}>
+                                <button onClick={() => handleNav('#features')} className="text-primary font-bold inline-flex items-center gap-2 hover:text-primary-light transition-colors">
+                                    See Visual Flow <ArrowRight size={16} />
+                                </button>
+                            </motion.div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            viewport={viewportOnce}
+                            className="relative"
+                        >
+                            <div className="glass-card overflow-hidden">
+                                <img src={maintIllustration} alt="Maintenance illustration" className="w-full h-auto object-cover opacity-90 mix-blend-lighten" />
+                            </div>
+                            
+                            {/* Floating Badges */}
+                            <motion.div 
+                                animate={{ y: [0, -10, 0] }} 
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute -top-6 -left-6 glass-panel px-5 py-3 rounded-xl flex items-center gap-3 shadow-xl"
+                            >
+                                <div className="p-2 bg-primary/20 text-primary rounded-lg"><Activity size={18} /></div>
+                                <span className="font-bold text-sm">Live workflow</span>
+                            </motion.div>
+                            
+                            <motion.div 
+                                animate={{ y: [0, 15, 0] }} 
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                                className="absolute -bottom-8 -right-8 glass-panel px-5 py-3 rounded-xl flex items-center gap-3 shadow-xl"
+                            >
+                                <div className="p-2 bg-success/20 text-success rounded-lg"><Shield size={18} /></div>
+                                <span className="font-bold text-sm">Better campus care</span>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Section */}
+            <section id="features" className="py-24 bg-background relative overflow-hidden">
+                <div className="container mx-auto px-6">
                     <SectionHeading title="System Views" kicker="Gallery" />
                     <motion.div
                         variants={staggerContainer}
                         initial="hidden"
                         whileInView="visible"
                         viewport={viewportOnce}
-                        className="row g-4"
+                        className="grid md:grid-cols-3 gap-8"
                     >
-                        {featureCards.map((card) => (
-                            <motion.div key={card.title} variants={revealUp} className="col-md-4">
-                                <div className="landing-gallery-card premium-card border-secondary border-opacity-10 shadow-lg landing-gallery-card--compact">
-                                    <div className="landing-gallery-card__media">
-                                        <img src={card.image} alt={card.title} className="img-standard" />
-                                    </div>
-                                    <div className="landing-gallery-card__overlay"></div>
-                                    <div className="landing-gallery-card__content">
-                                        <span className="landing-gallery-card__eyebrow">{card.description}</span>
-                                        <h4 className="fw-800 text-white mb-0">{card.title}</h4>
-                                    </div>
+                        {featureCards.map((card, idx) => (
+                            <motion.div 
+                                key={idx} 
+                                variants={revealUp}
+                                whileHover={{ y: -10 }}
+                                className="glass-card group overflow-hidden relative min-h-[320px]"
+                            >
+                                <img src={card.image} alt={card.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
+                                <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
+                                    <span className="text-primary font-bold text-xs uppercase tracking-widest mb-2 block">{card.description}</span>
+                                    <h4 className="text-2xl font-extrabold text-white">{card.title}</h4>
                                 </div>
                             </motion.div>
                         ))}
@@ -358,27 +377,31 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section id="services" className="landing-section py-5 bg-background">
-                <div className="container py-5">
+            {/* Services Section */}
+            <section id="services" className="py-24 bg-surface relative">
+                <div className="container mx-auto px-6">
                     <SectionHeading title="Maintenance Areas" kicker="Coverage" />
                     <motion.div
                         variants={staggerContainer}
                         initial="hidden"
                         whileInView="visible"
                         viewport={viewportOnce}
-                        className="row g-4"
+                        className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
                     >
-                        {serviceCards.map((card) => {
+                        {serviceCards.map((card, idx) => {
                             const Icon = card.icon;
                             return (
-                                <motion.div key={card.title} variants={revealUp} className="col-md-6 col-xl-3">
-                                    <div className="landing-mini-card premium-card p-4 h-100 bg-glass border-secondary border-opacity-10 shadow-lg">
-                                        <div className="landing-mini-card__icon">
-                                            <Icon size={20} />
-                                        </div>
-                                        <h5 className="fw-800 text-main mb-2">{card.title}</h5>
-                                        <p className="small text-muted mb-0">{card.description}</p>
+                                <motion.div 
+                                    key={idx} 
+                                    variants={revealUp}
+                                    whileHover={{ y: -5, scale: 1.02 }}
+                                    className="glass-card p-8 h-full flex flex-col items-start"
+                                >
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary mb-6 shadow-inner border border-primary/20">
+                                        <Icon size={28} />
                                     </div>
+                                    <h5 className="text-xl font-bold text-textPrimary mb-3">{card.title}</h5>
+                                    <p className="text-textSecondary text-sm leading-relaxed">{card.description}</p>
                                 </motion.div>
                             );
                         })}
@@ -386,57 +409,53 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section id="contact" className="landing-section py-5 border-top border-secondary border-opacity-10 bg-surface-hover overflow-hidden">
-                <div className="container py-5">
+            {/* Contact Section */}
+            <section id="contact" className="py-24 bg-background border-t border-white/5 relative">
+                <div className="container mx-auto px-6">
                     <SectionHeading title="Command Center" kicker="Support" />
-                    <div className="row g-4 align-items-stretch">
-                        <div className="col-lg-5">
-                            <div className="d-flex flex-column gap-3 h-100">
-                                {contactCards.map((item) => {
-                                    const Icon = item.icon;
-                                    return (
-                                        <motion.div
-                                            key={item.title}
-                                            whileHover={{ x: 8 }}
-                                            className="landing-command-card premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-sm"
-                                        >
-                                            <div className="landing-command-card__icon">
-                                                <Icon size={20} />
-                                            </div>
-                                            <div>
-                                                <h5 className="fw-800 text-main mb-1">{item.title}</h5>
-                                                <p className="small text-muted mb-0">{item.description}</p>
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })}
-
-                                <div className="landing-command-banner mt-2">
-                                    <Shield size={18} className="text-primary flex-shrink-0" />
-                                    <div>
-                                        <strong className="text-main d-block mb-1">Ready</strong>
-                                        <span className="small text-muted">Open the system and start.</span>
-                                    </div>
+                    <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+                        <div className="lg:col-span-5 flex flex-col gap-4">
+                            {contactCards.map((item, idx) => {
+                                const Icon = item.icon;
+                                return (
+                                    <motion.div
+                                        key={idx}
+                                        whileHover={{ x: 8 }}
+                                        className="glass-panel p-6 rounded-2xl flex items-center gap-5 transition-transform"
+                                    >
+                                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-primary shrink-0 border border-white/10">
+                                            <Icon size={20} />
+                                        </div>
+                                        <div>
+                                            <h5 className="font-bold text-textPrimary mb-1 text-lg">{item.title}</h5>
+                                            <p className="text-sm text-textSecondary m-0">{item.description}</p>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                            
+                            <div className="mt-4 p-6 rounded-2xl bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 flex items-start gap-4">
+                                <Shield size={24} className="text-primary mt-1" />
+                                <div>
+                                    <strong className="block text-textPrimary text-lg mb-1">System is Ready</strong>
+                                    <span className="text-textSecondary text-sm">Log in to the command dashboard to begin managing requests.</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="col-lg-7">
+                        <div className="lg:col-span-7">
                             <motion.div
                                 whileHover={{ scale: 1.01 }}
-                                className="landing-command-map-card premium-card bg-glass border-secondary border-opacity-10 shadow-22xl h-100 overflow-hidden position-relative"
+                                className="glass-card h-full min-h-[400px] overflow-hidden relative"
                             >
-                                <div className="position-absolute top-0 start-0 m-3 z-3">
-                                    <span className="badge bg-primary px-3 py-2 rounded-pill shadow-lg d-flex align-items-center fw-bold small">
-                                        <Activity size={12} className="me-2" />
-                                        DBU SERVICE ZONE
-                                    </span>
+                                <div className="absolute top-4 left-4 z-20 bg-background/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg flex items-center gap-2 border border-white/10">
+                                    <Activity size={14} className="text-primary animate-pulse" />
+                                    <span className="text-xs font-bold tracking-wider uppercase text-textPrimary">DBU Service Zone</span>
                                 </div>
-
                                 <iframe
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15745.2862803875!2d39.5255462!3d9.6961148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x16460395642d64f3%3A0xc62b47e85295c2!2sDebre%20Birhan%20University!5e0!3m2!1sen!2set!4v1713350000000!5m2!1sen!2set"
-                                    className="w-100 h-100 map-iframe"
-                                    style={{ border: 0, minHeight: '390px' }}
+                                    className="w-full h-full absolute inset-0 mix-blend-luminosity opacity-80"
+                                    style={{ border: 0 }}
                                     allowFullScreen=""
                                     loading="lazy"
                                     title="Debre Birhan University map"
@@ -447,43 +466,39 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <footer className="footer-modern py-5 bg-surface border-top border-secondary border-opacity-10">
-                <div className="container py-4">
-                    <div className="row g-4 align-items-center">
-                        <div className="col-lg-4">
-                            <div className="d-flex align-items-center">
-                                <img src={dbuLogo} alt="DBU" className="me-3" style={{ height: '40px' }} />
-                                <h4 className="fw-800 tracking-tighter text-main mb-0">Campus Maintain</h4>
-                            </div>
+            {/* Footer */}
+            <footer className="py-12 bg-surface border-t border-white/5">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                        <div className="flex items-center gap-4">
+                            <img src={dbuLogo} alt="DBU" className="h-10" />
+                            <h4 className="text-xl font-extrabold tracking-tight m-0 text-textPrimary">Campus Maintain</h4>
                         </div>
-                        <div className="col-lg-5">
-                            <div className="d-flex flex-wrap gap-3 justify-content-lg-center">
-                                {sectionLinks.map((link) => (
-                                    <button
-                                        key={link.anchor}
-                                        type="button"
-                                        className="btn btn-link p-0 smaller text-muted text-decoration-none hover-primary d-inline-flex align-items-center"
-                                        onClick={() => handleNav(link.anchor)}
-                                    >
-                                        <ChevronRight size={14} className="me-1 opacity-50" />
-                                        {link.label}
-                                    </button>
-                                ))}
-                            </div>
+                        
+                        <div className="flex flex-wrap justify-center gap-6">
+                            {sectionLinks.map((link) => (
+                                <button
+                                    key={link.anchor}
+                                    onClick={() => handleNav(link.anchor)}
+                                    className="flex items-center gap-1 text-sm font-medium text-textSecondary hover:text-primary transition-colors"
+                                >
+                                    <ChevronRight size={14} />
+                                    {link.label}
+                                </button>
+                            ))}
                         </div>
-                        <div className="col-lg-3">
-                            <div className="d-flex gap-3 justify-content-lg-end">
-                                {[Globe, Mail, Shield].map((Icon, index) => (
-                                    <motion.a
-                                        key={index}
-                                        href="#"
-                                        whileHover={{ y: -4, scale: 1.06, backgroundColor: 'var(--primary)', color: 'white' }}
-                                        className="btn btn-surface p-2 rounded-circle border-secondary border-opacity-10 text-muted"
-                                    >
-                                        <Icon size={18} />
-                                    </motion.a>
-                                ))}
-                            </div>
+
+                        <div className="flex gap-4">
+                            {[Globe, Mail, Shield].map((Icon, idx) => (
+                                <motion.a
+                                    key={idx}
+                                    href="#"
+                                    whileHover={{ y: -4, scale: 1.1, backgroundColor: '#6366f1', color: 'white' }}
+                                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-textSecondary transition-colors"
+                                >
+                                    <Icon size={18} />
+                                </motion.a>
+                            ))}
                         </div>
                     </div>
                 </div>
