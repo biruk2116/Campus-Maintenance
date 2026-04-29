@@ -85,15 +85,11 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        const theme = isDarkMode ? 'dark' : 'light';
-        document.body.setAttribute('data-bs-theme', theme);
-
+        const root = window.document.documentElement;
         if (isDarkMode) {
-            document.body.classList.add('bg-dark');
-            document.body.classList.remove('bg-light');
+            root.classList.add('dark');
         } else {
-            document.body.classList.add('bg-light');
-            document.body.classList.remove('bg-dark');
+            root.classList.remove('dark');
         }
     }, [isDarkMode]);
 
