@@ -14,7 +14,7 @@ import {
     Zap
 } from 'lucide-react';
 
-import heroOne from '../../assets/images/hero1.webp';
+
 import maintIllustration from '../../assets/images/maint_illustration.png';
 import techPc from '../../assets/images/tech_pc.png';
 import safetyKit from '../../assets/images/safety_kit.png';
@@ -253,7 +253,7 @@ const LandingPage = () => {
                                         key={index}
                                         onClick={() => setActiveSlide(index)}
                                         className={`h-2 rounded-full transition-all duration-500 ${
-                                            index === activeSlide ? 'w-10 bg-primary' : 'w-2 bg-white/20 hover:bg-white/40'
+                                            index === activeSlide ? 'w-10 bg-primary' : 'w-2 bg-overlay/20 hover:bg-overlay/40'
                                         }`}
                                         aria-label={`Go to slide ${index + 1}`}
                                     />
@@ -267,9 +267,74 @@ const LandingPage = () => {
                             transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
                             className="relative perspective-1000"
                         >
-                            <div className="relative rounded-3xl overflow-hidden glass-panel p-2 shadow-2xl shadow-primary/20 transform-gpu hover:scale-[1.02] transition-transform duration-500">
-                                <img src={heroOne} alt="Dashboard preview" className="w-full h-auto rounded-2xl object-cover" />
-                                <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-primary/10 rounded-2xl pointer-events-none"></div>
+                            <div className="relative w-full aspect-square md:aspect-[4/3] rounded-3xl overflow-hidden glass-panel p-6 lg:p-8 shadow-2xl shadow-primary/20 transform-gpu hover:scale-[1.02] transition-transform duration-500 flex flex-col gap-5">
+                                {/* Browser/Window Header */}
+                                <div className="flex justify-between items-center pb-4 border-b border-overlay/10">
+                                    <div className="flex gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-danger/80"></div>
+                                        <div className="w-3 h-3 rounded-full bg-warning/80"></div>
+                                        <div className="w-3 h-3 rounded-full bg-success/80"></div>
+                                    </div>
+                                    <div className="h-6 w-1/3 bg-overlay/5 rounded-full flex items-center px-3">
+                                        <div className="h-1.5 w-1/2 bg-overlay/10 rounded-full"></div>
+                                    </div>
+                                </div>
+                                
+                                {/* Abstract Dashboard Content */}
+                                <div className="flex-1 grid grid-cols-2 gap-4">
+                                    {/* Main active request */}
+                                    <motion.div 
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.5, duration: 0.6 }}
+                                        className="col-span-2 flex items-center gap-4 p-4 rounded-2xl bg-overlay/5 border border-overlay/5 hover:bg-overlay/10 transition-colors"
+                                    >
+                                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                                            <Activity size={20} />
+                                        </div>
+                                        <div className="flex-1 space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <div className="h-3 w-1/2 bg-textPrimary/80 rounded-full"></div>
+                                                <div className="h-4 w-12 bg-success/20 rounded-md"></div>
+                                            </div>
+                                            <div className="h-2 w-3/4 bg-overlay/10 rounded-full"></div>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Stat Card 1 */}
+                                    <motion.div 
+                                        initial={{ x: -20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        transition={{ delay: 0.7, duration: 0.6 }}
+                                        className="p-5 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 flex flex-col justify-between"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-4">
+                                            <Wrench size={18} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="text-3xl font-extrabold text-textPrimary">24</div>
+                                            <div className="text-xs font-bold uppercase tracking-wider text-primary">Active</div>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Stat Card 2 */}
+                                    <motion.div 
+                                        initial={{ x: 20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        transition={{ delay: 0.8, duration: 0.6 }}
+                                        className="p-5 rounded-2xl bg-overlay/5 border border-overlay/5 flex flex-col justify-between"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center text-success mb-4">
+                                            <Shield size={18} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="text-3xl font-extrabold text-textPrimary">18</div>
+                                            <div className="text-xs font-bold uppercase tracking-wider text-success">Resolved</div>
+                                        </div>
+                                    </motion.div>
+                                </div>
+                                
+                                <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-primary/5 rounded-3xl pointer-events-none"></div>
                             </div>
                         </motion.div>
                     </div>
@@ -410,7 +475,7 @@ const LandingPage = () => {
             </section>
 
             {/* Contact Section */}
-            <section id="contact" className="py-24 bg-background border-t border-white/5 relative">
+            <section id="contact" className="py-24 bg-background border-t border-overlay/5 relative">
                 <div className="container mx-auto px-6">
                     <SectionHeading title="Command Center" kicker="Support" />
                     <div className="grid lg:grid-cols-12 gap-8 items-stretch">
@@ -423,7 +488,7 @@ const LandingPage = () => {
                                         whileHover={{ x: 8 }}
                                         className="glass-panel p-6 rounded-2xl flex items-center gap-5 transition-transform"
                                     >
-                                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-primary shrink-0 border border-white/10">
+                                        <div className="w-12 h-12 rounded-full bg-overlay/5 flex items-center justify-center text-primary shrink-0 border border-overlay/10">
                                             <Icon size={20} />
                                         </div>
                                         <div>
@@ -448,7 +513,7 @@ const LandingPage = () => {
                                 whileHover={{ scale: 1.01 }}
                                 className="glass-card h-full min-h-[400px] overflow-hidden relative"
                             >
-                                <div className="absolute top-4 left-4 z-20 bg-background/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg flex items-center gap-2 border border-white/10">
+                                <div className="absolute top-4 left-4 z-20 bg-background/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg flex items-center gap-2 border border-overlay/10">
                                     <Activity size={14} className="text-primary animate-pulse" />
                                     <span className="text-xs font-bold tracking-wider uppercase text-textPrimary">DBU Service Zone</span>
                                 </div>
@@ -467,7 +532,7 @@ const LandingPage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="py-12 bg-surface border-t border-white/5">
+            <footer className="py-12 bg-surface border-t border-overlay/5">
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
                         <div className="flex items-center gap-4">
@@ -494,7 +559,7 @@ const LandingPage = () => {
                                     key={idx}
                                     href="#"
                                     whileHover={{ y: -4, scale: 1.1, backgroundColor: '#6366f1', color: 'white' }}
-                                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-textSecondary transition-colors"
+                                    className="w-10 h-10 rounded-full bg-overlay/5 flex items-center justify-center text-textSecondary transition-colors"
                                 >
                                     <Icon size={18} />
                                 </motion.a>
@@ -508,3 +573,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
