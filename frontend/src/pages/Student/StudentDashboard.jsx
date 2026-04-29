@@ -65,7 +65,7 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="relative p-3 rounded-full bg-surface/50 border border-white/10 hover:bg-surface transition-colors"
+                className="relative p-3 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
                 title="Open requests"
             >
                 <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
@@ -121,7 +121,7 @@ const RequestTimelineModal = ({ request, logs, loading, onClose }) => (
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.1 }}
                                 key={log.id} 
-                                className="p-4 rounded-xl bg-surface/50 border border-white/5 shadow-sm"
+                                className="p-4 rounded-xl bg-surface/50 border border-overlay/5 shadow-sm"
                             >
                                 <div className="flex justify-between items-start gap-4 mb-3">
                                     <div>
@@ -227,7 +227,7 @@ const NewRequestForm = () => {
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Problem Title</label>
                                 <input
                                     type="text"
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                     value={formData.title}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
                                     placeholder="Example: Water leakage in Block B"
@@ -238,7 +238,7 @@ const NewRequestForm = () => {
                             <div>
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Category</label>
                                 <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                     value={formData.category}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
                                 >
@@ -253,7 +253,7 @@ const NewRequestForm = () => {
                             <div>
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Priority</label>
                                 <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                     value={formData.priority}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, priority: event.target.value }))}
                                 >
@@ -268,7 +268,7 @@ const NewRequestForm = () => {
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Dorm</label>
                                 <input
                                     type="text"
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                     value={formData.dorm}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, dorm: event.target.value }))}
                                     placeholder="Example: Dorm A"
@@ -280,7 +280,7 @@ const NewRequestForm = () => {
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Block</label>
                                 <input
                                     type="text"
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                     value={formData.block}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, block: event.target.value }))}
                                     placeholder="Example: Block B"
@@ -291,7 +291,7 @@ const NewRequestForm = () => {
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Description</label>
                                 <textarea
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                     rows="5"
                                     value={formData.description}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
@@ -489,7 +489,7 @@ const StudentOverview = () => {
                                 whileHover={{ scale: 1.1, rotate: 15 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={refreshData}
-                                className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                                className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
                             >
                                 <Activity size={20} />
                             </motion.button>
@@ -538,7 +538,7 @@ const StudentOverview = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Location</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Status</th>
@@ -560,7 +560,7 @@ const StudentOverview = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         key={request.id} 
-                                        className="hover:bg-white/[0.02] transition-colors"
+                                        className="hover:bg-overlay/[0.02] transition-colors"
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
@@ -707,7 +707,7 @@ const StudentHistory = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Technician</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Completed On</th>
@@ -728,7 +728,7 @@ const StudentHistory = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         key={request.id} 
-                                        className="hover:bg-white/[0.02] transition-colors"
+                                        className="hover:bg-overlay/[0.02] transition-colors"
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
@@ -822,3 +822,4 @@ const StudentDashboard = () => (
 );
 
 export default StudentDashboard;
+
