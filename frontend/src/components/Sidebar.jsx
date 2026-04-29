@@ -66,7 +66,7 @@ const Sidebar = () => {
     const links = roleLinks[user?.role] || [];
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-50 flex flex-col p-6 glass-panel border-r border-white/5">
+        <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-50 flex flex-col p-6 glass-panel border-r border-overlay/5">
             <div className="flex items-center mb-8 px-2">
                 <img src={dbuLogo} alt="DBU" className="h-10 mr-4" />
                 <div>
@@ -85,7 +85,7 @@ const Sidebar = () => {
                                 `flex items-center p-3 rounded-xl transition-all duration-300 no-underline ${
                                     isActive
                                         ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/20 font-bold'
-                                        : 'text-textSecondary hover:bg-white/5 hover:text-textPrimary font-medium'
+                                        : 'text-textSecondary hover:bg-overlay/5 hover:text-textPrimary font-medium'
                                 }`
                             }
                         >
@@ -105,7 +105,7 @@ const Sidebar = () => {
                 ))}
             </ul>
 
-            <div className="mt-6 pt-6 border-t border-white/10">
+            <div className="mt-6 pt-6 border-t border-overlay/10">
                 <div className="flex items-center justify-between gap-3 mb-4">
                     <div>
                         <div className="text-[10px] text-textSecondary uppercase font-extrabold tracking-widest">Appearance</div>
@@ -128,3 +128,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
