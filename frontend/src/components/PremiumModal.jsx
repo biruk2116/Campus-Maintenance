@@ -79,7 +79,7 @@ const PremiumModal = ({
                             </div>
                             <button 
                                 onClick={onClose} 
-                                className="p-2 rounded-full hover:bg-white/10 text-textSecondary hover:text-textPrimary transition-colors"
+                                className="p-2 rounded-full hover:bg-overlay/10 text-textSecondary hover:text-textPrimary transition-colors"
                             >
                                 <X size={20} />
                             </button>
@@ -115,3 +115,4 @@ const PremiumModal = ({
 };
 
 export default PremiumModal;
+
