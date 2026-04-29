@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { motion as Motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 
@@ -45,88 +46,82 @@ const Sidebar = () => {
 
     const roleLinks = {
         student: [
-            { path: '/student', icon: <Target size={18} />, label: 'Active Requests', badge: notificationCount },
-            { path: '/student/new-request', icon: <PlusCircle size={18} />, label: 'New Request' },
-            { path: '/student/history', icon: <History size={18} />, label: 'History' }
+            { path: '/student', icon: <Target size={20} />, label: 'Active Requests', badge: notificationCount },
+            { path: '/student/new-request', icon: <PlusCircle size={20} />, label: 'New Request' },
+            { path: '/student/history', icon: <History size={20} />, label: 'History' }
         ],
         technician: [
-            { path: '/technician', icon: <Wrench size={18} />, label: 'Assigned Work', badge: notificationCount },
-            { path: '/technician/history', icon: <History size={18} />, label: 'History' }
+            { path: '/technician', icon: <Wrench size={20} />, label: 'Assigned Work', badge: notificationCount },
+            { path: '/technician/history', icon: <History size={20} />, label: 'History' }
         ],
         admin: [
-            { path: '/admin', icon: <Activity size={18} />, label: 'Overview' },
-            { path: '/admin/requests', icon: <ClipboardList size={18} />, label: 'Active Queue', badge: notificationCount },
-            { path: '/admin/history', icon: <History size={18} />, label: 'History' },
-            { path: '/admin/users', icon: <Users size={18} />, label: 'Users' },
-            { path: '/admin/security', icon: <Shield size={18} />, label: 'Password Reset' }
+            { path: '/admin', icon: <Activity size={20} />, label: 'Overview' },
+            { path: '/admin/requests', icon: <ClipboardList size={20} />, label: 'Active Queue', badge: notificationCount },
+            { path: '/admin/history', icon: <History size={20} />, label: 'History' },
+            { path: '/admin/users', icon: <Users size={20} />, label: 'Users' },
+            { path: '/admin/security', icon: <Shield size={20} />, label: 'Password Reset' }
         ]
     };
 
     const links = roleLinks[user?.role] || [];
 
     return (
-        <aside
-            className="d-flex flex-column flex-shrink-0 p-4 bg-glass border-end border-secondary border-opacity-10 shadow-22xl"
-            style={{ width: '280px', position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 1100 }}
-        >
-            <div className="d-flex align-items-center mb-5 ps-2">
-                <img src={dbuLogo} alt="DBU" className="me-3" style={{ height: '38px' }} />
+        <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-50 flex flex-col p-6 glass-panel border-r border-white/5">
+            <div className="flex items-center mb-8 px-2">
+                <img src={dbuLogo} alt="DBU" className="h-10 mr-4" />
                 <div>
-                    <h5 className="fw-800 mb-0 text-main tracking-tighter">Command OS</h5>
-                    <span className="smallest text-primary text-uppercase fw-800 tracking-widest">{user?.role} Dashboard</span>
+                    <h5 className="font-extrabold m-0 text-textPrimary tracking-tight">Command OS</h5>
+                    <span className="text-xs text-primary uppercase font-extrabold tracking-widest">{user?.role} Dashboard</span>
                 </div>
             </div>
 
-            <ul className="nav nav-pills flex-column mb-auto">
+            <ul className="flex-1 flex flex-col gap-2 m-0 p-0 list-none">
                 {links.map((link) => (
-                    <li key={link.path} className="nav-item mb-2">
+                    <li key={link.path}>
                         <NavLink
                             to={link.path}
                             end={link.path === `/${user?.role}`}
                             className={({ isActive }) =>
-                                `nav-link d-flex align-items-center p-3 rounded-4 border-0 transition-all ${
+                                `flex items-center p-3 rounded-xl transition-all duration-300 no-underline ${
                                     isActive
-                                        ? 'bg-primary text-white shadow-lg fw-800'
-                                        : 'text-muted hover-bg-surface-hover fw-bold'
+                                        ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/20 font-bold'
+                                        : 'text-textSecondary hover:bg-white/5 hover:text-textPrimary font-medium'
                                 }`
                             }
                         >
-                            <span className="me-3">{link.icon}</span>
-                            <span className="smaller">{link.label}</span>
+                            <span className="mr-3">{link.icon}</span>
+                            <span className="text-sm">{link.label}</span>
                             {link.badge > 0 && (
-                                <span className="badge bg-danger rounded-circle p-2 ms-auto animate-pulse" style={{ fontSize: '0.6rem' }}>
+                                <Motion.span 
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="ml-auto bg-danger text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md shadow-danger/40 animate-pulse"
+                                >
                                     {link.badge}
-                                </span>
+                                </Motion.span>
                             )}
                         </NavLink>
                     </li>
                 ))}
             </ul>
 
-            <div className="sidebar-theme-panel mt-4 pt-4 border-top border-secondary border-opacity-10">
-                <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
+            <div className="mt-6 pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between gap-3 mb-4">
                     <div>
-                        <div className="smallest text-muted text-uppercase fw-800 tracking-widest">Appearance</div>
-                        <div className="smaller text-main">{isDarkMode ? 'Dark mode' : 'Light mode'}</div>
+                        <div className="text-[10px] text-textSecondary uppercase font-extrabold tracking-widest">Appearance</div>
+                        <div className="text-sm text-textPrimary font-medium">{isDarkMode ? 'Dark mode' : 'Light mode'}</div>
                     </div>
-                    <button
+                    <Motion.button
+                        whileTap={{ scale: 0.9 }}
                         type="button"
-                        className="btn theme-toggle-btn border-0 p-2 rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
+                        className="p-2 rounded-full bg-surface shadow-sm hover:bg-surface-hover transition-colors"
                         onClick={toggleDarkMode}
                         aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
                         title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
                     >
                         {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
-                    </button>
+                    </Motion.button>
                 </div>
-                <button
-                    type="button"
-                    className="btn btn-surface w-100 rounded-pill py-3 border-secondary border-opacity-10 fw-800 smallest tracking-widest text-uppercase d-inline-flex align-items-center justify-content-center gap-2"
-                    onClick={toggleDarkMode}
-                >
-                    {isDarkMode ? <Sun size={15} className="text-warning" /> : <Moon size={15} className="text-primary" />}
-                    {isDarkMode ? 'Switch to Light' : 'Switch to Dark'}
-                </button>
             </div>
         </aside>
     );
