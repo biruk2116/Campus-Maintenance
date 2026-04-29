@@ -7,6 +7,34 @@
    BASE STYLES
    ========================================================================== */
 @layer base {
+  :root {
+    --color-background: 248 250 252;
+    --color-surface: 255 255 255;
+    --color-primary: 79 70 229;
+    --color-secondary: 124 58 237;
+    --color-accent: 2 132 199;
+    --color-textPrimary: 15 23 42;
+    --color-textSecondary: 100 116 139;
+    --color-success: 16 185 129;
+    --color-warning: 245 158 11;
+    --color-danger: 239 68 68;
+    --color-overlay: 0 0 0;
+  }
+
+  .dark {
+    --color-background: 15 23 42;
+    --color-surface: 30 41 59;
+    --color-primary: 99 102 241;
+    --color-secondary: 139 92 246;
+    --color-accent: 14 165 233;
+    --color-textPrimary: 248 250 252;
+    --color-textSecondary: 148 163 184;
+    --color-success: 16 185 129;
+    --color-warning: 245 158 11;
+    --color-danger: 239 68 68;
+    --color-overlay: 255 255 255;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
@@ -55,15 +83,15 @@
 @layer components {
   /* Panels & Cards */
   .glass-panel {
-    @apply bg-surface/80 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+    @apply bg-surface/80 backdrop-blur-md border border-overlay/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
   }
   
   .glass-card {
-    @apply bg-surface/60 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:border-primary/40 transition-all duration-300;
+    @apply bg-surface/60 backdrop-blur-xl border border-overlay/5 rounded-2xl shadow-xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:border-primary/40 transition-all duration-300;
   }
   
   .premium-card {
-    @apply relative overflow-hidden bg-surface/70 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl;
+    @apply relative overflow-hidden bg-surface/70 backdrop-blur-2xl border border-overlay/10 rounded-3xl shadow-2xl;
   }
 
   /* Buttons */
@@ -81,7 +109,7 @@
   }
   
   .btn-secondary {
-    @apply px-4 py-2 bg-surface/50 text-textPrimary font-bold rounded-xl border border-white/10 hover:bg-surface hover:border-white/20 shadow-sm hover:shadow-md transition-all duration-300;
+    @apply px-4 py-2 bg-surface/50 text-textPrimary font-bold rounded-xl border border-overlay/10 hover:bg-surface hover:border-overlay/20 shadow-sm hover:shadow-md transition-all duration-300;
   }
   
   .btn-danger {
@@ -121,7 +149,7 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  @apply bg-overlay/10 rounded-full hover:bg-overlay/20 transition-colors;
 }
 
 /* Background Patterns */
@@ -148,7 +176,7 @@
 
 /* Table Hover Effects */
 table tr:hover td {
-  @apply bg-white/[0.03] transition-colors duration-200;
+  @apply bg-overlay/[0.03] transition-colors duration-200;
 }
 
 /* Smooth Input Focus Rings */
