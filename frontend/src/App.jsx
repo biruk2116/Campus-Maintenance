@@ -29,9 +29,9 @@ const ProtectedRoute = ({ children, role }) => {
     const { user, loading } = useAuth();
 
     if (loading) return (
-        <div className="d-flex justify-content-center align-items-center vh-100 bg-background">
-            <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+        <div className="flex items-center justify-center min-h-screen bg-background">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" role="status">
+                <span className="sr-only">Loading...</span>
             </div>
         </div>
     );
