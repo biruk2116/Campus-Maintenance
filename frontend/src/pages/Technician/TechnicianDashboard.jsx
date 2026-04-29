@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity,
     Bell,
@@ -31,40 +31,45 @@ import techBg from '../../assets/images/tech-bg.png';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const statusClassName = (status) => {
-    if (status === 'Completed') return 'bg-success bg-opacity-10 text-success';
-    if (status === 'On Hold') return 'bg-secondary bg-opacity-10 text-secondary';
-    if (status === 'Assigned') return 'bg-primary bg-opacity-10 text-primary';
-    return 'bg-warning bg-opacity-10 text-warning';
+    if (status === 'Completed') return 'bg-success/10 text-success border border-success/20';
+    if (status === 'On Hold') return 'bg-textSecondary/10 text-textSecondary border border-textSecondary/20';
+    if (status === 'Assigned') return 'bg-primary/10 text-primary border border-primary/20';
+    return 'bg-warning/10 text-warning border border-warning/20';
 };
 
 const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap gap-3">
-        <div className="d-flex align-items-center">
-            <img src={dbuLogo} alt="DBU" className="me-4 d-none d-md-block" style={{ height: '46px' }} />
+    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 mt-2">
+        <div className="flex items-center gap-4">
+            <img src={dbuLogo} alt="DBU" className="hidden md:block h-12" />
             <div>
-                <h2 className="fw-800 tracking-tighter mb-1 text-main">{title}</h2>
-                <p className="text-muted smallest fw-800 uppercase tracking-widest opacity-75 mb-0">{subtitle}</p>
+                <h2 className="text-3xl font-extrabold tracking-tight text-textPrimary mb-1">{title}</h2>
+                <p className="text-xs text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
             </div>
         </div>
-        <div className="d-flex align-items-center gap-2">
-            <button
-                type="button"
+        <div className="flex items-center gap-3">
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="btn btn-surface position-relative rounded-circle p-3 border-secondary border-opacity-10"
-                style={{ width: '48px', height: '48px' }}
+                className="relative p-3 rounded-full bg-surface/50 border border-white/10 hover:bg-surface transition-colors"
                 title="Open assigned work"
             >
-                <Bell size={20} className={unreadCount > 0 ? 'text-danger' : 'text-muted'} />
+                <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
                 {unreadCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ minWidth: '22px', minHeight: '22px', fontSize: '0.65rem' }}>
+                    <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
                         {unreadCount}
                     </span>
                 )}
-            </button>
-            <button type="button" onClick={onLogout} className="btn btn-danger rounded-pill px-4 py-2 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center">
-                <LogOut size={15} className="me-2" />
+            </motion.button>
+            <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onLogout} 
+                className="flex items-center gap-2 px-5 py-2.5 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-xs font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+            >
+                <LogOut size={16} />
                 Logout
-            </button>
+            </motion.button>
         </div>
     </div>
 );
@@ -160,44 +165,44 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
         >
             {request && (
                 <form onSubmit={saveProgress}>
-                    <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 mb-4">
-                        <h5 className="fw-800 text-main mb-1">{request.title}</h5>
-                        <div className="smallest text-muted d-flex align-items-center">
-                            <MapPin size={13} className="me-2 text-primary" />
+                    <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 mb-6">
+                        <h5 className="text-lg font-extrabold text-textPrimary mb-2">{request.title}</h5>
+                        <div className="flex items-center text-xs text-textSecondary font-medium">
+                            <MapPin size={14} className="mr-2 text-primary" />
                             {request.location}
                         </div>
                     </div>
 
-                    <div className="row g-4 mb-4">
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Status</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Status</label>
                             <select
-                                className="form-select py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
-                                <option value="Assigned">Assigned</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="On Hold">On Hold</option>
-                                <option value="Completed">Completed</option>
+                                <option value="Assigned" className="bg-surface">Assigned</option>
+                                <option value="In Progress" className="bg-surface">In Progress</option>
+                                <option value="On Hold" className="bg-surface">On Hold</option>
+                                <option value="Completed" className="bg-surface">Completed</option>
                             </select>
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Progress ({progress}%)</label>
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Progress ({progress}%)</label>
                             <input
                                 type="range"
                                 min="0"
                                 max="100"
                                 step="5"
-                                className="form-range"
+                                className="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-primary mt-3"
                                 value={progress}
                                 onChange={(event) => setProgress(event.target.value)}
                             />
                         </div>
-                        <div className="col-12">
-                            <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Remarks</label>
+                        <div className="md:col-span-2">
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Remarks</label>
                             <textarea
-                                className="form-control py-3 px-4 bg-surface border-secondary border-opacity-10 rounded-4 fw-bold text-main shadow-sm"
+                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 rows="4"
                                 value={remarks}
                                 onChange={(event) => setRemarks(event.target.value)}
@@ -207,40 +212,52 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                         </div>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="form-label smallest fw-800 uppercase tracking-widest text-muted">Previous Updates</label>
-                        <div className="d-flex flex-column gap-3" style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                    <div className="mb-6">
+                        <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Previous Updates</label>
+                        <div className="flex flex-col gap-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-2">
                             {loadingHistory ? (
-                                <div className="text-center py-4">
+                                <div className="flex justify-center py-6">
                                     <Loader2 size={24} className="animate-spin text-primary" />
                                 </div>
                             ) : history.length > 0 ? (
-                                history.map((log) => (
-                                    <div key={log.id} className="p-3 rounded-4 bg-surface border border-secondary border-opacity-10">
-                                        <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                history.map((log, idx) => (
+                                    <motion.div 
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1 }}
+                                        key={log.id} 
+                                        className="p-4 rounded-xl bg-surface/30 border border-white/5 shadow-sm"
+                                    >
+                                        <div className="flex justify-between items-start gap-4 mb-2">
                                             <div>
-                                                <div className="fw-800 text-main">{log.action_taken}</div>
-                                                <div className="smallest text-muted">{log.action_by}</div>
+                                                <div className="font-extrabold text-textPrimary text-sm">{log.action_taken}</div>
+                                                <div className="text-xs text-textSecondary mt-1">{log.action_by}</div>
                                             </div>
-                                            <span className="smallest text-muted">{new Date(log.created_at).toLocaleString()}</span>
+                                            <span className="text-[10px] font-bold text-textSecondary">{new Date(log.created_at).toLocaleString()}</span>
                                         </div>
-                                        <div className="small text-main">{log.remarks}</div>
-                                    </div>
+                                        <div className="text-sm text-textPrimary">{log.remarks}</div>
+                                    </motion.div>
                                 ))
                             ) : (
-                                <div className="text-center py-4 text-muted">No previous updates yet.</div>
+                                <div className="text-center py-6 text-sm text-textSecondary font-medium">No previous updates yet.</div>
                             )}
                         </div>
                     </div>
 
-                    <div className="d-flex gap-3">
-                        <button type="button" className="btn btn-surface flex-grow-1 rounded-pill py-3 border-secondary border-opacity-10" onClick={onClose}>
+                    <div className="flex gap-4">
+                        <button type="button" className="btn-secondary flex-1 py-4 text-xs font-extrabold tracking-widest uppercase rounded-xl" onClick={onClose}>
                             Cancel
                         </button>
-                        <button type="submit" className="btn btn-primary flex-grow-1 rounded-pill py-3 fw-800 uppercase smallest tracking-widest d-inline-flex align-items-center justify-content-center" disabled={saving}>
-                            {saving ? <Loader2 size={16} className="animate-spin me-2" /> : <Save size={16} className="me-2" />}
-                            Save Update
-                        </button>
+                        <motion.button 
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            type="submit" 
+                            className="btn-primary flex-1 py-4 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl" 
+                            disabled={saving}
+                        >
+                            {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                            {saving ? 'Saving...' : 'Save Update'}
+                        </motion.button>
                     </div>
                 </form>
             )}
@@ -269,109 +286,141 @@ const TechnicianOverview = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Technician Dashboard"
-                subtitle="Receive assigned work, update status, and send progress back to admin and students"
+                subtitle="Receive assigned work, update status, and send progress back"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
 
-            <div className="row g-4 mb-4">
-                <div className="col-xl-4">
-                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
-                        <div className="d-flex align-items-center gap-3 mb-4">
-                            <Activity size={22} className="text-primary" />
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                <div className="xl:col-span-1">
+                    <div className="glass-card p-6 h-full flex flex-col">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="p-3 rounded-xl bg-primary/10 text-primary shadow-inner border border-primary/20">
+                                <Activity size={24} />
+                            </div>
                             <div>
-                                <h4 className="fw-800 text-main mb-1">Workload Summary</h4>
-                                <p className="smallest text-muted mb-0">Live chart of your assigned work</p>
+                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Workload Summary</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0">Live assigned work status</p>
                             </div>
                         </div>
-                        <Doughnut
-                            data={{
-                                labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
-                                datasets: [
-                                    {
-                                        data: chartData,
-                                        backgroundColor: ['#3b82f6', '#f59e0b', '#6b7280', '#10b981'],
-                                        borderWidth: 0
-                                    }
-                                ]
-                            }}
-                            options={{
-                                responsive: true,
-                                plugins: { legend: { position: 'bottom' } }
-                            }}
-                        />
+                        <div className="flex-1 flex items-center justify-center min-h-[250px]">
+                            <Doughnut
+                                data={{
+                                    labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                    datasets: [
+                                        {
+                                            data: chartData,
+                                            backgroundColor: ['#3b82f6', '#f59e0b', '#6b7280', '#10b981'],
+                                            borderWidth: 0,
+                                            hoverOffset: 4
+                                        }
+                                    ]
+                                }}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
+                                    cutout: '70%'
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <div className="col-xl-8">
-                    <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl h-100">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
+                <div className="xl:col-span-2">
+                    <div className="glass-card p-6 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h4 className="fw-800 text-main mb-1">Assigned Requests</h4>
-                                <p className="smallest text-muted mb-0">Open each request and send your status update</p>
+                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Assigned Requests</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0">Open requests to send status updates</p>
                             </div>
-                            <button type="button" className={`btn btn-surface rounded-circle p-3 border-secondary border-opacity-10 ${loading ? 'animate-spin' : ''}`} onClick={refreshData}>
-                                <Activity size={18} />
-                            </button>
+                            <motion.button 
+                                whileHover={{ scale: 1.1, rotate: 15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={refreshData}
+                                className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                            >
+                                <Activity size={20} />
+                            </motion.button>
                         </div>
 
-                        <div className="table-responsive">
-                            <table className="table align-middle table-borderless">
+                        <div className="overflow-x-auto flex-1">
+                            <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                        <th className="pb-3 text-main">Problem</th>
-                                        <th className="pb-3 text-main">Student</th>
-                                        <th className="pb-3 text-main">Location</th>
-                                        <th className="pb-3 text-main">Status</th>
-                                        <th className="pb-3 text-end text-main">Update</th>
+                                    <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                        <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                        <th className="pb-4 px-4 whitespace-nowrap">Student</th>
+                                        <th className="pb-4 px-4 whitespace-nowrap">Location</th>
+                                        <th className="pb-4 px-4 whitespace-nowrap">Status</th>
+                                        <th className="pb-4 px-4 text-right whitespace-nowrap">Update</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-white/5">
                                     {loading ? (
                                         <tr>
-                                            <td colSpan="5" className="text-center py-5">
-                                                <Loader2 size={28} className="animate-spin text-primary" />
+                                            <td colSpan="5" className="py-12 text-center">
+                                                <Loader2 size={32} className="animate-spin text-primary mx-auto" />
                                             </td>
                                         </tr>
                                     ) : activeRequests.length > 0 ? (
-                                        activeRequests.map((request) => (
-                                            <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
-                                                <td className="py-4">
-                                                    <div className="fw-800 text-main">{request.title}</div>
-                                                    <div className="smallest text-muted mt-1">{request.category}</div>
+                                        activeRequests.map((request, idx) => (
+                                            <motion.tr 
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: idx * 0.05 }}
+                                                key={request.id} 
+                                                className="hover:bg-white/[0.02] transition-colors"
+                                            >
+                                                <td className="py-4 px-4">
+                                                    <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                                    <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
                                                 </td>
-                                                <td className="py-4">
-                                                    <div className="fw-800 text-main">{request.student_name}</div>
-                                                    <div className="smallest text-muted">{request.student_code}</div>
-                                                    <div className="smallest text-muted d-flex align-items-center mt-1">
-                                                        <Phone size={13} className="me-2 text-primary" />
-                                                        {request.student_phone || 'No phone number'}
+                                                <td className="py-4 px-4">
+                                                    <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
+                                                    <div className="text-xs text-textSecondary font-medium">{request.student_code}</div>
+                                                    <div className="flex items-center text-[10px] text-textSecondary mt-1 font-medium whitespace-nowrap">
+                                                        <Phone size={12} className="mr-1.5 text-primary" />
+                                                        {request.student_phone || 'No phone'}
                                                     </div>
                                                 </td>
-                                                <td className="py-4">
-                                                    <div className="d-flex align-items-center text-muted">
-                                                        <MapPin size={14} className="me-2 text-primary" />
-                                                        {request.location}
+                                                <td className="py-4 px-4">
+                                                    <div className="flex items-center text-xs text-textSecondary font-medium">
+                                                        <MapPin size={14} className="mr-2 text-primary shrink-0" />
+                                                        <span className="truncate max-w-[120px]">{request.location}</span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4">
-                                                    <span className={`status-badge ${statusClassName(request.status)}`}>{request.status}</span>
-                                                    <div className="smallest text-muted mt-2">Progress: {request.progress_percentage}%</div>
+                                                <td className="py-4 px-4">
+                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>
+                                                        {request.status}
+                                                    </span>
+                                                    <div className="text-[10px] text-textSecondary mt-2 font-bold uppercase tracking-wider">
+                                                        Progress: {request.progress_percentage}%
+                                                    </div>
                                                 </td>
-                                                <td className="py-4 text-end">
-                                                    <button type="button" className="btn btn-primary rounded-pill px-4 py-2 fw-800 uppercase smallest tracking-widest" onClick={() => setSelectedRequest(request)}>
+                                                <td className="py-4 px-4 text-right">
+                                                    <motion.button 
+                                                        whileHover={{ scale: 1.05 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                        onClick={() => setSelectedRequest(request)}
+                                                        className="btn-primary px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap shadow-md"
+                                                    >
                                                         Update
-                                                    </button>
+                                                    </motion.button>
                                                 </td>
-                                            </tr>
+                                            </motion.tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="text-center py-5 text-muted">
+                                            <td colSpan="5" className="py-12 text-center text-textSecondary font-medium">
                                                 No active requests assigned right now.
                                             </td>
                                         </tr>
@@ -384,7 +433,7 @@ const TechnicianOverview = () => {
             </div>
 
             <ProgressModal key={selectedRequest?.id || 'empty'} request={selectedRequest} onClose={() => setSelectedRequest(null)} onSaved={refreshData} />
-        </div>
+        </motion.div>
     );
 };
 
@@ -412,7 +461,12 @@ const TechnicianHistory = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-6"
+        >
             <DashboardHeader
                 title="Technician History"
                 subtitle="Completed assignments you can review or remove from history"
@@ -421,66 +475,79 @@ const TechnicianHistory = () => {
                 onLogout={logout}
             />
 
-            <div className="premium-card p-4 bg-glass border-secondary border-opacity-10 shadow-22xl">
-                <div className="d-flex align-items-center gap-3 mb-4">
-                    <CheckCircle2 size={22} className="text-success" />
+            <div className="glass-card p-6">
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 rounded-xl bg-success/20 text-success shadow-inner border border-success/20">
+                        <CheckCircle2 size={24} />
+                    </div>
                     <div>
-                        <h4 className="fw-800 text-main mb-1">Completed Requests</h4>
-                        <p className="smallest text-muted mb-0">These are the jobs you already marked as completed</p>
+                        <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completed Requests</h4>
+                        <p className="text-xs text-textSecondary font-medium m-0">These are the jobs you already marked as completed</p>
                     </div>
                 </div>
 
-                <div className="table-responsive">
-                    <table className="table align-middle table-borderless">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="smallest text-uppercase text-muted fw-800 tracking-widest border-bottom border-secondary border-opacity-10">
-                                <th className="pb-3 text-main">Problem</th>
-                                <th className="pb-3 text-main">Student</th>
-                                <th className="pb-3 text-main">Location</th>
-                                <th className="pb-3 text-main">Completed</th>
-                                <th className="pb-3 text-end text-main">Delete</th>
+                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Student</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Location</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Completed On</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="text-center py-5">
-                                        <Loader2 size={28} className="animate-spin text-primary" />
+                                    <td colSpan="5" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
                                     </td>
                                 </tr>
                             ) : completedRequests.length > 0 ? (
-                                completedRequests.map((request) => (
-                                    <tr key={request.id} className="border-bottom border-secondary border-opacity-5">
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.title}</div>
-                                            <div className="smallest text-muted mt-1">{request.category}</div>
+                                completedRequests.map((request, idx) => (
+                                    <motion.tr 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={request.id} 
+                                        className="hover:bg-white/[0.02] transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="fw-800 text-main">{request.student_name}</div>
-                                            <div className="smallest text-muted">{request.student_code}</div>
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
+                                            <div className="text-xs text-textSecondary font-medium">{request.student_code}</div>
                                         </td>
-                                        <td className="py-4">
-                                            <div className="d-flex align-items-center text-muted">
-                                                <MapPin size={14} className="me-2 text-primary" />
-                                                {request.location}
+                                        <td className="py-4 px-4">
+                                            <div className="flex items-center text-xs text-textSecondary font-medium">
+                                                <MapPin size={12} className="mr-1.5 text-primary shrink-0" />
+                                                <span className="truncate max-w-[150px]">{request.location}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4">{new Date(request.updated_at).toLocaleString()}</td>
-                                        <td className="py-4 text-end">
-                                            <button
-                                                type="button"
-                                                className="btn btn-danger rounded-pill px-3 py-2"
+                                        <td className="py-4 px-4">
+                                            <div className="text-sm text-textSecondary font-medium whitespace-nowrap">
+                                                {new Date(request.updated_at).toLocaleString()}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
                                                 onClick={() => deleteCompletedTask(request.id)}
                                                 disabled={deletingId === request.id}
+                                                className="p-2 inline-flex rounded-lg bg-danger/10 text-danger hover:bg-danger hover:text-white border border-danger/20 transition-colors"
                                             >
-                                                {deletingId === request.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-                                            </button>
+                                                {deletingId === request.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                            </motion.button>
                                         </td>
-                                    </tr>
+                                    </motion.tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center py-5 text-muted">
+                                    <td colSpan="5" className="py-12 text-center text-textSecondary font-medium">
                                         No completed requests in history.
                                     </td>
                                 </tr>
@@ -489,23 +556,27 @@ const TechnicianHistory = () => {
                     </table>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
 const TechnicianDashboard = () => (
-    <div className="min-vh-100 position-relative">
-        <div className="app-backdrop">
-            <div className="fullscreen-bg-fixed" style={{ backgroundImage: `url(${techBg})` }}></div>
-            <div className="bg-overlay"></div>
+    <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-cover bg-center opacity-30 blur-md scale-105" style={{ backgroundImage: `url(${techBg})` }}></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-background/90 via-surface/80 to-background/90"></div>
+            <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow"></div>
+            <div className="absolute bottom-[10%] right-[20%] w-[300px] h-[300px] rounded-full bg-accent/10 blur-[100px] animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
         </div>
 
         <Sidebar />
-        <div className="main-content-area text-main">
+        
+        <div className="relative z-10 lg:pl-[280px] min-h-screen">
             <AnimatePresence mode="wait">
                 <Routes>
-                    <Route index element={<div><TechnicianOverview /></div>} />
-                    <Route path="history" element={<div><TechnicianHistory /></div>} />
+                    <Route index element={<TechnicianOverview />} />
+                    <Route path="history" element={<TechnicianHistory />} />
                 </Routes>
             </AnimatePresence>
         </div>
