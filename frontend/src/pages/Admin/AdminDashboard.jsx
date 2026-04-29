@@ -77,7 +77,7 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="relative p-3 rounded-full bg-surface/50 border border-white/10 hover:bg-surface transition-colors"
+                className="relative p-3 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
                 title="Open active queue"
             >
                 <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
@@ -148,7 +148,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                                 <>
                                     <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Assign Technician</label>
                                     <select
-                                        className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                        className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                         defaultValue={request.technician_id ? String(request.technician_id) : ''}
                                         onChange={(event) => event.target.value && onAssign(request.id, event.target.value)}
                                     >
@@ -165,7 +165,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                             )}
                             
                             {request.technician_name && (
-                                <div className="mt-4 p-4 rounded-xl bg-surface/30 border border-white/5 shadow-sm">
+                                <div className="mt-4 p-4 rounded-xl bg-surface/30 border border-overlay/5 shadow-sm">
                                     <div className="font-extrabold text-textPrimary text-sm">{request.technician_name}</div>
                                     <div className="text-xs text-textSecondary mt-1 font-medium">{request.technician_skills || 'Technician'}</div>
                                     <div className="flex items-center text-xs text-textSecondary mt-2 font-medium">
@@ -190,7 +190,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: idx * 0.1 }}
                                             key={log.id} 
-                                            className="p-4 rounded-xl bg-surface/30 border border-white/5 shadow-sm"
+                                            className="p-4 rounded-xl bg-surface/30 border border-overlay/5 shadow-sm"
                                         >
                                             <div className="flex justify-between items-start gap-4 mb-2">
                                                 <div>
@@ -343,7 +343,7 @@ const AdminOverview = () => {
                                 whileHover={{ scale: 1.1, rotate: 15 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={refreshData}
-                                className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                                className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
                             >
                                 <Activity size={20} />
                             </motion.button>
@@ -509,7 +509,7 @@ const ActiveQueue = () => {
                         whileHover={{ scale: 1.1, rotate: 15 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={refreshData}
-                        className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                        className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
                     >
                         <RefreshCcw size={20} />
                     </motion.button>
@@ -518,7 +518,7 @@ const ActiveQueue = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Student</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Location</th>
@@ -541,7 +541,7 @@ const ActiveQueue = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         key={request.id} 
-                                        className="hover:bg-white/[0.02] transition-colors"
+                                        className="hover:bg-overlay/[0.02] transition-colors"
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
@@ -571,7 +571,7 @@ const ActiveQueue = () => {
                                         </td>
                                         <td className="py-4 px-4">
                                             <select
-                                                className="w-full py-2 px-3 bg-surface border border-white/10 text-textPrimary text-xs rounded-lg font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none disabled:opacity-50"
+                                                className="w-full py-2 px-3 bg-surface border border-overlay/10 text-textPrimary text-xs rounded-lg font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none disabled:opacity-50"
                                                 value={request.technician_id || ''}
                                                 onChange={(event) => assignTechnician(request.id, event.target.value)}
                                                 disabled={assigningId === request.id}
@@ -723,7 +723,7 @@ const AdminHistory = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Student</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Technician</th>
@@ -745,7 +745,7 @@ const AdminHistory = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         key={request.id} 
-                                        className="hover:bg-white/[0.02] transition-colors"
+                                        className="hover:bg-overlay/[0.02] transition-colors"
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
@@ -997,7 +997,7 @@ const UsersPage = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">User</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">ID Code</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Contact</th>
@@ -1021,7 +1021,7 @@ const UsersPage = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         key={user.id} 
-                                        className="hover:bg-white/[0.02] transition-colors"
+                                        className="hover:bg-overlay/[0.02] transition-colors"
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{user.name}</div>
@@ -1048,7 +1048,7 @@ const UsersPage = () => {
                                                     whileHover={{ scale: 1.05 }}
                                                     whileTap={{ scale: 0.95 }}
                                                     onClick={() => resetPassword(user.user_code)}
-                                                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface border border-white/10 hover:border-white/20 text-textPrimary text-xs font-bold transition-colors"
+                                                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface border border-overlay/10 hover:border-overlay/20 text-textPrimary text-xs font-bold transition-colors"
                                                 >
                                                     <RefreshCcw size={14} />
                                                     Reset
@@ -1104,7 +1104,7 @@ const UsersPage = () => {
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Full Name</label>
                             <input
                                 type="text"
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 value={newUser.name}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, name: event.target.value }))}
                                 required
@@ -1114,7 +1114,7 @@ const UsersPage = () => {
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
                             <input
                                 type="text"
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
                                 placeholder="DBU1601069"
                                 value={newUser.user_code}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, user_code: event.target.value.toUpperCase() }))}
@@ -1125,7 +1125,7 @@ const UsersPage = () => {
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Phone Number</label>
                             <input
                                 type="text"
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 placeholder="0911000000"
                                 value={newUser.phone_number}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, phone_number: event.target.value }))}
@@ -1136,7 +1136,7 @@ const UsersPage = () => {
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Email</label>
                             <input
                                 type="email"
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 placeholder="user@dbu.edu.et"
                                 value={newUser.email}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
@@ -1146,7 +1146,7 @@ const UsersPage = () => {
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Role</label>
                             <select
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                 value={newUser.role}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, role: event.target.value, skills: event.target.value === 'technician' ? prev.skills : '' }))}
                             >
@@ -1158,7 +1158,7 @@ const UsersPage = () => {
                             <div>
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Technician Ability</label>
                                 <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                     value={newUser.skills}
                                     onChange={(event) => setNewUser((prev) => ({ ...prev, skills: event.target.value }))}
                                     required
@@ -1210,7 +1210,7 @@ const UsersPage = () => {
                     <p className="text-textSecondary font-medium leading-relaxed mb-6">
                         Provide these credentials to the user. They must use them to sign in and will be prompted to change their password immediately.
                     </p>
-                    <div className="p-6 rounded-2xl bg-surface/50 border border-white/10 shadow-inner max-w-sm mx-auto text-left">
+                    <div className="p-6 rounded-2xl bg-surface/50 border border-overlay/10 shadow-inner max-w-sm mx-auto text-left">
                         <div className="mb-4">
                             <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-1">User ID</span>
                             <span className="block text-2xl font-extrabold text-textPrimary tracking-wider">{generatedCredentials?.user_code}</span>
@@ -1301,7 +1301,7 @@ const SecurityPage = () => {
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <input
                                         type="text"
-                                        className="flex-1 py-4 px-5 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
+                                        className="flex-1 py-4 px-5 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
                                         placeholder="E.g. DBU1601069"
                                         value={userCode}
                                         onChange={(event) => setUserCode(event.target.value.toUpperCase())}
@@ -1348,7 +1348,7 @@ const SecurityPage = () => {
                     <p className="text-textSecondary font-medium leading-relaxed mb-6">
                         Provide these credentials to the user. They must use them to sign in and will be prompted to change their password immediately.
                     </p>
-                    <div className="p-6 rounded-2xl bg-surface/50 border border-white/10 shadow-inner max-w-sm mx-auto text-left">
+                    <div className="p-6 rounded-2xl bg-surface/50 border border-overlay/10 shadow-inner max-w-sm mx-auto text-left">
                         <div className="mb-4">
                             <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-1">User ID</span>
                             <span className="block text-2xl font-extrabold text-textPrimary tracking-wider">{generatedCredentials?.user_code}</span>
@@ -1391,3 +1391,4 @@ const AdminDashboard = () => (
 );
 
 export default AdminDashboard;
+
