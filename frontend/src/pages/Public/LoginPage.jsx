@@ -170,7 +170,7 @@ const LoginPage = () => {
                                         <div className="relative group">
                                             <input
                                                 type="text"
-                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                                 value={credentials.user_code}
                                                 onChange={(e) =>
                                                     setCredentials((prev) => ({
@@ -190,7 +190,7 @@ const LoginPage = () => {
                                         <div className="relative group">
                                             <input
                                                 type="password"
-                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                                 value={credentials.password}
                                                 onChange={(e) =>
                                                     setCredentials((prev) => ({
@@ -230,7 +230,7 @@ const LoginPage = () => {
                                         <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
                                         <input
                                             type="text"
-                                            className="w-full py-3 px-4 bg-surface/30 border border-white/5 text-textSecondary rounded-xl font-bold cursor-not-allowed"
+                                            className="w-full py-3 px-4 bg-surface/30 border border-overlay/5 text-textSecondary rounded-xl font-bold cursor-not-allowed"
                                             value={passwordForm.user_code}
                                             disabled
                                         />
@@ -240,7 +240,7 @@ const LoginPage = () => {
                                         <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">New Password</label>
                                         <input
                                             type="password"
-                                            className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                             value={passwordForm.new_password}
                                             onChange={(e) =>
                                                 setPasswordForm((prev) => ({
@@ -256,7 +256,7 @@ const LoginPage = () => {
                                         <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Confirm New Password</label>
                                         <input
                                             type="password"
-                                            className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                             value={passwordForm.confirm_password}
                                             onChange={(e) =>
                                                 setPasswordForm((prev) => ({
@@ -322,3 +322,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
