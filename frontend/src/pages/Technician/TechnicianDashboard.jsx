@@ -51,7 +51,7 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="relative p-3 rounded-full bg-surface/50 border border-white/10 hover:bg-surface transition-colors"
+                className="relative p-3 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
                 title="Open assigned work"
             >
                 <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
@@ -177,7 +177,7 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Status</label>
                             <select
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
@@ -202,7 +202,7 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                         <div className="md:col-span-2">
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Remarks</label>
                             <textarea
-                                className="w-full py-3 px-4 bg-surface/50 border border-white/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 rows="4"
                                 value={remarks}
                                 onChange={(event) => setRemarks(event.target.value)}
@@ -226,7 +226,7 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: idx * 0.1 }}
                                         key={log.id} 
-                                        className="p-4 rounded-xl bg-surface/30 border border-white/5 shadow-sm"
+                                        className="p-4 rounded-xl bg-surface/30 border border-overlay/5 shadow-sm"
                                     >
                                         <div className="flex justify-between items-start gap-4 mb-2">
                                             <div>
@@ -347,7 +347,7 @@ const TechnicianOverview = () => {
                                 whileHover={{ scale: 1.1, rotate: 15 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={refreshData}
-                                className={`p-2 rounded-lg bg-surface border border-white/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                                className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
                             >
                                 <Activity size={20} />
                             </motion.button>
@@ -356,7 +356,7 @@ const TechnicianOverview = () => {
                         <div className="overflow-x-auto flex-1">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                    <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                         <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
                                         <th className="pb-4 px-4 whitespace-nowrap">Student</th>
                                         <th className="pb-4 px-4 whitespace-nowrap">Location</th>
@@ -378,7 +378,7 @@ const TechnicianOverview = () => {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: idx * 0.05 }}
                                                 key={request.id} 
-                                                className="hover:bg-white/[0.02] transition-colors"
+                                                className="hover:bg-overlay/[0.02] transition-colors"
                                             >
                                                 <td className="py-4 px-4">
                                                     <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
@@ -489,7 +489,7 @@ const TechnicianHistory = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Student</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Location</th>
@@ -511,7 +511,7 @@ const TechnicianHistory = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         key={request.id} 
-                                        className="hover:bg-white/[0.02] transition-colors"
+                                        className="hover:bg-overlay/[0.02] transition-colors"
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
@@ -584,3 +584,4 @@ const TechnicianDashboard = () => (
 );
 
 export default TechnicianDashboard;
+
