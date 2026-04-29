@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion as Motion } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
     Wrench,
     Sun,
     Moon,
     LogIn,
-    Activity
+    Activity,
+    Menu,
+    X
 } from 'lucide-react';
 
 const sectionLinks = [
@@ -25,8 +27,10 @@ const Navbar = () => {
     const { user, isDarkMode, toggleDarkMode } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const scrollToSection = (id) => {
+        setIsMobileMenuOpen(false);
         const el = document.querySelector(id);
         if (!el) return;
 
@@ -36,13 +40,13 @@ const Navbar = () => {
     };
 
     const handleNavigate = (id) => {
+        setIsMobileMenuOpen(false);
         if (location.pathname === LANDING_PATH) {
             if (id === '#home') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 window.history.replaceState(null, '', `${LANDING_PATH}#home`);
                 return;
             }
-
             scrollToSection(id);
         } else {
             navigate(`${LANDING_PATH}${id}`);
@@ -54,77 +58,110 @@ const Navbar = () => {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`navbar navbar-expand-lg nav-glass fixed-top py-3 ${isDarkMode ? 'navbar-dark' : 'navbar-light'}`} 
-            style={{ transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', height: '80px' }}
+            className="fixed top-0 left-0 right-0 z-50 h-20 transition-all duration-300 glass-panel"
         >
-            <div className="container">
-                <Link className="navbar-brand fw-bold d-flex align-items-center" to={LANDING_PATH} style={{ letterSpacing: '-0.05em' }}>
-                    <Motion.div 
-                        whileHover={{ rotate: 15, scale: 1.1 }}
-                        className="nav-brand-mark me-3 d-flex align-items-center justify-content-center shadow-lg"
-                        style={{ width: '40px', height: '40px' }}
-                    >
-                        <Wrench size={22} />
-                    </Motion.div>
-                    <span className="nav-brand-text text-main fs-4">Campus<span className="hero-title-accent" style={{ color: '#f7b718' }}>Maintain</span></span>
-                </Link>
-                <button
-                    className="navbar-toggler border-0 shadow-none p-2 rounded-3 bg-surface bg-opacity-10"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                >
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <div className="flex items-center justify-between h-full">
+                    {/* Logo */}
+                    <Link to={LANDING_PATH} className="flex items-center gap-3 no-underline group">
+                        <Motion.div 
+                            whileHover={{ rotate: 15, scale: 1.1 }}
+                            className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-lg shadow-primary/30"
+                        >
+                            <Wrench size={20} />
+                        </Motion.div>
+                        <span className="text-xl font-bold tracking-tight text-textPrimary">
+                            Campus<span className="text-accent">Maintain</span>
+                        </span>
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <div className="hidden lg:flex items-center gap-1">
                         {sectionLinks.map((item) => (
-                            <li className="nav-item" key={item.id}>
-                                <Motion.button
-                                    whileHover={{ y: -2 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    type="button"
-                                    className="nav-link landing-nav-link px-3 py-2 smaller fw-800 text-uppercase tracking-widest btn btn-link text-decoration-none"
-                                    onClick={() => handleNavigate(item.id)}
-                                >
-                                    {item.label}
-                                </Motion.button>
-                            </li>
-                        ))}
-                        
-                        <div className="vr d-none d-lg-block mx-3 text-muted opacity-10" style={{ height: '24px' }}></div>
-                        
-                        <li className="nav-item d-flex align-items-center me-lg-2">
                             <Motion.button
-                                whileTap={{ scale: 0.9 }}
-                                type="button"
-                                className="btn theme-toggle-btn border-0 p-2 rounded-circle shadow-sm"
-                                onClick={toggleDarkMode}
+                                key={item.id}
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleNavigate(item.id)}
+                                className="px-4 py-2 text-sm font-bold tracking-wider uppercase text-textSecondary hover:text-accent transition-colors"
                             >
-                                {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
+                                {item.label}
                             </Motion.button>
-                        </li>
-                        
-                        <li className="nav-item">
-                            {user ? (
-                                <Link 
-                                    className="btn nav-cta-btn px-4 py-2 smaller fw-800 text-uppercase tracking-widest rounded-pill shadow-lg d-flex align-items-center bg-primary text-white border-0" 
-                                    to={`/${user.role.toLowerCase()}`}
-                                >
-                                    <Activity size={14} className="me-2" /> Live Dashboard
-                                </Link>
-                            ) : (
-                                <Link 
-                                    className="btn nav-cta-btn px-4 py-2 smaller fw-800 text-uppercase tracking-widest rounded-pill shadow-lg d-flex align-items-center bg-primary text-white border-0" 
-                                    to="/login"
-                                >
-                                    <LogIn size={14} className="me-2" /> Sign In
-                                </Link>
-                            )}
-                        </li>
-                    </ul>
+                        ))}
+
+                        <div className="w-px h-6 mx-4 bg-white/10"></div>
+
+                        <Motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={toggleDarkMode}
+                            className="p-2 mr-2 rounded-full bg-surface hover:bg-surface-hover transition-colors"
+                        >
+                            {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
+                        </Motion.button>
+
+                        {user ? (
+                            <Link to={`/${user.role.toLowerCase()}`} className="btn-primary flex items-center gap-2 text-sm uppercase tracking-wider font-bold">
+                                <Activity size={16} /> Live Dashboard
+                            </Link>
+                        ) : (
+                            <Link to="/login" className="btn-primary flex items-center gap-2 text-sm uppercase tracking-wider font-bold">
+                                <LogIn size={16} /> Sign In
+                            </Link>
+                        )}
+                    </div>
+
+                    {/* Mobile Menu Button */}
+                    <div className="flex lg:hidden items-center gap-4">
+                        <Motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={toggleDarkMode}
+                            className="p-2 rounded-full bg-surface text-textPrimary"
+                        >
+                            {isDarkMode ? <Sun size={18} className="text-warning" /> : <Moon size={18} className="text-primary" />}
+                        </Motion.button>
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2 text-textPrimary"
+                        >
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* Mobile Navigation */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <Motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="lg:hidden absolute top-20 left-0 right-0 bg-surface/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
+                    >
+                        <div className="px-4 py-6 flex flex-col gap-4">
+                            {sectionLinks.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => handleNavigate(item.id)}
+                                    className="text-left px-4 py-3 text-sm font-bold tracking-wider uppercase text-textPrimary hover:bg-white/5 rounded-lg transition-colors"
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                            <div className="h-px bg-white/10 my-2"></div>
+                            {user ? (
+                                <Link to={`/${user.role.toLowerCase()}`} className="btn-primary flex items-center justify-center gap-2 text-sm uppercase tracking-wider font-bold mt-2">
+                                    <Activity size={16} /> Live Dashboard
+                                </Link>
+                            ) : (
+                                <Link to="/login" className="btn-primary flex items-center justify-center gap-2 text-sm uppercase tracking-wider font-bold mt-2">
+                                    <LogIn size={16} /> Sign In
+                                </Link>
+                            )}
+                        </div>
+                    </Motion.div>
+                )}
+            </AnimatePresence>
         </Motion.nav>
     );
 };
