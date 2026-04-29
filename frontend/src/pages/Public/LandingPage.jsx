@@ -14,12 +14,51 @@ import {
   GraduationCap,
   ClipboardList,
   CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  Sun,
+  Moon,
+  Menu,
+  X
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { isDarkMode, toggleDarkMode } = useAuth();
   const [activeTab, setActiveTab] = useState('student');
+  const [isScrolled, setIsScrolled] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: 'Services', href: '#services' },
+    { name: 'How it Works', href: '#how-it-works' },
+    { name: 'Features', href: '#roles' },
+    { name: 'About Us', href: '#impact' },
+    { name: 'Contacts', href: '#footer' }
+  ];
+
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+    setIsMobileMenuOpen(false);
+    const element = document.querySelector(href);
+    if (element) {
+      const offset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -40,28 +79,95 @@ const LandingPage = () => {
       </div>
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 z-50 px-6 transition-all duration-300 ${
+          isScrolled 
+            ? 'py-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-slate-200 dark:border-white/10 shadow-sm' 
+            : 'py-5 bg-transparent border-transparent'
+        }`}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <motion.div 
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-500/20"
+            >
               <GraduationCap size={20} className="text-white" />
-            </div>
+            </motion.div>
             <div>
               <span className="font-extrabold text-xl tracking-tight block leading-none">DBU</span>
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Maintenance</span>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
-            <a href="#services" className="hover:text-indigo-600 dark:hover:text-white transition-colors">Services</a>
-            <a href="#how-it-works" className="hover:text-indigo-600 dark:hover:text-white transition-colors">How it Works</a>
-            <a href="#roles" className="hover:text-indigo-600 dark:hover:text-white transition-colors">Roles</a>
+          
+          <div className="hidden md:flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full border border-slate-200/50 dark:border-white/5">
+            {navLinks.map((link) => (
+              <a 
+                key={link.name}
+                href={link.href} 
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white rounded-full hover:bg-white dark:hover:bg-slate-700 transition-all duration-300"
+              >
+                {link.name}
+              </a>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/login" className="hidden md:block text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white transition-colors">Login</Link>
-            <Link to="/login" className="px-5 py-2.5 text-sm font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20">Report Issue</Link>
+
+          <div className="flex items-center gap-3">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </motion.button>
+            
+            <Link to="/login" className="hidden md:block px-5 py-2.5 text-sm font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 hover:-translate-y-0.5 hover:shadow-indigo-600/30">
+              Portal Login
+            </Link>
+
+            <button 
+              className="md:hidden p-2 text-slate-600 dark:text-slate-300"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
-      </nav>
+      </motion.nav>
+
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="fixed top-[72px] left-0 right-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 md:hidden overflow-hidden"
+          >
+            <div className="px-6 py-4 flex flex-col gap-2">
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className="px-4 py-3 text-base font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                >
+                  {link.name}
+                </a>
+              ))}
+              <div className="h-px bg-slate-200 dark:bg-white/10 my-2"></div>
+              <Link to="/login" className="px-4 py-3 text-base font-bold text-center bg-indigo-600 text-white rounded-xl shadow-md">
+                Portal Login
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="relative z-10">
         {/* 1. HERO SECTION */}
@@ -351,7 +457,7 @@ const LandingPage = () => {
         </section>
 
         {/* 5. CAMPUS IMPACT SECTION */}
-        <section className="py-24 px-6 relative">
+        <section id="impact" className="py-24 px-6 relative">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
@@ -426,7 +532,7 @@ const LandingPage = () => {
       </main>
 
       {/* 7. FOOTER */}
-      <footer className="py-12 px-6 border-t border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950 relative z-10">
+      <footer id="footer" className="py-12 px-6 border-t border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
