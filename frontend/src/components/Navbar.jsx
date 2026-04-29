@@ -89,7 +89,7 @@ const Navbar = () => {
                             </Motion.button>
                         ))}
 
-                        <div className="w-px h-6 mx-4 bg-white/10"></div>
+                        <div className="w-px h-6 mx-4 bg-overlay/10"></div>
 
                         <Motion.button
                             whileTap={{ scale: 0.9 }}
@@ -136,19 +136,19 @@ const Navbar = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="lg:hidden absolute top-20 left-0 right-0 bg-surface/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
+                        className="lg:hidden absolute top-20 left-0 right-0 bg-surface/95 backdrop-blur-xl border-b border-overlay/10 overflow-hidden"
                     >
                         <div className="px-4 py-6 flex flex-col gap-4">
                             {sectionLinks.map((item) => (
                                 <button
                                     key={item.id}
                                     onClick={() => handleNavigate(item.id)}
-                                    className="text-left px-4 py-3 text-sm font-bold tracking-wider uppercase text-textPrimary hover:bg-white/5 rounded-lg transition-colors"
+                                    className="text-left px-4 py-3 text-sm font-bold tracking-wider uppercase text-textPrimary hover:bg-overlay/5 rounded-lg transition-colors"
                                 >
                                     {item.label}
                                 </button>
                             ))}
-                            <div className="h-px bg-white/10 my-2"></div>
+                            <div className="h-px bg-overlay/10 my-2"></div>
                             {user ? (
                                 <Link to={`/${user.role.toLowerCase()}`} className="btn-primary flex items-center justify-center gap-2 text-sm uppercase tracking-wider font-bold mt-2">
                                     <Activity size={16} /> Live Dashboard
@@ -167,3 +167,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
