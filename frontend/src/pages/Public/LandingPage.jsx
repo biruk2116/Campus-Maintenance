@@ -58,8 +58,8 @@ const LandingPage = () => {
           <div className="absolute top-20 right-10 w-[400px] h-[400px] bg-gradient-to-br from-emerald-400/10 to-sky-400/10 rounded-full blur-[80px] -z-10 animate-pulse"></div>
           <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-gradient-to-tr from-blue-500/10 to-cyan-300/10 rounded-full blur-[100px] -z-10"></div>
 
-          <div className="max-w-5xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl">
+          <div className="w-full max-w-[1600px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center justify-between relative z-10 xl:px-12">
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl lg:mr-auto">
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold tracking-wide mb-6 shadow-sm">
                 <CheckCircle2 size={14} className="text-emerald-500" />
                 Trusted by DBU Students & Staff
@@ -92,7 +92,7 @@ const LandingPage = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 50 }}
-              className="relative hidden lg:block"
+              className="relative hidden lg:block lg:ml-auto w-full max-w-2xl"
             >
               <div className="relative w-full rounded-[2.5rem] bg-white dark:bg-slate-800/50 p-4 border border-slate-200/50 dark:border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-xl">
                 <div className="rounded-[2rem] overflow-hidden relative">
@@ -123,6 +123,10 @@ const LandingPage = () => {
 
         {/* 2. ABOUT US SECTION (#impact) */}
         <section id="impact" className="py-8 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative overflow-hidden">
+          <style>
+            {`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');`}
+          </style>
+          
           {/* Decorative background elements */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-500/5 rounded-full blur-[100px] pointer-events-none"></div>
           
@@ -136,24 +140,35 @@ const LandingPage = () => {
               >
                  <Building2 size={24} className="text-sky-500" />
               </motion.div>
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">About Us</h2>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>About Us</h2>
             </div>
             
             <motion.div 
               initial="hidden" 
               whileInView="visible" 
-              viewport={{ once: true }} 
-              variants={stagger}
-              className="bg-slate-50 dark:bg-slate-800/80 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] shadow-xl border border-slate-200 dark:border-white/10 text-center relative overflow-hidden"
+              viewport={{ once: true, margin: "-100px" }} 
+              variants={{
+                 hidden: {},
+                 visible: { transition: { staggerChildren: 0.2 } }
+              }}
+              className="bg-slate-50 dark:bg-slate-800/80 backdrop-blur-xl p-8 md:p-12 rounded-[2rem] shadow-xl border border-slate-200 dark:border-white/10 text-center relative overflow-hidden"
             >
                {/* Accent line */}
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-gradient-to-r from-sky-400 to-blue-600 rounded-b-full"></div>
+               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-gradient-to-r from-sky-400 to-blue-600 rounded-b-full"></div>
                
-               <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-slate-800 dark:text-white leading-relaxed font-bold mb-8">
+               <motion.p 
+                  variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} 
+                  className="text-base md:text-lg text-slate-700 dark:text-slate-200 leading-loose font-light tracking-wide mb-6"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
+               >
                   Campus Maintenance System is built to eliminate delays, miscommunication, and untracked maintenance requests across campus.
                </motion.p>
                
-               <motion.p variants={fadeInUp} className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+               <motion.p 
+                  variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} 
+                  className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-light"
+                  style={{ fontFamily: "'Outfit', sans-serif" }}
+               >
                   It provides a centralized platform where students and staff can report issues instantly, while administrators manage, prioritize, and resolve them efficiently. By combining real-time tracking with transparent workflows, the system ensures that every request is visible, accountable, and handled on time.
                </motion.p>
             </motion.div>
@@ -161,14 +176,14 @@ const LandingPage = () => {
         </section>
 
         {/* 3. SERVICES SECTION (#services) */}
-        <section id="services" className="py-8 px-6 bg-slate-50 dark:bg-slate-800/50 relative">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-slate-900 dark:text-white">Services</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm max-w-2xl mx-auto">Everything you need to manage and resolve campus issues efficiently.</p>
+        <section id="services" className="py-12 px-6 bg-slate-50 dark:bg-slate-800/50 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Services</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Everything you need to manage and resolve campus issues efficiently.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 { img: FireEmergencyImg, title: 'Submit Requests', desc: 'Easily submit maintenance requests from any device.' },
                 { img: LockDetailImg, title: 'Monitor Progress', desc: 'Track your request status in real-time.' },
@@ -178,18 +193,18 @@ const LandingPage = () => {
               ].map((service, i) => (
                 <motion.div 
                   key={i}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: i * 0.1 }}
-                  className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col group"
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  className="rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col group"
                 >
-                  <div className="h-28 w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                  <div className="h-56 w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
                      <img src={service.img} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 z-10" />
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
                   </div>
-                  <div className="p-4 flex-1">
-                    <h3 className="text-sm font-bold mb-1 text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">{service.title}</h3>
+                  <div className="p-8 flex-1 flex flex-col justify-center">
+                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">{service.title}</h3>
                     <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{service.desc}</p>
                   </div>
                 </motion.div>
@@ -199,14 +214,14 @@ const LandingPage = () => {
         </section>
 
         {/* 4. FEATURES SECTION (#roles) */}
-        <section id="roles" className="py-8 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-slate-900 dark:text-white">Features</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm max-w-2xl mx-auto">Designed for speed, transparency, and accountability.</p>
+        <section id="roles" className="py-12 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Features</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Designed for speed, transparency, and accountability.</p>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 { icon: Smartphone, title: 'Report instantly', desc: 'Log a ticket in seconds without paperwork.' },
                 { icon: Activity, title: 'Real-time tracking', desc: 'Know exactly when your issue will be fixed.' },
@@ -221,16 +236,16 @@ const LandingPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ delay: i * 0.1, type: 'spring', stiffness: 100 }}
-                  whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 shadow-md hover:shadow-lg hover:shadow-sky-500/10 hover:border-sky-500/30 transition-all duration-300 group relative overflow-hidden"
+                  whileHover={{ y: -8 }}
+                  className="p-10 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 shadow-lg hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-500/30 transition-all duration-300 group relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-sky-500/10 rounded-bl-full -mr-6 -mt-6 transition-transform group-hover:scale-125 duration-500"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-125 duration-500"></div>
                   
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-700 flex items-center justify-center mb-4 shadow-sm border border-slate-100 dark:border-white/10 relative z-10 group-hover:scale-110 transition-transform">
-                    <feature.icon size={20} className="text-sky-500 dark:text-sky-400" />
+                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 flex items-center justify-center mb-6 shadow-sm border border-slate-100 dark:border-white/10 relative z-10 group-hover:scale-110 transition-transform">
+                    <feature.icon size={28} className="text-sky-500 dark:text-sky-400" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 relative z-10 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{feature.title}</h4>
-                  <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed relative z-10">{feature.desc}</p>
+                  <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{feature.title}</h4>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed relative z-10">{feature.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -238,19 +253,19 @@ const LandingPage = () => {
         </section>
 
         {/* 5. CONTACTS & MAP SECTION (#footer) */}
-        <section id="footer" className="py-8 px-6 relative bg-slate-50 dark:bg-slate-800/50">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-slate-900 dark:text-white">Contacts</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm max-w-2xl mx-auto">Get in touch with the Debre Berhan University maintenance office.</p>
+        <section id="footer" className="py-12 px-6 relative bg-slate-50 dark:bg-slate-800/50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Contacts</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Get in touch with the Debre Berhan University maintenance office.</p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6 items-start">
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
               {/* Google Map */}
-              <div className="w-full h-[250px] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-md">
+              <div className="w-full h-[400px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl">
                  <iframe 
                     title="DBU Location"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3923.630560831613!2d39.52735741065798!3d10.450797365074213!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1646ffb28e51b147%3A0xc6c7b0d771bc7339!2sDebre%20Berhan%20University!5e0!3m2!1sen!2set!4v1700000000000!5m2!1sen!2set" 
+                    src="https://maps.google.com/maps?q=Debre%20Berhan%20University&t=&z=16&ie=UTF8&iwloc=&output=embed" 
                     width="100%" 
                     height="100%" 
                     style={{ border: 0 }} 
@@ -308,11 +323,44 @@ const LandingPage = () => {
 
       </main>
 
-      {/* FOOTER BAR */}
-      <footer className="py-8 px-6 border-t border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950 relative z-10 text-center">
-        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-          © {new Date().getFullYear()} Debre Berhan University Campus Maintenance System. All rights reserved.
-        </p>
+      {/* 6. ENHANCED FOOTER */}
+      <footer className="bg-white dark:bg-slate-950 pt-20 pb-10 px-6 border-t border-slate-200 dark:border-white/10 relative z-10 text-slate-600 dark:text-slate-400">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+           <div>
+              <div className="flex items-center gap-2 mb-6">
+                <Wrench className="text-sky-500" size={24} />
+                <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Campus Fix</span>
+              </div>
+              <p className="text-sm leading-relaxed mb-6">A modern, centralized platform for reporting and resolving campus maintenance issues instantly and transparently.</p>
+           </div>
+           
+           <div>
+              <h4 className="text-slate-900 dark:text-white font-bold mb-6">Quick Links</h4>
+              <ul className="space-y-3 text-sm">
+                 <li><a href="#home" className="hover:text-sky-500 transition-colors">Home</a></li>
+                 <li><a href="#impact" className="hover:text-sky-500 transition-colors">About Us</a></li>
+                 <li><a href="#services" className="hover:text-sky-500 transition-colors">Services</a></li>
+                 <li><a href="#roles" className="hover:text-sky-500 transition-colors">Features</a></li>
+              </ul>
+           </div>
+           
+           <div>
+              <h4 className="text-slate-900 dark:text-white font-bold mb-6">Portal</h4>
+              <ul className="space-y-3 text-sm">
+                 <li><button onClick={() => navigate('/login')} className="hover:text-sky-500 transition-colors">Student Login</button></li>
+                 <li><button onClick={() => navigate('/login')} className="hover:text-sky-500 transition-colors">Staff Login</button></li>
+                 <li><button onClick={() => navigate('/login')} className="hover:text-sky-500 transition-colors">Admin Dashboard</button></li>
+              </ul>
+           </div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto border-t border-slate-200 dark:border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between text-xs">
+          <p>© {new Date().getFullYear()} Debre Berhan University. All rights reserved.</p>
+          <div className="flex gap-6 mt-4 md:mt-0">
+             <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</a>
+             <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</a>
+          </div>
+        </div>
       </footer>
 
     </div>
