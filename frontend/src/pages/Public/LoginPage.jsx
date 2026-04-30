@@ -16,8 +16,6 @@ import Navbar from '../../components/Navbar';
 import PremiumModal from '../../components/PremiumModal';
 import { useAuth } from '../../context/AuthContext';
 
-import maintHero from '../../assets/images/maint_hero.png';
-
 const LoginPage = () => {
     const navigate = useNavigate();
     const { user, login, updatePassword } = useAuth();
@@ -105,10 +103,14 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
-            <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-cover bg-center opacity-40 blur-md scale-105 transition-all duration-500" style={{ backgroundImage: `url(${maintHero})` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+        <div className="min-h-screen flex flex-col relative overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+            {/* BACKGROUND BLOBS */}
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 blur-[120px] dark:bg-indigo-600/20"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] dark:bg-blue-600/20"></div>
+                
+                {/* Subtle grid pattern overlay */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-5 mix-blend-overlay"></div>
             </div>
 
             <Navbar />
