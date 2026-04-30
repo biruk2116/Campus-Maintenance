@@ -21,7 +21,7 @@ const sectionLinks = [
 ];
 
 const LANDING_PATH = '/';
-const NAVBAR_OFFSET = 80;
+const NAVBAR_OFFSET = 65;
 
 const Navbar = () => {
     const { user, isDarkMode, toggleDarkMode } = useAuth();
@@ -138,12 +138,12 @@ const Navbar = () => {
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="fixed top-[72px] left-0 right-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 md:hidden overflow-hidden"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-[65px] left-0 right-0 bottom-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/10 md:hidden overflow-y-auto"
                     >
-                        <div className="px-6 py-4 flex flex-col gap-2">
+                        <div className="px-6 py-8 flex flex-col gap-4 min-h-full">
                             {sectionLinks.map((link) => (
                                 <a 
                                     key={link.id}
