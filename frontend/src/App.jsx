@@ -51,9 +51,9 @@ function AnimatedRoutes() {
     return (
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<PageWrapper><LoginPage /></PageWrapper>} />
-                <Route path="/login" element={<Navigate to="/" replace />} />
-                <Route path="/landing" element={<PageWrapper><LandingPage /></PageWrapper>} />
+                <Route path="/" element={<PageWrapper><LandingPage /></PageWrapper>} />
+                <Route path="/login" element={<PageWrapper><LoginPage /></PageWrapper>} />
+                <Route path="/landing" element={<Navigate to="/" replace />} />
                 
                 <Route path="/student/*" element={
                     <ProtectedRoute role="student">
