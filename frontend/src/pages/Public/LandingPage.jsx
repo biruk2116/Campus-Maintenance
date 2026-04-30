@@ -53,12 +53,12 @@ const LandingPage = () => {
       <main className="relative z-10">
         
         {/* 1. HERO SECTION (#home) */}
-        <section id="home" className="relative min-h-screen flex items-center pt-24 pb-12 px-6 overflow-hidden">
+        <section id="home" className="relative min-h-screen flex items-center pt-20 pb-8 px-6 overflow-hidden">
           {/* Subtle animated background shapes */}
           <div className="absolute top-20 right-10 w-[600px] h-[600px] bg-gradient-to-br from-emerald-400/10 to-sky-400/10 rounded-full blur-[80px] -z-10 animate-pulse"></div>
           <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-gradient-to-tr from-blue-500/10 to-cyan-300/10 rounded-full blur-[100px] -z-10"></div>
 
-          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
+          <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
             <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl">
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-bold tracking-wide mb-8 shadow-sm">
                 <CheckCircle2 size={16} className="text-emerald-500" />
@@ -122,21 +122,21 @@ const LandingPage = () => {
         </section>
 
         {/* 2. ABOUT US SECTION (#impact) */}
-        <section id="impact" className="py-24 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative overflow-hidden">
+        <section id="impact" className="py-12 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative overflow-hidden">
           {/* Decorative background elements */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-sky-500/5 rounded-full blur-[100px] pointer-events-none"></div>
           
           <div className="max-w-5xl mx-auto relative z-10">
-            <div className="text-center mb-12">
+            <div className="text-center mb-10">
               <motion.div 
                  initial={{ opacity: 0, scale: 0.9 }} 
                  whileInView={{ opacity: 1, scale: 1 }} 
                  viewport={{ once: true }} 
-                 className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-sky-100 dark:bg-sky-500/20 mb-6 shadow-xl shadow-sky-500/10"
+                 className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-100 dark:bg-sky-500/20 mb-4 shadow-xl shadow-sky-500/10"
               >
-                 <Building2 size={36} className="text-sky-500" />
+                 <Building2 size={32} className="text-sky-500" />
               </motion.div>
-              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-8 text-slate-900 dark:text-white">About Us</h2>
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 text-slate-900 dark:text-white">About Us</h2>
             </div>
             
             <motion.div 
@@ -144,7 +144,7 @@ const LandingPage = () => {
               whileInView="visible" 
               viewport={{ once: true }} 
               variants={stagger}
-              className="bg-slate-50 dark:bg-slate-800/80 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-white/10 text-center relative overflow-hidden"
+              className="bg-slate-50 dark:bg-slate-800/80 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-white/10 text-center relative overflow-hidden"
             >
                {/* Accent line */}
                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-gradient-to-r from-sky-400 to-blue-600 rounded-b-full"></div>
@@ -161,14 +161,14 @@ const LandingPage = () => {
         </section>
 
         {/* 3. SERVICES SECTION (#services) */}
-        <section id="services" className="py-24 px-6 bg-slate-50 dark:bg-slate-800/50 relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
+        <section id="services" className="py-12 px-6 bg-slate-50 dark:bg-slate-800/50 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Services</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">Everything you need to manage and resolve campus issues efficiently.</p>
+              <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Everything you need to manage and resolve campus issues efficiently.</p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { img: FireEmergencyImg, title: 'Submit Requests', desc: 'Easily submit maintenance requests from any device.' },
                 { img: LockDetailImg, title: 'Monitor Progress', desc: 'Track your request status in real-time.' },
@@ -184,12 +184,12 @@ const LandingPage = () => {
                   transition={{ delay: i * 0.1 }}
                   className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col group"
                 >
-                  <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                  <div className="h-40 w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
                      <img src={service.img} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 z-10" />
                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
                   </div>
-                  <div className="p-8 flex-1">
-                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">{service.title}</h3>
+                  <div className="p-6 flex-1">
+                    <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">{service.title}</h3>
                     <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{service.desc}</p>
                   </div>
                 </motion.div>
@@ -199,11 +199,11 @@ const LandingPage = () => {
         </section>
 
         {/* 4. FEATURES SECTION (#roles) */}
-        <section id="roles" className="py-24 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
+        <section id="roles" className="py-12 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Features</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">Designed for speed, transparency, and accountability.</p>
+              <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Designed for speed, transparency, and accountability.</p>
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,16 +238,16 @@ const LandingPage = () => {
         </section>
 
         {/* 5. CONTACTS & MAP SECTION (#footer) */}
-        <section id="footer" className="py-24 px-6 relative bg-slate-50 dark:bg-slate-800/50">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
+        <section id="footer" className="py-12 px-6 relative bg-slate-50 dark:bg-slate-800/50">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Contacts</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">Get in touch with the Debre Berhan University maintenance office.</p>
+              <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Get in touch with the Debre Berhan University maintenance office.</p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="grid lg:grid-cols-2 gap-8 items-start">
               {/* Google Map */}
-              <div className="w-full h-[400px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl">
+              <div className="w-full h-[320px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl">
                  <iframe 
                     title="DBU Location"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3923.630560831613!2d39.52735741065798!3d10.450797365074213!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1646ffb28e51b147%3A0xc6c7b0d771bc7339!2sDebre%20Berhan%20University!5e0!3m2!1sen!2set!4v1700000000000!5m2!1sen!2set" 
