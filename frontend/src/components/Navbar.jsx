@@ -67,8 +67,8 @@ const Navbar = () => {
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className={`fixed top-0 left-0 right-0 z-50 px-6 transition-all duration-300 ${
                     isScrolled || location.pathname !== LANDING_PATH
-                        ? 'py-3 bg-[#1E1B4B] shadow-lg' 
-                        : 'py-5 bg-[#1E1B4B]'
+                        ? 'py-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg shadow-sm border-b border-gray-200 dark:border-slate-700' 
+                        : 'py-5 bg-transparent border-transparent'
                 }`}
             >
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -76,13 +76,13 @@ const Navbar = () => {
                     <Link to="/" className="flex items-center gap-3 group">
                         <motion.div 
                             whileHover={{ rotate: 5, scale: 1.05 }}
-                            className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg"
+                            className="w-10 h-10 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-md shadow-blue-600/20"
                         >
-                            <GraduationCap size={20} className="text-[#1E1B4B]" />
+                            <GraduationCap size={20} className="text-white" />
                         </motion.div>
                         <div>
-                            <span className="font-extrabold text-xl tracking-tight block leading-none text-white group-hover:text-[#6BA3D6] transition-colors">DBU</span>
-                            <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Maintenance</span>
+                            <span className="font-extrabold text-xl tracking-tight block leading-none text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors">DBU</span>
+                            <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">Maintenance</span>
                         </div>
                     </Link>
                     
@@ -94,7 +94,7 @@ const Navbar = () => {
                                     key={link.id}
                                     href={link.id} 
                                     onClick={(e) => handleNavigate(e, link.id)}
-                                    className="px-4 py-2 text-sm font-semibold text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-all duration-300"
+                                    className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-full transition-all duration-300"
                                 >
                                     {link.label}
                                 </a>
@@ -105,26 +105,26 @@ const Navbar = () => {
                         <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={toggleDarkMode}
-                            className="p-2 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                            className="p-2 rounded-full text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
                             aria-label="Toggle dark mode"
                         >
                             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                         </motion.button>
                         
                         {user ? (
-                            <Link to={`/${user.role.toLowerCase()}`} className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-[#6BA3D6] text-[#1E1B4B] rounded-none hover:bg-white transition-all shadow-lg hover:-translate-y-0.5">
+                            <Link to={`/${user.role.toLowerCase()}`} className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 transition-all shadow-md hover:-translate-y-0.5">
                                 <Activity size={16} /> Dashboard
                             </Link>
                         ) : (
                             location.pathname !== '/login' && (
-                                <Link to="/login" className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-[#6BA3D6] text-[#1E1B4B] rounded-none hover:bg-white transition-all shadow-lg hover:-translate-y-0.5">
+                                <Link to="/login" className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 transition-all shadow-md hover:-translate-y-0.5">
                                     <LogIn size={16} /> Login
                                 </Link>
                             )
                         )}
 
                         <button 
-                            className="md:hidden p-2 text-white"
+                            className="md:hidden p-2 text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
                             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -141,7 +141,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="fixed top-[65px] left-0 right-0 bottom-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/10 md:hidden overflow-y-auto"
+                        className="fixed top-[65px] left-0 right-0 bottom-0 z-40 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 md:hidden overflow-y-auto"
                     >
                         <div className="px-6 py-8 flex flex-col gap-4 min-h-full">
                             {sectionLinks.map((link) => (
@@ -149,19 +149,19 @@ const Navbar = () => {
                                     key={link.id}
                                     href={link.id}
                                     onClick={(e) => handleNavigate(e, link.id)}
-                                    className="px-4 py-3 text-base font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                                    className="px-4 py-3 text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-colors"
                                 >
                                     {link.label}
                                 </a>
                             ))}
-                            <div className="h-px bg-slate-200 dark:bg-white/10 my-2"></div>
+                            <div className="h-px bg-gray-200 dark:bg-slate-700 my-2"></div>
                             {user ? (
-                                <Link to={`/${user.role.toLowerCase()}`} className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-sky-500 text-white rounded-xl shadow-md">
+                                <Link to={`/${user.role.toLowerCase()}`} className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-md">
                                     <Activity size={18} /> Live Dashboard
                                 </Link>
                             ) : (
                                 location.pathname !== '/login' && (
-                                    <Link to="/login" className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-sky-500 text-white rounded-xl shadow-md">
+                                    <Link to="/login" className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-md">
                                         <LogIn size={18} /> Portal Login
                                     </Link>
                                 )
