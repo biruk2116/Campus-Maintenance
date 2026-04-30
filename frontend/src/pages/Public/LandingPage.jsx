@@ -61,28 +61,28 @@ const LandingPage = () => {
           <div className="absolute top-1/4 -right-32 w-[600px] h-[600px] rounded-full border-[120px] border-[#6BA3D6] border-b-transparent border-l-transparent -rotate-12 -z-10 hidden lg:block"></div>
           <div className="absolute top-1/4 -right-16 w-[450px] h-[450px] bg-[#1E1B4B] rounded-full -z-10 hidden lg:block"></div>
 
-          <div className="w-full max-w-[1600px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center justify-between relative z-10 xl:px-12">
+          <div className="w-full max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-center justify-between relative z-10 xl:px-8">
             <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl lg:mr-auto pl-4 lg:pl-16">
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-none bg-[#1E1B4B]/10 border border-[#1E1B4B]/20 text-[#1E1B4B] dark:bg-white/10 dark:border-white/20 dark:text-white text-xs font-bold tracking-wide mb-6">
                 <CheckCircle2 size={14} className="text-[#1E1B4B] dark:text-white" />
                 Trusted by DBU Students & Staff
               </motion.div>
               
-              <motion.h1 variants={fadeInUp} className="text-4xl lg:text-6xl font-black tracking-tighter leading-[1.1] mb-6 text-[#1E1B4B] dark:text-white uppercase" style={{ fontFamily: "'Outfit', sans-serif" }}>
+              <motion.h1 variants={fadeInUp} className="text-3xl lg:text-5xl font-black tracking-tight leading-[1.15] mb-5 text-[#1E1B4B] dark:text-white uppercase" style={{ fontFamily: "'Outfit', sans-serif" }}>
                 Fast, Transparent <br />
                 Maintenance
               </motion.h1>
               
-              <motion.p variants={fadeInUp} className="text-lg md:text-xl text-[#1E1B4B]/80 dark:text-slate-300 leading-relaxed mb-8 font-medium">
+              <motion.p variants={fadeInUp} className="text-base md:text-lg text-[#1E1B4B]/80 dark:text-slate-300 leading-relaxed mb-6 font-medium">
                 Report issues instantly. Track progress in real-time. Keep the university infrastructure running flawlessly.
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-3">
-                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-10 py-4 rounded-none bg-[#1E1B4B] text-white font-bold text-lg hover:bg-[#2c286d] transition-all duration-300 flex items-center justify-center gap-2 group">
+                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-8 py-3 rounded-none bg-[#1E1B4B] text-white font-bold text-base hover:bg-[#2c286d] transition-all duration-300 flex items-center justify-center gap-2 group">
                   Report Issue 
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-10 py-4 rounded-none bg-transparent border-2 border-[#1E1B4B] dark:border-white text-[#1E1B4B] dark:text-white font-bold text-lg hover:bg-[#6BA3D6] hover:border-[#6BA3D6] hover:text-[#1E1B4B] transition-all duration-300 flex items-center justify-center gap-2 group">
+                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-8 py-3 rounded-none bg-transparent border-2 border-[#1E1B4B] dark:border-white text-[#1E1B4B] dark:text-white font-bold text-base hover:bg-[#6BA3D6] hover:border-[#6BA3D6] hover:text-[#1E1B4B] transition-all duration-300 flex items-center justify-center gap-2 group">
                   <Activity size={20} className="group-hover:text-[#1E1B4B] transition-colors" />
                   Track Request
                 </button>
@@ -93,7 +93,7 @@ const LandingPage = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 50 }}
-              className="relative hidden lg:block lg:ml-auto w-full max-w-2xl"
+              className="relative hidden lg:block lg:ml-auto w-full max-w-xl"
             >
               <div className="relative w-full rounded-none bg-white/40 dark:bg-slate-800/50 p-4 border border-white/60 dark:border-white/5 backdrop-blur-xl">
                 <div className="rounded-none overflow-hidden relative">
