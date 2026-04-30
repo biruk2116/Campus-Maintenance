@@ -53,36 +53,37 @@ const LandingPage = () => {
       <main className="relative z-10">
         
         {/* 1. HERO SECTION (#home) */}
-        <section id="home" className="relative min-h-[80vh] flex items-center pt-16 pb-8 px-6 overflow-hidden">
-          {/* Subtle animated background shapes */}
-          <div className="absolute top-20 right-10 w-[400px] h-[400px] bg-gradient-to-br from-emerald-400/10 to-sky-400/10 rounded-full blur-[80px] -z-10 animate-pulse"></div>
-          <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-gradient-to-tr from-blue-500/10 to-cyan-300/10 rounded-full blur-[100px] -z-10"></div>
+        <section id="home" className="relative min-h-[80vh] flex items-center pt-24 pb-8 px-6 overflow-hidden bg-[#EAEAEA] dark:bg-slate-900">
+          {/* Solid geometric shapes inspired by the image */}
+          <div className="absolute top-1/4 -left-16 w-64 h-64 bg-[#1E1B4B] rounded-full -z-10"></div>
+          <div className="absolute -bottom-16 left-12 w-56 h-56 bg-[#1E1B4B] rounded-[2rem] rotate-12 -z-10"></div>
+          
+          <div className="absolute top-1/4 -right-32 w-[600px] h-[600px] rounded-full border-[120px] border-[#6BA3D6] border-b-transparent border-l-transparent -rotate-12 -z-10 hidden lg:block"></div>
+          <div className="absolute top-1/4 -right-16 w-[450px] h-[450px] bg-[#1E1B4B] rounded-full -z-10 hidden lg:block"></div>
 
           <div className="w-full max-w-[1600px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center justify-between relative z-10 xl:px-12">
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl lg:mr-auto">
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold tracking-wide mb-6 shadow-sm">
-                <CheckCircle2 size={14} className="text-emerald-500" />
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl lg:mr-auto pl-4 lg:pl-16">
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-none bg-[#1E1B4B]/10 border border-[#1E1B4B]/20 text-[#1E1B4B] dark:bg-white/10 dark:border-white/20 dark:text-white text-xs font-bold tracking-wide mb-6">
+                <CheckCircle2 size={14} className="text-[#1E1B4B] dark:text-white" />
                 Trusted by DBU Students & Staff
               </motion.div>
               
-              <motion.h1 variants={fadeInUp} className="text-4xl lg:text-5xl font-black tracking-tight leading-[1.15] mb-4 text-slate-900 dark:text-white">
+              <motion.h1 variants={fadeInUp} className="text-4xl lg:text-6xl font-black tracking-tighter leading-[1.1] mb-6 text-[#1E1B4B] dark:text-white uppercase" style={{ fontFamily: "'Outfit', sans-serif" }}>
                 Fast, Transparent <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500">
-                  Maintenance.
-                </span>
+                Maintenance
               </motion.h1>
               
-              <motion.p variants={fadeInUp} className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed mb-8 font-medium">
+              <motion.p variants={fadeInUp} className="text-lg md:text-xl text-[#1E1B4B]/80 dark:text-slate-300 leading-relaxed mb-8 font-medium">
                 Report issues instantly. Track progress in real-time. Keep the university infrastructure running flawlessly.
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-3">
-                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold text-lg hover:shadow-[0_0_30px_rgba(14,165,233,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group">
+                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-10 py-4 rounded-none bg-[#1E1B4B] text-white font-bold text-lg hover:bg-[#2c286d] transition-all duration-300 flex items-center justify-center gap-2 group">
                   Report Issue 
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-lg hover:border-sky-500 dark:hover:border-sky-400 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 group">
-                  <Activity size={20} className="text-slate-400 group-hover:text-sky-500 transition-colors" />
+                <button onClick={() => navigate('/login')} className="w-full sm:w-auto px-10 py-4 rounded-none bg-transparent border-2 border-[#1E1B4B] dark:border-white text-[#1E1B4B] dark:text-white font-bold text-lg hover:bg-[#6BA3D6] hover:border-[#6BA3D6] hover:text-[#1E1B4B] transition-all duration-300 flex items-center justify-center gap-2 group">
+                  <Activity size={20} className="group-hover:text-[#1E1B4B] transition-colors" />
                   Track Request
                 </button>
               </motion.div>
@@ -94,10 +95,10 @@ const LandingPage = () => {
               transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 50 }}
               className="relative hidden lg:block lg:ml-auto w-full max-w-2xl"
             >
-              <div className="relative w-full rounded-[2.5rem] bg-white dark:bg-slate-800/50 p-4 border border-slate-200/50 dark:border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                <div className="rounded-[2rem] overflow-hidden relative">
+              <div className="relative w-full rounded-none bg-white/40 dark:bg-slate-800/50 p-4 border border-white/60 dark:border-white/5 backdrop-blur-xl">
+                <div className="rounded-none overflow-hidden relative">
                   <img src={HeroImg} alt="Maintenance Dashboard UI" className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-sky-500/10 to-emerald-500/10 pointer-events-none mix-blend-overlay"></div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#1E1B4B]/10 to-[#6BA3D6]/10 pointer-events-none mix-blend-overlay"></div>
                 </div>
                 
                 {/* Floating UI Elements for depth */}
@@ -105,13 +106,13 @@ const LandingPage = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1, duration: 0.5 }}
-                  className="absolute -bottom-6 -left-8 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 flex items-center gap-4"
+                  className="absolute -bottom-6 -left-8 bg-white dark:bg-slate-800 p-4 rounded-none shadow-xl border border-slate-100 dark:border-slate-700 flex items-center gap-4"
                 >
-                  <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
-                    <CheckCircle2 size={24} className="text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-12 h-12 rounded-full bg-[#6BA3D6]/20 flex items-center justify-center">
+                    <CheckCircle2 size={24} className="text-[#6BA3D6]" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">Issue Resolved</p>
+                    <p className="text-sm font-bold text-[#1E1B4B] dark:text-white">Issue Resolved</p>
                     <p className="text-xs text-slate-500">Just now</p>
                   </div>
                 </motion.div>
