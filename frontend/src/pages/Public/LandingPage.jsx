@@ -102,31 +102,41 @@ const LandingPage = () => {
         </section>
 
         {/* 2. ABOUT US SECTION (#impact) */}
-        <section id="impact" className="py-24 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">About Us</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">Why this system was built.</p>
+        <section id="impact" className="py-24 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-sky-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+          
+          <div className="max-w-5xl mx-auto relative z-10">
+            <div className="text-center mb-12">
+              <motion.div 
+                 initial={{ opacity: 0, scale: 0.9 }} 
+                 whileInView={{ opacity: 1, scale: 1 }} 
+                 viewport={{ once: true }} 
+                 className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-sky-100 dark:bg-sky-500/20 mb-6 shadow-xl shadow-sky-500/10"
+              >
+                 <Building2 size={36} className="text-sky-500" />
+              </motion.div>
+              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-8 text-slate-900 dark:text-white">About Us</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-8 items-stretch">
-               <div className="p-10 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 shadow-xl flex flex-col justify-center">
-                  <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mb-6">
-                     <AlertCircle size={32} className="text-red-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">The Problem</h3>
-                  <p className="text-lg text-slate-600 dark:text-slate-400">Poor maintenance handling, resulting in frustrating delays and no transparency for students and staff.</p>
-               </div>
-               <div className="p-10 rounded-3xl bg-sky-500 text-white shadow-xl shadow-sky-500/20 flex flex-col justify-center relative overflow-hidden">
-                  <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-6">
-                     <CheckCircle2 size={32} className="text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">The Solution</h3>
-                  <p className="text-lg text-sky-50">A centralized, digital system for reporting and managing issues efficiently, ensuring accountability and speed.</p>
-                  <div className="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
-                     <ShieldCheck size={200} />
-                  </div>
-               </div>
-            </div>
+            
+            <motion.div 
+              initial="hidden" 
+              whileInView="visible" 
+              viewport={{ once: true }} 
+              variants={stagger}
+              className="bg-slate-50 dark:bg-slate-800/80 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-white/10 text-center relative overflow-hidden"
+            >
+               {/* Accent line */}
+               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-gradient-to-r from-sky-400 to-blue-600 rounded-b-full"></div>
+               
+               <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-slate-800 dark:text-white leading-relaxed font-bold mb-8">
+                  Campus Maintenance System is built to eliminate delays, miscommunication, and untracked maintenance requests across campus.
+               </motion.p>
+               
+               <motion.p variants={fadeInUp} className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+                  It provides a centralized platform where students and staff can report issues instantly, while administrators manage, prioritize, and resolve them efficiently. By combining real-time tracking with transparent workflows, the system ensures that every request is visible, accountable, and handled on time.
+               </motion.p>
+            </motion.div>
           </div>
         </section>
 
@@ -152,14 +162,14 @@ const LandingPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ delay: i * 0.1 }}
-                  className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
+                  className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col group"
                 >
-                  <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 p-6 flex items-center justify-center relative overflow-hidden">
-                     <img src={service.img} alt={service.title} className="w-full h-full object-contain hover:scale-110 transition-transform duration-500 drop-shadow-md z-10" />
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent z-0"></div>
+                  <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                     <img src={service.img} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 z-10" />
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
                   </div>
                   <div className="p-8 flex-1">
-                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">{service.title}</h3>
+                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">{service.title}</h3>
                     <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{service.desc}</p>
                   </div>
                 </motion.div>
@@ -171,40 +181,38 @@ const LandingPage = () => {
         {/* 4. FEATURES SECTION (#roles) */}
         <section id="roles" className="py-24 px-6 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 relative">
           <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 text-slate-900 dark:text-white">Features</h2>
-                <div className="space-y-6">
-                  {[
-                    { icon: Smartphone, title: 'Report issues instantly', desc: 'Log a ticket in seconds without paperwork.' },
-                    { icon: Activity, title: 'Track status in real-time', desc: 'Know exactly when your issue will be fixed.' },
-                    { icon: ShieldCheck, title: 'Admin manages tasks efficiently', desc: 'Central dashboard to dispatch the right personnel.' },
-                    { icon: AlertCircle, title: 'Priority handling for urgent issues', desc: 'Critical emergencies get immediate attention.' },
-                    { icon: BellRing, title: 'Notifications on updates', desc: 'Get alerted when your ticket status changes.' },
-                    { icon: BarChart3, title: 'Data insights for improvement', desc: 'Analyze trends to prevent future breakdowns.' },
-                  ].map((feature, i) => (
-                    <motion.div 
-                      key={i}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.05 }}
-                      className="flex gap-4 items-start"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-500/20 flex items-center justify-center shrink-0 mt-1">
-                        <feature.icon size={18} className="text-sky-600 dark:text-sky-400" />
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{feature.title}</h4>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm">{feature.desc}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-              <div className="relative hidden lg:block">
-                  <img src={FeatureImg} alt="System Features" className="w-full h-auto rounded-[2rem] shadow-2xl border border-slate-200 dark:border-white/10" />
-              </div>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white">Features</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">Designed for speed, transparency, and accountability.</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { icon: Smartphone, title: 'Report instantly', desc: 'Log a ticket in seconds without paperwork.' },
+                { icon: Activity, title: 'Real-time tracking', desc: 'Know exactly when your issue will be fixed.' },
+                { icon: ShieldCheck, title: 'Admin efficiency', desc: 'Central dashboard to dispatch personnel.' },
+                { icon: AlertCircle, title: 'Priority handling', desc: 'Critical emergencies get immediate attention.' },
+                { icon: BellRing, title: 'Live Notifications', desc: 'Get alerted when your ticket status changes.' },
+                { icon: BarChart3, title: 'Data insights', desc: 'Analyze trends to prevent future breakdowns.' },
+              ].map((feature, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: i * 0.1, type: 'spring', stiffness: 100 }}
+                  whileHover={{ y: -8 }}
+                  className="p-8 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 shadow-lg hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-500/30 transition-all duration-300 group relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-125 duration-500"></div>
+                  
+                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 flex items-center justify-center mb-6 shadow-sm border border-slate-100 dark:border-white/10 relative z-10 group-hover:scale-110 transition-transform">
+                    <feature.icon size={26} className="text-sky-500 dark:text-sky-400" />
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{feature.title}</h4>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed relative z-10">{feature.desc}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
