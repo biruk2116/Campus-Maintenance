@@ -88,7 +88,7 @@ const Navbar = () => {
                     
                     <div className="flex items-center gap-6">
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full border border-slate-200/50 dark:border-white/5">
+                        <div className="hidden md:flex items-center gap-2">
                             {sectionLinks.map((link) => (
                                 <a 
                                     key={link.id}
