@@ -14,9 +14,9 @@ import {
 
 const sectionLinks = [
     { id: '#home', label: 'Home' },
+    { id: '#impact', label: 'About Us' },
     { id: '#services', label: 'Services' },
     { id: '#roles', label: 'Features' },
-    { id: '#impact', label: 'About Us' },
     { id: '#footer', label: 'Contacts' }
 ];
 
