@@ -61,11 +61,12 @@ const LandingPage = () => {
               backgroundPosition: 'center right',
               backgroundRepeat: 'no-repeat',
               backgroundSize: '100% auto',
+              imageRendering: 'auto',
             }}
           ></div>
-          <div className="absolute inset-0 bg-white/10 dark:bg-slate-950/24"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-white/82 via-white/24 to-transparent dark:from-slate-950/90 dark:via-slate-950/34 dark:to-transparent"></div>
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/55 to-transparent dark:from-slate-900/75"></div>
+          <div className="absolute inset-0 bg-white/4 dark:bg-slate-950/14"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/76 via-white/16 to-transparent dark:from-slate-950/82 dark:via-slate-950/22 dark:to-transparent"></div>
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/40 to-transparent dark:from-slate-900/60"></div>
 
           <div className="w-full max-w-[1400px] mx-auto relative z-10 xl:px-8">
             <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl pl-4 lg:pl-16">
