@@ -60,11 +60,11 @@ const LandingPage = () => {
               backgroundImage: `url(${HeroImg})`,
               backgroundPosition: 'center right',
               backgroundRepeat: 'no-repeat',
-              backgroundSize: '100% auto',
+              backgroundSize: 'min(84vw, 860px) auto',
             }}
           ></div>
-          <div className="absolute inset-0 bg-white/22 dark:bg-slate-950/30"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-white/88 via-white/42 to-transparent dark:from-slate-950/88 dark:via-slate-950/40 dark:to-transparent"></div>
+          <div className="absolute inset-0 bg-white/18 dark:bg-slate-950/24"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/38 to-transparent dark:from-slate-950/90 dark:via-slate-950/34 dark:to-transparent"></div>
           <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/70 to-transparent dark:from-slate-900/75"></div>
 
           <div className="w-full max-w-[1400px] mx-auto relative z-10 xl:px-8">
