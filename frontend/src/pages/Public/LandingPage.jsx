@@ -58,13 +58,13 @@ const LandingPage = () => {
             className="absolute inset-0"
             style={{
               backgroundImage: `url(${HeroImg})`,
-              backgroundPosition: 'center center',
+              backgroundPosition: 'center right',
               backgroundRepeat: 'no-repeat',
-              backgroundSize: 'contain',
+              backgroundSize: '100% auto',
             }}
           ></div>
-          <div className="absolute inset-0 bg-white/35 dark:bg-slate-950/45"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/45 to-transparent dark:from-slate-950/90 dark:via-slate-950/45 dark:to-transparent"></div>
+          <div className="absolute inset-0 bg-white/22 dark:bg-slate-950/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/88 via-white/42 to-transparent dark:from-slate-950/88 dark:via-slate-950/40 dark:to-transparent"></div>
           <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/70 to-transparent dark:from-slate-900/75"></div>
 
           <div className="w-full max-w-[1400px] mx-auto relative z-10 xl:px-8">
