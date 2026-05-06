@@ -53,10 +53,21 @@ const LandingPage = () => {
       <main className="relative z-10">
         
         {/* 1. HERO SECTION (#home) */}
-        <section id="home" className="relative min-h-[80vh] flex items-center pt-24 pb-8 px-6 overflow-hidden">
+        <section id="home" className="relative min-h-[85vh] flex items-center pt-24 pb-10 px-6 overflow-hidden">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${HeroImg})`,
+              backgroundPosition: 'center right',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'contain',
+            }}
+          ></div>
+          <div className="absolute inset-0 bg-white/78 dark:bg-slate-950/78"></div>
+          <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-white via-white/90 to-white/30 dark:from-slate-950 dark:via-slate-950/85 dark:to-slate-950/35"></div>
 
-          <div className="w-full max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-center justify-between relative z-10 xl:px-8">
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl lg:mr-auto pl-4 lg:pl-16">
+          <div className="w-full max-w-[1400px] mx-auto relative z-10 xl:px-8">
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl pl-4 lg:pl-16">
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-blue-700 dark:text-blue-400 text-xs font-bold tracking-wide mb-6">
                 <CheckCircle2 size={14} className="text-blue-600 dark:text-blue-400" />
                 Trusted by DBU Students & Staff
@@ -81,37 +92,6 @@ const LandingPage = () => {
                   Track Request
                 </button>
               </motion.div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 50 }}
-              className="relative hidden lg:block lg:ml-auto w-full max-w-xl"
-            >
-              <div className="relative w-full rounded-2xl bg-white dark:bg-slate-800 p-3 border border-gray-200 dark:border-slate-700 shadow-xl">
-                <div className="rounded-xl overflow-hidden relative">
-                  <img src={HeroImg} alt="Maintenance Dashboard UI" className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 to-transparent pointer-events-none mix-blend-overlay"></div>
-                </div>
-                
-                {/* Floating UI Elements for depth */}
-                <motion.div 
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1, duration: 0.5 }}
-                  className="absolute -bottom-6 -left-8 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 flex items-center gap-4"
-                >
-                  <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center">
-                    <CheckCircle2 size={24} className="text-green-600 dark:text-green-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900 dark:text-gray-50">Issue Resolved</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-400">Just now</p>
-                  </div>
-                </motion.div>
-                
-              </div>
             </motion.div>
           </div>
         </section>
