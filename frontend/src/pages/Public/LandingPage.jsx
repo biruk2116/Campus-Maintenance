@@ -60,7 +60,7 @@ const LandingPage = () => {
               backgroundImage: `url(${HeroImg})`,
               backgroundPosition: 'center center',
               backgroundRepeat: 'no-repeat',
-              backgroundSize: 'contain',
+              backgroundSize: '92% auto',
             }}
           ></div>
           <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/82"></div>
