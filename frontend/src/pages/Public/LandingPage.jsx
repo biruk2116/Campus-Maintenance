@@ -53,18 +53,19 @@ const LandingPage = () => {
       <main className="relative z-10">
         
         {/* 1. HERO SECTION (#home) */}
-        <section id="home" className="relative min-h-[85vh] flex items-center pt-24 pb-10 px-6 overflow-hidden">
+        <section id="home" className="relative mt-[65px] min-h-[calc(100vh-65px)] flex items-center py-10 px-6 overflow-hidden">
           <div
             className="absolute inset-0"
             style={{
               backgroundImage: `url(${HeroImg})`,
-              backgroundPosition: 'center right',
+              backgroundPosition: 'center center',
               backgroundRepeat: 'no-repeat',
               backgroundSize: 'contain',
             }}
           ></div>
-          <div className="absolute inset-0 bg-white/78 dark:bg-slate-950/78"></div>
-          <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-white via-white/90 to-white/30 dark:from-slate-950 dark:via-slate-950/85 dark:to-slate-950/35"></div>
+          <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/82"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-slate-950 dark:via-slate-950/82 dark:to-slate-950/45"></div>
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/90 to-transparent dark:from-slate-900/90"></div>
 
           <div className="w-full max-w-[1400px] mx-auto relative z-10 xl:px-8">
             <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl pl-4 lg:pl-16">
