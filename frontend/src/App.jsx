@@ -5,7 +5,7 @@ import { useAuth } from './context/AuthContext';
 import 'animate.css';
 
 // Pages
-import LandingPage from './pages/Public/LandingPage';
+import Home from './pages/Public/Home';
 import LoginPage from './pages/Public/LoginPage';
 import StudentDashboard from './pages/Student/StudentDashboard';
 import TechnicianDashboard from './pages/Technician/TechnicianDashboard';
@@ -51,9 +51,19 @@ function AnimatedRoutes() {
     return (
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<PageWrapper><LandingPage /></PageWrapper>} />
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/Home" element={<Navigate to="/home" replace />} />
+                <Route path="/home" element={<PageWrapper><Home /></PageWrapper>} />
+                <Route path="/About-us" element={<Navigate to="/about-us" replace />} />
+                <Route path="/about-us" element={<PageWrapper><Home /></PageWrapper>} />
+                <Route path="/Services" element={<Navigate to="/services" replace />} />
+                <Route path="/services" element={<PageWrapper><Home /></PageWrapper>} />
+                <Route path="/Features" element={<Navigate to="/features" replace />} />
+                <Route path="/features" element={<PageWrapper><Home /></PageWrapper>} />
+                <Route path="/Contacts" element={<Navigate to="/contacts" replace />} />
+                <Route path="/contacts" element={<PageWrapper><Home /></PageWrapper>} />
                 <Route path="/login" element={<PageWrapper><LoginPage /></PageWrapper>} />
-                <Route path="/landing" element={<Navigate to="/" replace />} />
+                <Route path="/landing" element={<Navigate to="/home" replace />} />
                 
                 <Route path="/student/*" element={
                     <ProtectedRoute role="student">
@@ -73,7 +83,7 @@ function AnimatedRoutes() {
                     </ProtectedRoute>
                 } />
 
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
         </AnimatePresence>
     );
