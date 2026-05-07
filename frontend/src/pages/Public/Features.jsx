@@ -2,33 +2,51 @@ import React from 'react';
 import { Activity, AlertCircle, BarChart3, BellRing, ShieldCheck, Smartphone } from 'lucide-react';
 
 const features = [
-    { icon: Smartphone, title: 'Report instantly', desc: 'Log a ticket in seconds without paperwork.' },
-    { icon: Activity, title: 'Real-time tracking', desc: 'Know exactly when your issue will be fixed.' },
-    { icon: ShieldCheck, title: 'Admin efficiency', desc: 'Central dashboard to dispatch personnel.' },
-    { icon: AlertCircle, title: 'Priority handling', desc: 'Critical emergencies get immediate attention.' },
+    { icon: Smartphone, title: 'Report Instantly', desc: 'Log a ticket in seconds without paperwork.' },
+    { icon: Activity, title: 'Real-Time Tracking', desc: 'Know exactly when your issue will be fixed.' },
+    { icon: ShieldCheck, title: 'Admin Efficiency', desc: 'Central dashboard to dispatch personnel.' },
+    { icon: AlertCircle, title: 'Priority Handling', desc: 'Critical emergencies get immediate attention.' },
     { icon: BellRing, title: 'Live Notifications', desc: 'Get alerted when your ticket status changes.' },
-    { icon: BarChart3, title: 'Data insights', desc: 'Analyze trends to prevent future breakdowns.' }
+    { icon: BarChart3, title: 'Data Insights', desc: 'Analyze trends to prevent future breakdowns.' }
 ];
 
 const Features = () => {
     return (
-        <section id="features" className="py-16 px-6 bg-slate-200/45 dark:bg-slate-900/35 border-y border-slate-300/60 dark:border-slate-800">
+        <section id="features" className="section-container border-y border-overlay/10">
+            <div className="section-glow-bg" />
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-gray-50">Features</h2>
-                    <p className="text-gray-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Designed for speed, transparency, and accountability.</p>
+                {/* Header */}
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-textPrimary">
+                        Powerful Features
+                    </h2>
+                    <p className="text-lg text-textSecondary max-w-2xl mx-auto">
+                        Designed for speed, transparency, and accountability
+                    </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {features.map((feature) => (
-                        <div key={feature.title} className="p-8 rounded-2xl bg-slate-100/90 dark:bg-slate-900/82 backdrop-blur-sm border border-slate-300/70 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-5 shadow-sm border border-slate-200 dark:border-slate-700">
-                                <feature.icon size={24} className="text-blue-600 dark:text-blue-500" />
+                {/* Features Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {features.map((feature, idx) => {
+                        const Icon = feature.icon;
+                        return (
+                            <div 
+                                key={feature.title} 
+                                className="glass-card p-8 hover:scale-105 hover:shadow-2xl transition-all duration-300 group"
+                                style={{
+                                    animation: `slideUp 0.5s ease-out forwards`,
+                                    animationDelay: `${idx * 0.05}s`,
+                                    opacity: 0
+                                }}
+                            >
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center mb-6 group-hover:scale-110 shadow-lg shadow-primary/10 transition-transform">
+                                    <Icon size={28} className="text-primary" />
+                                </div>
+                                <h4 className="text-lg font-bold text-textPrimary mb-3 group-hover:text-primary transition-colors">{feature.title}</h4>
+                                <p className="text-textSecondary text-sm leading-relaxed">{feature.desc}</p>
                             </div>
-                            <h4 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-2">{feature.title}</h4>
-                            <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </section>
