@@ -42,19 +42,19 @@ const ProtectedRoute = ({ children, role }) => {
 function AnimatedRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/Home" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/About-us" element={<Navigate to="/about-us" replace />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
+            <Route path="/Home" element={<Navigate to="/" replace />} />
             <Route path="/about-us" element={<Home />} />
-            <Route path="/Services" element={<Navigate to="/services" replace />} />
+            <Route path="/About-us" element={<Navigate to="/about-us" replace />} />
             <Route path="/services" element={<Home />} />
-            <Route path="/Features" element={<Navigate to="/features" replace />} />
+            <Route path="/Services" element={<Navigate to="/services" replace />} />
             <Route path="/features" element={<Home />} />
-            <Route path="/Contacts" element={<Navigate to="/contacts" replace />} />
+            <Route path="/Features" element={<Navigate to="/features" replace />} />
             <Route path="/contacts" element={<Home />} />
+            <Route path="/Contacts" element={<Navigate to="/contacts" replace />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/landing" element={<Navigate to="/home" replace />} />
+            <Route path="/landing" element={<Home />} />
 
             <Route path="/student/*" element={
                 <ProtectedRoute role="student">
@@ -74,7 +74,7 @@ function AnimatedRoutes() {
                 </ProtectedRoute>
             } />
 
-            <Route path="*" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
 }
