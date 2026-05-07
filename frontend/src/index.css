@@ -36,14 +36,24 @@
   }
 
   html {
+    min-height: 100%;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: rgb(var(--color-background));
   }
   
   body {
     @apply bg-background text-textPrimary antialiased transition-colors duration-300;
+    min-height: 100vh;
+    margin: 0;
     overflow-x: hidden;
+    background-color: rgb(var(--color-background));
+  }
+
+  #root {
+    min-height: 100vh;
+    background-color: rgb(var(--color-background));
   }
   
   h1, h2, h3, h4, h5, h6 {
