@@ -8,8 +8,8 @@
    ========================================================================== */
 @layer base {
   :root {
-    --color-background: 248 250 252;
-    --color-surface: 255 255 255;
+    --color-background: 226 232 240;
+    --color-surface: 241 245 249;
     --color-primary: 79 70 229;
     --color-secondary: 124 58 237;
     --color-accent: 2 132 199;
@@ -19,6 +19,10 @@
     --color-warning: 245 158 11;
     --color-danger: 239 68 68;
     --color-overlay: 0 0 0;
+    --page-gradient-start: 219 234 254;
+    --page-gradient-end: 226 232 240;
+    --page-glow-a: 37 99 235;
+    --page-glow-b: 14 165 233;
   }
 
   .dark {
@@ -33,6 +37,10 @@
     --color-warning: 245 158 11;
     --color-danger: 239 68 68;
     --color-overlay: 255 255 255;
+    --page-gradient-start: 2 6 23;
+    --page-gradient-end: 15 23 42;
+    --page-glow-a: 59 130 246;
+    --page-glow-b: 14 165 233;
   }
 
   html {
@@ -44,16 +52,28 @@
   }
   
   body {
-    @apply bg-background text-textPrimary antialiased transition-colors duration-300;
+    @apply w-full h-full text-textPrimary antialiased transition-colors duration-500;
     min-height: 100vh;
     margin: 0;
+    padding: 0;
     overflow-x: hidden;
     background-color: rgb(var(--color-background));
+    /* Modern gradient background */
+    background: linear-gradient(
+      135deg,
+      rgb(var(--color-background)) 0%,
+      rgb(var(--color-background)) 70%,
+      rgb(var(--color-surface)) 100%
+    );
+    position: relative;
   }
 
   #root {
+    width: 100%;
     min-height: 100vh;
-    background-color: rgb(var(--color-background));
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -93,15 +113,25 @@
 @layer components {
   /* Panels & Cards */
   .glass-panel {
-    @apply bg-surface/80 backdrop-blur-md border border-overlay/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+    @apply bg-surface/75 backdrop-blur-xl border border-overlay/10 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_0_rgba(0,0,0,0.2)] transition-all duration-300;
   }
   
   .glass-card {
-    @apply bg-surface/60 backdrop-blur-xl border border-overlay/5 rounded-2xl shadow-xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:border-primary/40 transition-all duration-300;
+    @apply relative overflow-hidden bg-surface/60 backdrop-blur-2xl border border-overlay/10 rounded-2xl shadow-lg hover:shadow-2xl hover:border-primary/30 transition-all duration-300 group;
   }
   
   .premium-card {
-    @apply relative overflow-hidden bg-surface/70 backdrop-blur-2xl border border-overlay/10 rounded-3xl shadow-2xl;
+    @apply relative overflow-hidden bg-gradient-to-br from-surface/80 to-surface/40 backdrop-blur-3xl border border-overlay/20 rounded-3xl shadow-2xl hover:shadow-[0_20px_60px_0_rgba(0,0,0,0.3)] transition-all duration-500;
+  }
+
+  /* Modern section backgrounds */
+  .section-container {
+    @apply relative w-full py-20 md:py-28 px-4 md:px-6;
+  }
+
+  .section-glow-bg {
+    @apply absolute inset-0 -z-10 opacity-40;
+    background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
   }
 
   /* Buttons */
