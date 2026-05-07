@@ -34,10 +34,6 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useEffect(() => {
-        setIsMobileMenuOpen(false);
-    }, [location.pathname]);
-
     return (
         <>
             {/* DESKTOP NAVBAR */}
@@ -131,6 +127,7 @@ const Navbar = () => {
                                 <Link
                                     key={link.to}
                                     to={link.to}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     className={`px-4 py-3 text-base font-semibold rounded-xl transition-colors ${
                                         location.pathname === link.to
                                             ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-slate-700'
