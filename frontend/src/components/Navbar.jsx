@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -13,20 +13,16 @@ import {
 } from 'lucide-react';
 
 const sectionLinks = [
-    { id: '#home', label: 'Home' },
-    { id: '#impact', label: 'About Us' },
-    { id: '#services', label: 'Services' },
-    { id: '#roles', label: 'Features' },
-    { id: '#footer', label: 'Contacts' }
+    { to: '/home', label: 'Home' },
+    { to: '/about-us', label: 'About Us' },
+    { to: '/services', label: 'Services' },
+    { to: '/features', label: 'Features' },
+    { to: '/contacts', label: 'Contacts' }
 ];
-
-const LANDING_PATH = '/';
-const NAVBAR_OFFSET = 65;
 
 const Navbar = () => {
     const { user, isDarkMode, toggleDarkMode } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -38,25 +34,9 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const scrollToSection = (id) => {
+    useEffect(() => {
         setIsMobileMenuOpen(false);
-        const el = document.querySelector(id);
-        if (!el) return;
-
-        const elementPosition = el.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - NAVBAR_OFFSET;
-        window.scrollTo({ top: Math.max(offsetPosition, 0), behavior: 'smooth' });
-    };
-
-    const handleNavigate = (e, id) => {
-        e.preventDefault();
-        setIsMobileMenuOpen(false);
-        if (location.pathname === LANDING_PATH || location.pathname === '/') {
-            scrollToSection(id);
-        } else {
-            navigate(`${LANDING_PATH}${id}`);
-        }
-    };
+    }, [location.pathname]);
 
     return (
         <>
@@ -66,14 +46,14 @@ const Navbar = () => {
                 animate={{ y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className={`fixed top-0 left-0 right-0 z-50 px-6 transition-all duration-300 ${
-                    isScrolled || location.pathname !== LANDING_PATH
+                    isScrolled
                         ? 'py-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg shadow-sm border-b border-gray-200 dark:border-slate-700' 
                         : 'py-5 bg-transparent border-transparent'
                 }`}
             >
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center gap-3 group">
+                    <Link to="/home" className="flex items-center gap-3 group">
                         <motion.div 
                             whileHover={{ rotate: 5, scale: 1.05 }}
                             className="w-10 h-10 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-md shadow-blue-600/20"
@@ -90,14 +70,17 @@ const Navbar = () => {
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex items-center gap-2">
                             {sectionLinks.map((link) => (
-                                <a 
-                                    key={link.id}
-                                    href={link.id} 
-                                    onClick={(e) => handleNavigate(e, link.id)}
-                                    className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-full transition-all duration-300"
+                                <Link
+                                    key={link.to}
+                                    to={link.to}
+                                    className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
+                                        location.pathname === link.to
+                                            ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-slate-700'
+                                            : 'text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700'
+                                    }`}
                                 >
                                     {link.label}
-                                </a>
+                                </Link>
                             ))}
                         </div>
 
@@ -145,14 +128,17 @@ const Navbar = () => {
                     >
                         <div className="px-6 py-8 flex flex-col gap-4 min-h-full">
                             {sectionLinks.map((link) => (
-                                <a 
-                                    key={link.id}
-                                    href={link.id}
-                                    onClick={(e) => handleNavigate(e, link.id)}
-                                    className="px-4 py-3 text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-colors"
+                                <Link
+                                    key={link.to}
+                                    to={link.to}
+                                    className={`px-4 py-3 text-base font-semibold rounded-xl transition-colors ${
+                                        location.pathname === link.to
+                                            ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-slate-700'
+                                            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400'
+                                    }`}
                                 >
                                     {link.label}
-                                </a>
+                                </Link>
                             ))}
                             <div className="h-px bg-gray-200 dark:bg-slate-700 my-2"></div>
                             {user ? (
