@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import 'animate.css';
 
@@ -10,11 +9,6 @@ import LoginPage from './pages/Public/LoginPage';
 import StudentDashboard from './pages/Student/StudentDashboard';
 import TechnicianDashboard from './pages/Technician/TechnicianDashboard';
 import AdminDashboard from './pages/Admin/AdminDashboard';
-
-// Page Transition Wrapper
-const PageWrapper = ({ children }) => {
-    return <div>{children}</div>;
-};
 
 // Scroll to Top on Route Change
 const ScrollToTop = () => {
@@ -46,46 +40,42 @@ const ProtectedRoute = ({ children, role }) => {
 };
 
 function AnimatedRoutes() {
-    const location = useLocation();
-    
     return (
-        <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/Home" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<PageWrapper><Home /></PageWrapper>} />
-                <Route path="/About-us" element={<Navigate to="/about-us" replace />} />
-                <Route path="/about-us" element={<PageWrapper><Home /></PageWrapper>} />
-                <Route path="/Services" element={<Navigate to="/services" replace />} />
-                <Route path="/services" element={<PageWrapper><Home /></PageWrapper>} />
-                <Route path="/Features" element={<Navigate to="/features" replace />} />
-                <Route path="/features" element={<PageWrapper><Home /></PageWrapper>} />
-                <Route path="/Contacts" element={<Navigate to="/contacts" replace />} />
-                <Route path="/contacts" element={<PageWrapper><Home /></PageWrapper>} />
-                <Route path="/login" element={<PageWrapper><LoginPage /></PageWrapper>} />
-                <Route path="/landing" element={<Navigate to="/home" replace />} />
-                
-                <Route path="/student/*" element={
-                    <ProtectedRoute role="student">
-                        <PageWrapper><StudentDashboard /></PageWrapper>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/technician/*" element={
-                    <ProtectedRoute role="technician">
-                        <PageWrapper><TechnicianDashboard /></PageWrapper>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/admin/*" element={
-                    <ProtectedRoute role="admin">
-                        <PageWrapper><AdminDashboard /></PageWrapper>
-                    </ProtectedRoute>
-                } />
+        <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/Home" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/About-us" element={<Navigate to="/about-us" replace />} />
+            <Route path="/about-us" element={<Home />} />
+            <Route path="/Services" element={<Navigate to="/services" replace />} />
+            <Route path="/services" element={<Home />} />
+            <Route path="/Features" element={<Navigate to="/features" replace />} />
+            <Route path="/features" element={<Home />} />
+            <Route path="/Contacts" element={<Navigate to="/contacts" replace />} />
+            <Route path="/contacts" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/landing" element={<Navigate to="/home" replace />} />
 
-                <Route path="*" element={<Navigate to="/home" replace />} />
-            </Routes>
-        </AnimatePresence>
+            <Route path="/student/*" element={
+                <ProtectedRoute role="student">
+                    <StudentDashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/technician/*" element={
+                <ProtectedRoute role="technician">
+                    <TechnicianDashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/admin/*" element={
+                <ProtectedRoute role="admin">
+                    <AdminDashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
     );
 }
 
