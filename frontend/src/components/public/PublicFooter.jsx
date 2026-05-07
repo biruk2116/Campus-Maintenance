@@ -14,7 +14,7 @@ const PublicFooter = () => {
     const navigate = useNavigate();
 
     return (
-        <footer className="bg-white dark:bg-slate-800 pt-20 pb-10 px-6 border-t border-gray-200 dark:border-slate-700 relative z-10 text-gray-600 dark:text-slate-400">
+        <footer className="bg-slate-200/70 dark:bg-slate-900/70 backdrop-blur-sm pt-20 pb-10 px-6 border-t border-slate-300/70 dark:border-slate-700 relative z-10 text-gray-600 dark:text-slate-400">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
                 <div>
                     <div className="flex items-center gap-2 mb-6">
