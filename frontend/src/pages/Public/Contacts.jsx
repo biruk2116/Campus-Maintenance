@@ -1,69 +1,93 @@
 import React from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, Send } from 'lucide-react';
 
 const Contacts = () => {
     return (
-        <section id="contacts" className="py-16 px-6">
+        <section id="contacts" className="section-container">
+            <div className="section-glow-bg" />
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-gray-50">Contacts</h2>
-                    <p className="text-gray-600 dark:text-slate-400 text-base max-w-2xl mx-auto">Get in touch with the Debre Berhan University maintenance office.</p>
+                {/* Header */}
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-textPrimary">
+                        Get In Touch
+                    </h2>
+                    <p className="text-lg text-textSecondary max-w-2xl mx-auto">
+                        Have questions? Contact the DBU maintenance office or submit your inquiry below.
+                    </p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                    <div className="w-full h-[400px] rounded-2xl overflow-hidden border border-slate-300/70 dark:border-slate-700 shadow-md">
+                <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+                    {/* Map */}
+                    <div className="premium-card overflow-hidden min-h-[450px] lg:min-h-auto">
                         <iframe
                             title="DBU Location"
                             src="https://maps.google.com/maps?q=Debre%20Berhan%20University&t=&z=16&ie=UTF8&iwloc=&output=embed"
                             width="100%"
                             height="100%"
-                            style={{ border: 0 }}
+                            style={{ border: 0, minHeight: '450px' }}
                             allowFullScreen=""
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
                         ></iframe>
                     </div>
 
-                    <div className="flex flex-col justify-center h-full space-y-8 p-8 lg:p-12 bg-slate-100/92 dark:bg-slate-900/82 backdrop-blur-sm rounded-2xl border border-slate-300/70 dark:border-slate-700 shadow-md">
-                        <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
-                                <MapPin size={24} className="text-blue-600 dark:text-blue-500" />
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-2">Location</h4>
-                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-                                    Debre Berhan University Main Campus<br />
-                                    Maintenance Office, Building 4<br />
-                                    Debre Berhan, Ethiopia
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
-                                <Phone size={24} className="text-blue-600 dark:text-blue-500" />
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-2">Phone</h4>
-                                <p className="text-gray-600 dark:text-slate-400">
-                                    +251 11 681 5440<br />
-                                    +251 91 123 4567 (Emergency)
-                                </p>
+                    {/* Contact Info */}
+                    <div className="flex flex-col space-y-6">
+                        {/* Location Card */}
+                        <div className="glass-card p-8 hover:shadow-2xl transition-all duration-300 group">
+                            <div className="flex items-start gap-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+                                    <MapPin size={24} className="text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-lg font-bold text-textPrimary mb-2 group-hover:text-primary transition-colors">Location</h4>
+                                    <p className="text-textSecondary text-sm leading-relaxed">
+                                        Debre Berhan University<br />
+                                        Main Campus, Building 4<br />
+                                        Debre Berhan, Ethiopia
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
-                                <Mail size={24} className="text-blue-600 dark:text-blue-500" />
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-2">Email</h4>
-                                <p className="text-gray-600 dark:text-slate-400">
-                                    maintenance@dbu.edu.et<br />
-                                    support@dbu.edu.et
-                                </p>
+                        {/* Phone Card */}
+                        <div className="glass-card p-8 hover:shadow-2xl transition-all duration-300 group">
+                            <div className="flex items-start gap-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+                                    <Phone size={24} className="text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-lg font-bold text-textPrimary mb-2 group-hover:text-primary transition-colors">Phone</h4>
+                                    <p className="text-textSecondary text-sm leading-relaxed">
+                                        <a href="tel:+251116815440" className="hover:text-primary transition-colors">+251 11 681 5440</a><br />
+                                        <a href="tel:+251911234567" className="hover:text-primary transition-colors">+251 91 123 4567</a><br />
+                                        <span className="text-xs text-textSecondary/70">(Emergency)</span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
+
+                        {/* Email Card */}
+                        <div className="glass-card p-8 hover:shadow-2xl transition-all duration-300 group">
+                            <div className="flex items-start gap-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+                                    <Mail size={24} className="text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-lg font-bold text-textPrimary mb-2 group-hover:text-primary transition-colors">Email</h4>
+                                    <p className="text-textSecondary text-sm leading-relaxed">
+                                        <a href="mailto:maintenance@dbu.edu.et" className="hover:text-primary transition-colors">maintenance@dbu.edu.et</a><br />
+                                        <a href="mailto:support@dbu.edu.et" className="hover:text-primary transition-colors">support@dbu.edu.et</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CTA Button */}
+                        <button className="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
+                            <Send size={18} />
+                            Send a Message
+                        </button>
                     </div>
                 </div>
             </div>
