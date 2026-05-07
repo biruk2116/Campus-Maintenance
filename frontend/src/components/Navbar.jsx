@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
     GraduationCap,
@@ -37,10 +36,7 @@ const Navbar = () => {
     return (
         <>
             {/* DESKTOP NAVBAR */}
-            <motion.nav 
-                initial={{ y: -100 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
+            <nav
                 className={`fixed top-0 left-0 right-0 z-50 px-6 transition-all duration-300 ${
                     isScrolled
                         ? 'py-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg shadow-sm border-b border-gray-200 dark:border-slate-700' 
@@ -50,12 +46,9 @@ const Navbar = () => {
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     {/* Logo */}
                     <Link to="/home" className="flex items-center gap-3 group">
-                        <motion.div 
-                            whileHover={{ rotate: 5, scale: 1.05 }}
-                            className="w-10 h-10 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-md shadow-blue-600/20"
-                        >
+                        <div className="w-10 h-10 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-md shadow-blue-600/20">
                             <GraduationCap size={20} className="text-white" />
-                        </motion.div>
+                        </div>
                         <div>
                             <span className="font-extrabold text-xl tracking-tight block leading-none text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors">DBU</span>
                             <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">Maintenance</span>
@@ -81,14 +74,13 @@ const Navbar = () => {
                         </div>
 
                     <div className="flex items-center gap-3">
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
+                        <button
                             onClick={toggleDarkMode}
                             className="p-2 rounded-full text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
                             aria-label="Toggle dark mode"
                         >
                             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                        </motion.button>
+                        </button>
                         
                         {user ? (
                             <Link to={`/${user.role.toLowerCase()}`} className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 transition-all shadow-md hover:-translate-y-0.5">
@@ -111,48 +103,41 @@ const Navbar = () => {
                     </div>
                     </div>
                 </div>
-            </motion.nav>
+            </nav>
 
             {/* MOBILE MENU */}
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="fixed top-[65px] left-0 right-0 bottom-0 z-40 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 md:hidden overflow-y-auto"
-                    >
-                        <div className="px-6 py-8 flex flex-col gap-4 min-h-full">
-                            {sectionLinks.map((link) => (
-                                <Link
-                                    key={link.to}
-                                    to={link.to}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 text-base font-semibold rounded-xl transition-colors ${
-                                        location.pathname === link.to
-                                            ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-slate-700'
-                                            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400'
-                                    }`}
-                                >
-                                    {link.label}
+            {isMobileMenuOpen && (
+                <div className="fixed top-[65px] left-0 right-0 bottom-0 z-40 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 md:hidden overflow-y-auto">
+                    <div className="px-6 py-8 flex flex-col gap-4 min-h-full">
+                        {sectionLinks.map((link) => (
+                            <Link
+                                key={link.to}
+                                to={link.to}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`px-4 py-3 text-base font-semibold rounded-xl transition-colors ${
+                                    location.pathname === link.to
+                                        ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-slate-700'
+                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400'
+                                }`}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                        <div className="h-px bg-gray-200 dark:bg-slate-700 my-2"></div>
+                        {user ? (
+                            <Link to={`/${user.role.toLowerCase()}`} className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-md">
+                                <Activity size={18} /> Live Dashboard
+                            </Link>
+                        ) : (
+                            location.pathname !== '/login' && (
+                                <Link to="/login" className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-md">
+                                    <LogIn size={18} /> Portal Login
                                 </Link>
-                            ))}
-                            <div className="h-px bg-gray-200 dark:bg-slate-700 my-2"></div>
-                            {user ? (
-                                <Link to={`/${user.role.toLowerCase()}`} className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-md">
-                                    <Activity size={18} /> Live Dashboard
-                                </Link>
-                            ) : (
-                                location.pathname !== '/login' && (
-                                    <Link to="/login" className="flex items-center justify-center gap-2 px-4 py-3 text-base font-bold bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-md">
-                                        <LogIn size={18} /> Portal Login
-                                    </Link>
-                                )
-                            )}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            )
+                        )}
+                    </div>
+                </div>
+            )}
         </>
     );
 };
