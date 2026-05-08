@@ -34,9 +34,16 @@ const LoginPage = () => {
 
     useEffect(() => {
         if (user?.role) {
-            navigate(`/${user.role}`);
+            // Redirect based on user role
+            const roleMap = {
+                'admin': '/admin',
+                'student': '/student',
+                'technician': '/technician'
+            };
+            const dashboardPath = roleMap[user.role] || `/${user.role}`;
+            navigate(dashboardPath);
         }
-    }, [navigate, user]);
+    }, [user, navigate]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -47,6 +54,7 @@ const LoginPage = () => {
             const res = await login(credentials.user_code, credentials.password);
             const payload = res.data || {};
 
+            // Check if password change is required
             if (payload.must_change_password === 1 || payload.action === 'change_password') {
                 setPasswordForm({
                     user_code: payload.user_code || credentials.user_code.toUpperCase(),
@@ -58,9 +66,7 @@ const LoginPage = () => {
                 return;
             }
 
-            if (payload.role) {
-                navigate(`/${payload.role}`);
-            }
+            // Login successful - the useEffect will handle redirect based on user state
         } catch (err) {
             setError(err.message || 'Login failed');
         } finally {
