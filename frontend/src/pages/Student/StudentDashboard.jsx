@@ -388,16 +388,18 @@ const StudentOverview = () => {
     const historyRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
 
     const statusCounts = useMemo(() => ({
+        pending: requests.filter((request) => request.status === 'Pending').length,
         assigned: requests.filter((request) => request.status === 'Assigned').length,
         progress: requests.filter((request) => request.status === 'In Progress').length,
         holding: requests.filter((request) => request.status === 'On Hold').length,
         completed: historyRequests.length
     }), [historyRequests.length, requests]);
 
-    const categoryCounts = useMemo(
-        () => REQUEST_CATEGORIES.map((category) => requests.filter((request) => request.category === category).length),
-        [requests]
-    );
+    const totalCount = requests.length;
+    const pendingCount = statusCounts.pending;
+    const inProgressCount = statusCounts.progress;
+    const completedCount = statusCounts.completed;
+    const completionRate = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
     const openTimeline = async (request) => {
         setSelectedRequest(request);
@@ -440,84 +442,116 @@ const StudentOverview = () => {
                 onLogout={logout}
             />
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-                <div className="xl:col-span-1">
-                    <div className="glass-card p-6 h-full flex flex-col">
-                        <div className="flex justify-between items-start mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div className="flex flex-wrap gap-3">
+                    <Link to="/student/history" className="btn-secondary text-xs font-semibold px-4 py-3 rounded-xl">My Requests</Link>
+                    <Link to="/student/new-request" className="btn-primary text-xs font-semibold px-4 py-3 rounded-xl">Create Request</Link>
+                </div>
+                <p className="text-sm text-textSecondary max-w-2xl">A quick snapshot of your maintenance requests, technician updates, and completion progress.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+                {[
+                    {
+                        label: 'Total Requests',
+                        value: totalCount,
+                        icon: <Activity size={24} className="text-primary" />,
+                        note: 'All reported issues'
+                    },
+                    {
+                        label: 'Pending',
+                        value: pendingCount,
+                        icon: <Loader2 size={24} className="text-warning" />,
+                        note: 'Waiting for review'
+                    },
+                    {
+                        label: 'In Progress',
+                        value: inProgressCount,
+                        icon: <Wrench size={24} className="text-info" />,
+                        note: 'Technicians working'
+                    },
+                    {
+                        label: 'Completed',
+                        value: completedCount,
+                        icon: <CheckCircle size={24} className="text-success" />,
+                        note: 'Closed requests'
+                    }
+                ].map((card) => (
+                    <div key={card.label} className="glass-card p-6">
+                        <div className="flex justify-between items-start gap-4 mb-6">
                             <div>
-                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Request Summary</h4>
-                                <p className="text-xs text-textSecondary font-medium m-0">Live status distribution</p>
+                                <p className="text-xs uppercase tracking-[0.3em] font-semibold text-textSecondary">{card.label}</p>
+                                <h3 className="text-3xl font-extrabold text-textPrimary mt-3">{card.value}</h3>
                             </div>
-                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                <Activity size={20} />
-                            </div>
+                            <div className="p-3 rounded-2xl bg-surface/70 border border-overlay/10 shadow-sm">{card.icon}</div>
                         </div>
-                        <div className="flex-1 flex items-center justify-center min-h-[250px]">
-                            <Doughnut
-                                data={{
-                                    labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
-                                    datasets: [
-                                        {
-                                            data: [statusCounts.assigned, statusCounts.progress, statusCounts.holding, statusCounts.completed],
-                                            backgroundColor: ['#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
-                                            borderWidth: 0,
-                                            hoverOffset: 4
-                                        }
-                                    ]
-                                }}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { 
-                                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } 
-                                    },
-                                    cutout: '70%'
-                                }}
-                            />
+                        <p className="text-sm text-textSecondary">{card.note}</p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                <div className="xl:col-span-2 glass-card p-6">
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Request Status</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Your current request distribution</p>
                         </div>
+                        <motion.button 
+                            whileHover={{ scale: 1.1, rotate: 15 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={refreshData}
+                            className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                        >
+                            <Activity size={20} />
+                        </motion.button>
+                    </div>
+                    <div className="h-[320px]">
+                        <Doughnut
+                            data={{
+                                labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                datasets: [
+                                    {
+                                        data: [pendingCount, statusCounts.assigned, inProgressCount, statusCounts.holding, completedCount],
+                                        backgroundColor: ['#fbbf24', '#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
+                                        borderWidth: 0,
+                                        hoverOffset: 6
+                                    }
+                                ]
+                            }}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
+                                cutout: '68%'
+                            }}
+                        />
                     </div>
                 </div>
 
-                <div className="xl:col-span-2">
-                    <div className="glass-card p-6 h-full flex flex-col">
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Category Activity</h4>
-                                <p className="text-xs text-textSecondary font-medium m-0">Requests by department</p>
-                            </div>
-                            <motion.button 
-                                whileHover={{ scale: 1.1, rotate: 15 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={refreshData}
-                                className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
-                            >
-                                <Activity size={20} />
-                            </motion.button>
+                <div className="glass-card p-6">
+                    <div className="flex items-center justify-between mb-6 gap-4">
+                        <div>
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completion</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Completed {completedCount} of {totalCount} requests</p>
                         </div>
-                        <div className="flex-1 min-h-[250px]">
-                            <Bar
-                                data={{
-                                    labels: REQUEST_CATEGORIES,
-                                    datasets: [
-                                        {
-                                            label: 'Requests',
-                                            data: categoryCounts,
-                                            backgroundColor: '#6366f1',
-                                            borderRadius: 6,
-                                            hoverBackgroundColor: '#8b5cf6'
-                                        }
-                                    ]
-                                }}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } },
-                                    scales: {
-                                        y: { ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-                                    }
-                                }}
-                            />
+                        <span className="rounded-full bg-success/10 text-success text-xs font-bold px-3 py-1">{completionRate}%</span>
+                    </div>
+                    <div className="w-full h-4 rounded-full bg-overlay/20 overflow-hidden mb-6">
+                        <div className="h-full rounded-full bg-success" style={{ width: `${completionRate}%` }} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-3xl bg-warning/10 text-warning border border-warning/20">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Pending</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{pendingCount}</span>
+                        </div>
+                        <div className="p-4 rounded-3xl bg-info/10 text-info border border-info/20">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">In progress</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{inProgressCount}</span>
+                        </div>
+                        <div className="p-4 rounded-3xl bg-success/10 text-success border border-success/20">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Completed</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{completedCount}</span>
                         </div>
                     </div>
                 </div>
