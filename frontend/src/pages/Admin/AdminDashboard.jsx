@@ -269,7 +269,10 @@ const AdminOverview = () => {
         return () => clearInterval(interval);
     }, [refreshData]);
 
-    const activeCount = useMemo(() => requests.filter((request) => request.status !== 'Completed').length, [requests]);
+    const totalRequests = useMemo(() => requests.length, [requests]);
+    const pendingCount = useMemo(() => requests.filter((request) => request.status === 'Pending').length, [requests]);
+    const assignedCount = useMemo(() => requests.filter((request) => request.status === 'Assigned').length, [requests]);
+    const inProgressCount = useMemo(() => requests.filter((request) => request.status === 'In Progress').length, [requests]);
     const completedCount = useMemo(() => requests.filter((request) => request.status === 'Completed').length, [requests]);
     const technicianCount = useMemo(() => users.filter((user) => user.role === 'technician').length, [users]);
     const studentCount = useMemo(() => users.filter((user) => user.role === 'student').length, [users]);
@@ -278,12 +281,13 @@ const AdminOverview = () => {
         [requests]
     );
     const statusCounts = useMemo(() => [
-        requests.filter((request) => request.status === 'Pending').length,
-        requests.filter((request) => request.status === 'Assigned').length,
-        requests.filter((request) => request.status === 'In Progress').length,
+        pendingCount,
+        assignedCount,
+        inProgressCount,
         requests.filter((request) => request.status === 'On Hold').length,
-        requests.filter((request) => request.status === 'Completed').length
-    ], [requests]);
+        completedCount
+    ], [pendingCount, assignedCount, inProgressCount, completedCount, requests]);
+    const completionRate = totalRequests === 0 ? 0 : Math.round((completedCount / totalRequests) * 100);
 
     const handleNotificationClick = async () => {
         await markNotificationsRead();
@@ -298,19 +302,39 @@ const AdminOverview = () => {
             className="p-6"
         >
             <DashboardHeader
-                title="Admin Overview"
+                title="Admin Dashboard"
                 subtitle="Monitor live maintenance requests, users, and technician workload"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
                 {[
-                    { label: 'All Users', value: users.length, icon: <Users size={24} />, note: `${studentCount} students` },
-                    { label: 'Technicians', value: technicianCount, icon: <Wrench size={24} />, note: 'Active technicians' },
-                    { label: 'Active Queue', value: activeCount, icon: <ClipboardList size={24} />, note: 'Needs tracking' },
-                    { label: 'Completed', value: completedCount, icon: <CheckCircle2 size={24} />, note: 'Stored in history' }
+                    {
+                        label: 'Total Requests',
+                        value: totalRequests,
+                        icon: <ClipboardList size={24} className="text-primary" />,
+                        note: 'All submitted issues'
+                    },
+                    {
+                        label: 'Pending',
+                        value: pendingCount,
+                        icon: <Activity size={24} className="text-warning" />,
+                        note: 'Need review'
+                    },
+                    {
+                        label: 'In Progress',
+                        value: inProgressCount,
+                        icon: <Wrench size={24} className="text-info" />,
+                        note: 'Technicians active'
+                    },
+                    {
+                        label: 'Completed',
+                        value: completedCount,
+                        icon: <CheckCircle2 size={24} className="text-success" />,
+                        note: 'Closed requests'
+                    }
                 ].map((item, idx) => (
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
@@ -320,15 +344,82 @@ const AdminOverview = () => {
                         className="glass-card p-6"
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-primary/10 text-primary rounded-xl shadow-inner border border-primary/20">
-                                {item.icon}
+                            <div>
+                                <p className="text-xs uppercase tracking-[0.3em] font-semibold text-textSecondary">{item.label}</p>
+                                <h2 className="text-4xl font-extrabold text-textPrimary mt-3 tracking-tight">{item.value}</h2>
                             </div>
-                            <span className="text-xs font-bold text-textSecondary uppercase tracking-wider">{item.note}</span>
+                            <div className="p-3 rounded-2xl bg-surface/70 border border-overlay/10 shadow-sm">{item.icon}</div>
                         </div>
-                        <h2 className="text-4xl font-extrabold text-textPrimary mb-1 tracking-tight">{item.value}</h2>
-                        <p className="text-sm font-medium text-textSecondary m-0">{item.label}</p>
+                        <p className="text-sm text-textSecondary">{item.note}</p>
                     </motion.div>
                 ))}
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                <div className="xl:col-span-2 glass-card p-6">
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Queue Status</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Overall request status distribution</p>
+                        </div>
+                        <motion.button 
+                            whileHover={{ scale: 1.1, rotate: 15 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={refreshData}
+                            className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                        >
+                            <Activity size={20} />
+                        </motion.button>
+                    </div>
+                    <div className="h-[320px]">
+                        <Doughnut
+                            data={{
+                                labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                datasets: [
+                                    {
+                                        data: statusCounts,
+                                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
+                                        borderWidth: 0,
+                                        hoverOffset: 6
+                                    }
+                                ]
+                            }}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
+                                cutout: '68%'
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <div className="glass-card p-6">
+                    <div className="flex items-center justify-between mb-6 gap-4">
+                        <div>
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completion</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Completed {completedCount} of {totalRequests} requests</p>
+                        </div>
+                        <span className="rounded-full bg-success/10 text-success text-xs font-bold px-3 py-1">{completionRate}%</span>
+                    </div>
+                    <div className="w-full h-4 rounded-full bg-overlay/20 overflow-hidden mb-6">
+                        <div className="h-full rounded-full bg-success" style={{ width: `${completionRate}%` }} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Assigned</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{assignedCount}</span>
+                        </div>
+                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">In progress</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{inProgressCount}</span>
+                        </div>
+                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Completed</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{completedCount}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
