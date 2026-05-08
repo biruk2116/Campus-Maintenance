@@ -29,30 +29,30 @@ const Features = () => {
             <div className="section-glow-bg" />
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <motion.div variants={fadeUp} className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-textPrimary">
+                <motion.div variants={fadeUp} className="text-center mb-8">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight mb-2 text-textPrimary">
                         Powerful Features
                     </h2>
-                    <p className="text-lg md:text-xl text-textSecondary max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-sm md:text-base text-textSecondary max-w-2xl mx-auto leading-relaxed">
                         Designed for speed, transparency, and accountability
                     </p>
                 </motion.div>
 
                 {/* Features Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {features.map((feature, idx) => {
                         const Icon = feature.icon;
                         return (
                             <motion.div 
                                 key={feature.title} 
                                 variants={fadeUp}
-                                className="glass-card p-8 hover:scale-105 hover:shadow-2xl transition-all duration-300 group"
+                                className="glass-card p-3 md:p-4 hover:scale-105 hover:shadow-2xl transition-all duration-300 group"
                             >
-                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center mb-6 group-hover:scale-110 shadow-lg shadow-primary/10 transition-transform">
-                                    <Icon size={28} className="text-primary" />
+                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center mb-2 group-hover:scale-110 shadow-lg shadow-primary/10 transition-transform">
+                                    <Icon size={18} className="text-primary" />
                                 </div>
-                                <h4 className="text-xl md:text-2xl font-bold text-textPrimary mb-3 group-hover:text-primary transition-colors">{feature.title}</h4>
-                                <p className="text-textSecondary text-base leading-relaxed">{feature.desc}</p>
+                                <h4 className="text-sm md:text-base font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">{feature.title}</h4>
+                                <p className="text-textSecondary text-xs leading-relaxed">{feature.desc}</p>
                             </motion.div>
                         );
                     })}
