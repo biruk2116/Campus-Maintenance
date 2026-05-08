@@ -11,6 +11,7 @@ import {
     Phone,
     Save,
     Trash2,
+    Wrench,
 } from 'lucide-react';
 import {
     ArcElement,
@@ -295,7 +296,7 @@ const TechnicianOverview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-6"
+            className="p-3 md:p-5"
         >
             <DashboardHeader
                 title="Technician Dashboard"
@@ -305,15 +306,15 @@ const TechnicianOverview = () => {
                 onLogout={logout}
             />
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <div className="flex flex-wrap gap-3">
-                    <button onClick={() => navigate('/technician')} className="btn-secondary text-xs font-semibold px-4 py-3 rounded-xl">My Tasks</button>
-                    <button onClick={() => navigate('/technician/history')} className="btn-primary text-xs font-semibold px-4 py-3 rounded-xl">Completed Tasks</button>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div className="flex flex-wrap gap-2">
+                    <button onClick={() => navigate('/technician')} className="btn-secondary text-xs font-semibold px-3 py-2 rounded-lg">My Tasks</button>
+                    <button onClick={() => navigate('/technician/history')} className="btn-primary text-xs font-semibold px-3 py-2 rounded-lg">Completed Tasks</button>
                 </div>
-                <p className="text-sm text-textSecondary max-w-2xl">A quick snapshot of your assigned maintenance requests, workload status, and completion progress.</p>
+                <p className="text-xs text-textSecondary max-w-2xl">A quick snapshot of your assigned maintenance requests, workload status, and completion progress.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-4">
                 {[
                     {
                         label: 'Total Requests',
@@ -359,7 +360,7 @@ const TechnicianOverview = () => {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4 mb-4">
                 <div className="xl:col-span-2 glass-card p-6">
                     <div className="flex justify-between items-start mb-6">
                         <div>
