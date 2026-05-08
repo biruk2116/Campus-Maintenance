@@ -37,19 +37,31 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = async (user_code, password) => {
-        const res = await axios.post('index.php?action=login', { user_code, password });
+        try {
+            const res = await axios.post('index.php?action=login', { user_code, password });
 
-        if (!res.data.success) {
-            throw new Error(res.data.message || 'Login failed');
-        }
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Login failed');
+            }
 
-        if (res.data.data?.must_change_password === 1) {
-            setUser(null);
+            if (res.data.data?.must_change_password === 1) {
+                setUser(null);
+                return res.data;
+            }
+
+            setUser(res.data.data);
             return res.data;
+        } catch (error) {
+            // Enhanced error handling
+            console.error('Login error:', error.message);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+            } else if (error.request) {
+                console.error('No response received:', error.request);
+            }
+            throw error;
         }
-
-        setUser(res.data.data);
-        return res.data;
     };
 
     const updatePassword = async ({ user_code, old_password, new_password }) => {
