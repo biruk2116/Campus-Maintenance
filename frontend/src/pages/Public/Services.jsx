@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Send, ClipboardList, TrendingUp, Users, FileText, Zap } from 'lucide-react';
 
 import HeroImg from '../../assets/images/maint_hero.png';
@@ -6,6 +7,11 @@ import FeatureImg from '../../assets/images/tech_pc.png';
 import FireEmergencyImg from '../../assets/images/fire_emergency.png';
 import LockDetailImg from '../../assets/images/lock_detail.png';
 import SafetyKitImg from '../../assets/images/safety_kit.png';
+
+const fadeUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: 'easeOut' } }
+};
 
 const services = [
     { 
@@ -48,25 +54,33 @@ const services = [
 
 const Services = () => {
     return (
-        <section id="services" className="section-container">
+        <motion.section
+            id="services"
+            className="section-container"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+        >
             <div className="section-glow-bg" />
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-textPrimary">
+                <motion.div variants={fadeUp} className="text-center mb-16">
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-textPrimary">
                         Comprehensive Services
                     </h2>
-                    <p className="text-lg text-textSecondary max-w-2xl mx-auto">
+                    <p className="text-lg md:text-xl text-textSecondary max-w-2xl mx-auto leading-relaxed">
                         Everything needed to manage and resolve campus issues efficiently and transparently
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Services Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service, idx) => (
-                        <div 
+                        <motion.div 
                             key={service.title} 
-                            className="premium-card overflow-hidden group hover:translate-y-[-8px] transition-all duration-300"
+                            variants={fadeUp}
+                            className="premium-card overflow-hidden group hover:-translate-y-2 transition-all duration-300"
                         >
                             {/* Image Container */}
                             <div className="h-56 w-full bg-gradient-to-br from-surface to-background overflow-hidden relative">
@@ -92,11 +106,11 @@ const Services = () => {
                                     </svg>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>
-        </section>
+        </motion.section>
     );
 };
 
