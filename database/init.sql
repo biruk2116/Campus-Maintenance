@@ -147,3 +147,55 @@ INSERT IGNORE INTO users (
 -- Default admin login:
 -- user_code: ADMIN001
 -- password: admin123
+
+-- Insert test student user
+INSERT IGNORE INTO users (
+    user_code,
+    name,
+    email,
+    phone_number,
+    password,
+    role,
+    status,
+    must_change_password
+) VALUES (
+    'DBU-2024-STU',
+    'Test Student',
+    'student@dbu.edu.et',
+    '0922000000',
+    '$2y$10$9BBWLlSETZ1ZduNlkXjy7e6qjFJpJautu1WtrKbtaOpC4jmaF.X2e',
+    'student',
+    'active',
+    0
+);
+
+-- Default student login:
+-- user_code: DBU-2024-STU
+-- password: admin123
+
+-- Insert test technician user
+INSERT IGNORE INTO users (
+    user_code,
+    name,
+    email,
+    phone_number,
+    password,
+    role,
+    status,
+    skills,
+    must_change_password
+) VALUES (
+    'DBU-2024-TEC',
+    'Test Technician',
+    'technician@dbu.edu.et',
+    '0933000000',
+    '$2y$10$9BBWLlSETZ1ZduNlkXjy7e6qjFJpJautu1WtrKbtaOpC4jmaF.X2e',
+    'technician',
+    'active',
+    'Plumbing, Electrical, HVAC',
+    0
+);
+
+-- Default technician login:
+-- user_code: DBU-2024-TEC
+-- password: admin123
