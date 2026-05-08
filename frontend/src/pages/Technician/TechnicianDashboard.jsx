@@ -273,12 +273,17 @@ const TechnicianOverview = () => {
 
     const activeRequests = useMemo(() => requests.filter((request) => request.status !== 'Completed'), [requests]);
     const completedRequests = useMemo(() => requests.filter((request) => request.status === 'Completed'), [requests]);
+    const totalRequests = useMemo(() => requests.length, [requests]);
+    const assignedCount = useMemo(() => requests.filter((request) => request.status === 'Assigned').length, [requests]);
+    const inProgressCount = useMemo(() => requests.filter((request) => request.status === 'In Progress').length, [requests]);
+    const onHoldCount = useMemo(() => requests.filter((request) => request.status === 'On Hold').length, [requests]);
     const chartData = useMemo(() => [
-        requests.filter((request) => request.status === 'Assigned').length,
-        requests.filter((request) => request.status === 'In Progress').length,
-        requests.filter((request) => request.status === 'On Hold').length,
+        assignedCount,
+        inProgressCount,
+        onHoldCount,
         completedRequests.length
-    ], [completedRequests.length, requests]);
+    ], [assignedCount, inProgressCount, onHoldCount, completedRequests.length]);
+    const completionRate = totalRequests === 0 ? 0 : Math.round((completedRequests.length / totalRequests) * 100);
 
     const handleNotificationClick = async () => {
         await markNotificationsRead();
@@ -300,135 +305,217 @@ const TechnicianOverview = () => {
                 onLogout={logout}
             />
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-                <div className="xl:col-span-1">
-                    <div className="glass-card p-6 h-full flex flex-col">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="p-3 rounded-xl bg-primary/10 text-primary shadow-inner border border-primary/20">
-                                <Activity size={24} />
-                            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div className="flex flex-wrap gap-3">
+                    <button onClick={() => navigate('/technician')} className="btn-secondary text-xs font-semibold px-4 py-3 rounded-xl">My Tasks</button>
+                    <button onClick={() => navigate('/technician/history')} className="btn-primary text-xs font-semibold px-4 py-3 rounded-xl">Completed Tasks</button>
+                </div>
+                <p className="text-sm text-textSecondary max-w-2xl">A quick snapshot of your assigned maintenance requests, workload status, and completion progress.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+                {[
+                    {
+                        label: 'Total Requests',
+                        value: totalRequests,
+                        icon: <Activity size={24} className="text-primary" />,
+                        note: 'Work assigned to you'
+                    },
+                    {
+                        label: 'Assigned',
+                        value: assignedCount,
+                        icon: <Wrench size={24} className="text-warning" />,
+                        note: 'Ready to start'
+                    },
+                    {
+                        label: 'In Progress',
+                        value: inProgressCount,
+                        icon: <Activity size={24} className="text-info" />,
+                        note: 'Currently working'
+                    },
+                    {
+                        label: 'Completed',
+                        value: completedRequests.length,
+                        icon: <CheckCircle2 size={24} className="text-success" />,
+                        note: 'Finished jobs'
+                    }
+                ].map((card, idx) => (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        key={card.label}
+                        className="glass-card p-6"
+                    >
+                        <div className="flex justify-between items-start gap-4 mb-4">
                             <div>
-                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Workload Summary</h4>
-                                <p className="text-xs text-textSecondary font-medium m-0">Live assigned work status</p>
+                                <p className="text-xs uppercase tracking-[0.3em] font-semibold text-textSecondary">{card.label}</p>
+                                <h2 className="text-4xl font-extrabold text-textPrimary mt-3 tracking-tight">{card.value}</h2>
                             </div>
+                            <div className="p-3 rounded-2xl bg-surface/70 border border-overlay/10 shadow-sm">{card.icon}</div>
                         </div>
-                        <div className="flex-1 flex items-center justify-center min-h-[250px]">
-                            <Doughnut
-                                data={{
-                                    labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
-                                    datasets: [
-                                        {
-                                            data: chartData,
-                                            backgroundColor: ['#3b82f6', '#f59e0b', '#6b7280', '#10b981'],
-                                            borderWidth: 0,
-                                            hoverOffset: 4
-                                        }
-                                    ]
-                                }}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
-                                    cutout: '70%'
-                                }}
-                            />
+                        <p className="text-sm text-textSecondary">{card.note}</p>
+                    </motion.div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                <div className="xl:col-span-2 glass-card p-6">
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Workload Status</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Your assigned request distribution</p>
                         </div>
+                        <motion.button
+                            whileHover={{ scale: 1.1, rotate: 15 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={refreshData}
+                            className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
+                        >
+                            <Activity size={20} />
+                        </motion.button>
+                    </div>
+                    <div className="h-[320px]">
+                        <Doughnut
+                            data={{
+                                labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
+                                datasets: [
+                                    {
+                                        data: chartData,
+                                        backgroundColor: ['#3b82f6', '#f59e0b', '#6b7280', '#10b981'],
+                                        borderWidth: 0,
+                                        hoverOffset: 6
+                                    }
+                                ]
+                            }}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
+                                cutout: '68%'
+                            }}
+                        />
                     </div>
                 </div>
 
-                <div className="xl:col-span-2">
-                    <div className="glass-card p-6 h-full flex flex-col">
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <h4 className="text-lg font-extrabold text-textPrimary mb-1">Assigned Requests</h4>
-                                <p className="text-xs text-textSecondary font-medium m-0">Open requests to send status updates</p>
-                            </div>
-                            <motion.button 
-                                whileHover={{ scale: 1.1, rotate: 15 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={refreshData}
-                                className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
-                            >
-                                <Activity size={20} />
-                            </motion.button>
+                <div className="glass-card p-6">
+                    <div className="flex items-center justify-between mb-6 gap-4">
+                        <div>
+                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completion</h4>
+                            <p className="text-xs text-textSecondary font-medium m-0">Completed {completedRequests.length} of {totalRequests} requests</p>
                         </div>
-
-                        <div className="overflow-x-auto flex-1">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
-                                        <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
-                                        <th className="pb-4 px-4 whitespace-nowrap">Student</th>
-                                        <th className="pb-4 px-4 whitespace-nowrap">Location</th>
-                                        <th className="pb-4 px-4 whitespace-nowrap">Status</th>
-                                        <th className="pb-4 px-4 text-right whitespace-nowrap">Update</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5">
-                                    {loading ? (
-                                        <tr>
-                                            <td colSpan="5" className="py-12 text-center">
-                                                <Loader2 size={32} className="animate-spin text-primary mx-auto" />
-                                            </td>
-                                        </tr>
-                                    ) : activeRequests.length > 0 ? (
-                                        activeRequests.map((request, idx) => (
-                                            <motion.tr 
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: idx * 0.05 }}
-                                                key={request.id} 
-                                                className="hover:bg-overlay/[0.02] transition-colors"
-                                            >
-                                                <td className="py-4 px-4">
-                                                    <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
-                                                    <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
-                                                    <div className="text-xs text-textSecondary font-medium">{request.student_code}</div>
-                                                    <div className="flex items-center text-[10px] text-textSecondary mt-1 font-medium whitespace-nowrap">
-                                                        <Phone size={12} className="mr-1.5 text-primary" />
-                                                        {request.student_phone || 'No phone'}
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <div className="flex items-center text-xs text-textSecondary font-medium">
-                                                        <MapPin size={14} className="mr-2 text-primary shrink-0" />
-                                                        <span className="truncate max-w-[120px]">{request.location}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>
-                                                        {request.status}
-                                                    </span>
-                                                    <div className="text-[10px] text-textSecondary mt-2 font-bold uppercase tracking-wider">
-                                                        Progress: {request.progress_percentage}%
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4 text-right">
-                                                    <motion.button 
-                                                        whileHover={{ scale: 1.05 }}
-                                                        whileTap={{ scale: 0.95 }}
-                                                        onClick={() => setSelectedRequest(request)}
-                                                        className="btn-primary px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap shadow-md"
-                                                    >
-                                                        Update
-                                                    </motion.button>
-                                                </td>
-                                            </motion.tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className="py-12 text-center text-textSecondary font-medium">
-                                                No active requests assigned right now.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                        <span className="rounded-full bg-success/10 text-success text-xs font-bold px-3 py-1">{completionRate}%</span>
+                    </div>
+                    <div className="w-full h-4 rounded-full bg-overlay/20 overflow-hidden mb-6">
+                        <div className="h-full rounded-full bg-success" style={{ width: `${completionRate}%` }} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Assigned</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{assignedCount}</span>
+                        </div>
+                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">In progress</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{inProgressCount}</span>
+                        </div>
+                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
+                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Completed</p>
+                            <span className="text-2xl font-extrabold text-textPrimary">{completedRequests.length}</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="glass-card p-6 h-full flex flex-col">
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h4 className="text-lg font-extrabold text-textPrimary mb-1">Assigned Requests</h4>
+                        <p className="text-xs text-textSecondary font-medium m-0">Open requests to send status updates</p>
+                    </div>
+                    <motion.button
+                        whileHover={{ scale: 1.1, rotate: 15 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={refreshData}
+                        className={loading ? 'p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors animate-spin text-primary' : 'p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors'}
+                    >
+                        <Activity size={20} />
+                    </motion.button>
+                </div>
+
+                <div className="overflow-x-auto flex-1">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
+                                <th className="pb-4 px-4 whitespace-nowrap">Problem</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Student</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Location</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Status</th>
+                                <th className="pb-4 px-4 text-right whitespace-nowrap">Update</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="py-12 text-center">
+                                        <Loader2 size={32} className="animate-spin text-primary mx-auto" />
+                                    </td>
+                                </tr>
+                            ) : activeRequests.length > 0 ? (
+                                activeRequests.map((request, idx) => (
+                                    <motion.tr
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={request.id}
+                                        className="hover:bg-overlay/2 transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
+                                            <div className="text-xs text-textSecondary font-medium">{request.student_code}</div>
+                                            <div className="flex items-center text-xs text-textSecondary mt-1 font-medium whitespace-nowrap">
+                                                <Phone size={12} className="mr-1.5 text-primary" />
+                                                {request.student_phone || 'No phone'}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <div className="flex items-center text-xs text-textSecondary font-medium">
+                                                <MapPin size={14} className="mr-2 text-primary shrink-0" />
+                                                <span className="truncate max-w-30">{request.location}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>
+                                                {request.status}
+                                            </span>
+                                            <div className="text-xs text-textSecondary mt-2 font-bold uppercase tracking-wider">
+                                                Progress: {request.progress_percentage}%
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => setSelectedRequest(request)}
+                                                className="btn-primary px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap shadow-md"
+                                            >
+                                                Update
+                                            </motion.button>
+                                        </td>
+                                    </motion.tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="py-12 text-center text-textSecondary font-medium">
+                                        No active requests assigned right now.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
