@@ -38,20 +38,20 @@ const Navbar = () => {
             {/* DESKTOP & MOBILE NAVBAR */}
             <nav
                 className={`fixed top-0 left-0 right-0 z-50 w-full px-4 md:px-6 transition-all duration-300 ${
-                    isScrolled
-                        ? 'py-3 bg-surface/75 dark:bg-surface/70 backdrop-blur-xl shadow-lg border-b border-overlay/10' 
+                    isScrolled || location.pathname === '/'
+                        ? 'py-3 bg-blue-800 dark:bg-blue-900 shadow-lg border-b border-blue-700 dark:border-blue-800' 
                         : 'py-5 bg-transparent border-b border-transparent'
                 }`}
             >
                 <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
                     {/* Logo */}
-                    <Link to="/home" className="flex items-center gap-3 group">
+                    <Link to="/home" className={`flex items-center gap-3 group ${(isScrolled || location.pathname === '/') ? 'text-white' : ''}`}>
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30 group-hover:shadow-xl transition-all">
                             <GraduationCap size={20} className="text-white" />
                         </div>
                         <div>
-                            <span className="font-extrabold text-lg tracking-tight block leading-none text-textPrimary group-hover:text-primary transition-colors">DBU</span>
-                            <span className="text-[10px] font-bold text-textSecondary uppercase tracking-widest">Maintenance</span>
+                            <span className={`font-extrabold text-lg tracking-tight block leading-none ${(isScrolled || location.pathname === '/') ? 'text-white' : 'text-textPrimary'} group-hover:text-primary transition-colors`}>DBU</span>
+                            <span className={`text-[10px] font-bold uppercase tracking-widest ${(isScrolled || location.pathname === '/') ? 'text-slate-300' : 'text-textSecondary'}`}>Maintenance</span>
                         </div>
                     </Link>
                     
@@ -64,8 +64,8 @@ const Navbar = () => {
                                     to={link.to}
                                     className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
                                         location.pathname === link.to
-                                            ? 'text-primary bg-primary/10 border border-primary/20'
-                                            : 'text-textSecondary hover:text-primary hover:bg-primary/5 border border-transparent'
+                                            ? `text-primary bg-primary/10 border border-primary/20 ${(isScrolled || location.pathname === '/') ? 'text-white bg-primary/20' : ''}`
+                                            : `${(isScrolled || location.pathname === '/') ? 'text-slate-300 hover:text-white hover:bg-white/10' : 'text-textSecondary hover:text-primary hover:bg-primary/5'} border border-transparent`
                                     }`}
                                 >
                                     {link.label}
@@ -76,7 +76,7 @@ const Navbar = () => {
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={toggleDarkMode}
-                                className="p-2.5 rounded-lg text-textSecondary hover:text-primary hover:bg-primary/10 transition-all duration-300 border border-transparent hover:border-primary/20"
+                                className={`p-2.5 rounded-lg transition-all duration-300 border border-transparent hover:border-primary/20 ${(isScrolled || location.pathname === '/') ? 'text-slate-300 hover:text-white hover:bg-white/10' : 'text-textSecondary hover:text-primary hover:bg-primary/10'}`}
                                 aria-label="Toggle dark mode"
                             >
                                 {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -95,7 +95,7 @@ const Navbar = () => {
                             )}
 
                             <button 
-                                className="md:hidden p-2.5 text-textSecondary hover:text-primary hover:bg-primary/10 rounded-lg transition-all border border-transparent hover:border-primary/20"
+                                className={`md:hidden p-2.5 rounded-lg transition-all border border-transparent hover:border-primary/20 ${(isScrolled || location.pathname === '/') ? 'text-slate-300 hover:text-white hover:bg-white/10' : 'text-textSecondary hover:text-primary hover:bg-primary/10'}`}
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             >
                                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -106,18 +106,14 @@ const Navbar = () => {
 
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-xl border-b border-overlay/10 mt-2 mx-4 rounded-xl shadow-xl">
+                    <div className="md:hidden absolute top-full left-0 right-0 bg-blue-800 dark:bg-blue-900 border-b border-blue-700 dark:border-blue-800 mt-2 mx-4 rounded-xl shadow-xl">
                         <div className="flex flex-col gap-2 p-4">
                             {sectionLinks.map((link) => (
                                 <Link
                                     key={link.to}
                                     to={link.to}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                                        location.pathname === link.to
-                                            ? 'text-primary bg-primary/10 border border-primary/20'
-                                            : 'text-textSecondary hover:text-primary hover:bg-primary/5'
-                                    }`}
+                                    className="px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-300 text-slate-300 hover:text-white hover:bg-white/10"
                                 >
                                     {link.label}
                                 </Link>
