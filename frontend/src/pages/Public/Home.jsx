@@ -14,7 +14,9 @@ import {
     Star,
     TrendingUp,
     Award,
-    Users
+    Users,
+    Moon,
+    Sun
 } from 'lucide-react';
 
 import PublicLayout from '../../components/public/PublicLayout';
@@ -41,30 +43,30 @@ const routeToSection = {
 };
 
 const fadeUp = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' } }
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
 };
 
 const fadeLeft = {
-    hidden: { opacity: 0, x: -40 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.9, ease: 'easeOut' } }
+    hidden: { opacity: 0, x: -30 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } }
 };
 
 const fadeRight = {
-    hidden: { opacity: 0, x: 40 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.9, ease: 'easeOut' } }
+    hidden: { opacity: 0, x: 30 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } }
 };
 
 const staggerContainer = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
+    visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } }
 };
 
 const statVariant = {
-    hidden: { opacity: 0, scale: 0.7, y: 20 },
+    hidden: { opacity: 0, scale: 0.8, y: 10 },
     visible: (i) => ({
         opacity: 1, scale: 1, y: 0,
-        transition: { delay: i * 0.12, duration: 0.6, ease: 'easeOut' }
+        transition: { delay: i * 0.08, duration: 0.4, ease: 'easeOut' }
     })
 };
 
@@ -79,11 +81,27 @@ const scrollToSection = (sectionId, behavior = 'smooth') => {
 const Home = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [hoveredCard, setHoveredCard] = useState(null);
-    const [scrolled, setScrolled] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            return savedTheme === 'dark';
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    });
+    
     const { scrollYProgress } = useScroll();
     const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+
+    // Apply theme to document
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [isDarkMode]);
 
     useEffect(() => {
         const sectionId = routeToSection[location.pathname] || 'home';
@@ -93,159 +111,124 @@ const Home = () => {
         return () => window.clearTimeout(timer);
     }, [location.pathname]);
 
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 100);
-        };
-        window.addEventListener('scroll', handleScroll);
-        
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+    };
 
     return (
         <PublicLayout>
-            {/* Custom cursor effect */}
-            <motion.div
-                className="fixed w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 mix-blend-screen pointer-events-none z-50 hidden lg:block"
-                animate={{
-                    x: mousePosition.x - 16,
-                    y: mousePosition.y - 16,
-                    scale: hoveredCard !== null ? 1.5 : 1,
-                }}
-                transition={{ type: "spring", stiffness: 500, damping: 28 }}
-                style={{ opacity: 0.3 }}
-            />
+            {/* Theme Toggle Button */}
+            <motion.button
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+                onClick={toggleTheme}
+                className="fixed top-24 right-4 z-50 p-3 rounded-full bg-white/10 dark:bg-gray-800/50 backdrop-blur-lg border border-gray-200/20 dark:border-gray-700/30 shadow-lg hover:scale-110 transition-all duration-300 group"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.95 }}
+            >
+                {isDarkMode ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                ) : (
+                    <Moon className="w-5 h-5 text-gray-700" />
+                )}
+            </motion.button>
 
             {/* HERO SECTION */}
             <motion.section
                 id="home"
-                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden"
+                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden transition-colors duration-500"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.1 }}
                 variants={staggerContainer}
                 style={{ opacity }}
             >
-                {/* Enhanced Dark overlay with gradient */}
-                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90" />
+                {/* Dynamic Background based on theme */}
+                <div className={`absolute inset-0 -z-10 transition-all duration-700 ${
+                    isDarkMode 
+                        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
+                        : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
+                }`} />
                 
-                {/* Animated gradient orbs */}
+                <div className={`absolute inset-0 -z-10 transition-all duration-700 ${
+                    isDarkMode 
+                        ? 'bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90' 
+                        : 'bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90'
+                }`} />
+                
+                {/* Animated gradient orbs - theme aware */}
                 <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-                    {/* Primary orb - top left */}
-                    <motion.div
-                        animate={{ 
-                            scale: [1, 1.3, 1], 
-                            opacity: [0.3, 0.6, 0.3],
-                            x: [0, 50, 0],
-                            y: [0, 30, 0]
-                        }}
-                        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-                        className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-blue-600/30 blur-3xl"
-                    />
-                    
-                    {/* Secondary orb - bottom right */}
-                    <motion.div
-                        animate={{ 
-                            scale: [1, 1.4, 1], 
-                            opacity: [0.2, 0.5, 0.2],
-                            x: [0, -40, 0],
-                            y: [0, -40, 0]
-                        }}
-                        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                        className="absolute -bottom-40 -right-40 w-[30rem] h-[30rem] rounded-full bg-cyan-500/20 blur-3xl"
-                    />
-                    
-                    {/* Tertiary orb - center */}
                     <motion.div
                         animate={{ 
                             scale: [1, 1.2, 1], 
-                            opacity: [0.15, 0.4, 0.15],
-                            rotate: [0, 180, 360]
+                            opacity: isDarkMode ? [0.2, 0.4, 0.2] : [0.1, 0.2, 0.1],
+                        }}
+                        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+                        className={`absolute -top-40 -left-40 w-96 h-96 rounded-full blur-3xl ${
+                            isDarkMode ? 'bg-blue-600/30' : 'bg-blue-400/20'
+                        }`}
+                    />
+                    
+                    <motion.div
+                        animate={{ 
+                            scale: [1, 1.3, 1], 
+                            opacity: isDarkMode ? [0.15, 0.35, 0.15] : [0.08, 0.18, 0.08],
+                        }}
+                        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                        className={`absolute -bottom-40 -right-40 w-[30rem] h-[30rem] rounded-full blur-3xl ${
+                            isDarkMode ? 'bg-cyan-500/20' : 'bg-cyan-400/15'
+                        }`}
+                    />
+                    
+                    <motion.div
+                        animate={{ 
+                            scale: [1, 1.15, 1], 
+                            opacity: isDarkMode ? [0.12, 0.3, 0.12] : [0.06, 0.15, 0.06],
                         }}
                         transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-indigo-500/25 blur-3xl"
-                    />
-                    
-                    {/* Additional accent orbs */}
-                    <motion.div
-                        animate={{ y: [-20, 20, -20], opacity: [0.2, 0.5, 0.2] }}
-                        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-                        className="absolute top-20 right-20 w-60 h-60 rounded-full bg-purple-500/20 blur-3xl"
-                    />
-                    
-                    <motion.div
-                        animate={{ y: [20, -20, 20], opacity: [0.15, 0.4, 0.15] }}
-                        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
-                        className="absolute bottom-20 left-20 w-80 h-80 rounded-full bg-pink-500/15 blur-3xl"
+                        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl ${
+                            isDarkMode ? 'bg-indigo-500/25' : 'bg-indigo-400/15'
+                        }`}
                     />
                 </div>
 
-                {/* Floating particles with enhanced animation */}
+                {/* Simplified floating particles - fewer for better performance */}
                 <div className="absolute inset-0 -z-10 pointer-events-none">
-                    {[...Array(20)].map((_, i) => (
+                    {[...Array(12)].map((_, i) => (
                         <motion.div
                             key={i}
                             animate={{
-                                y: [0, -100, 0],
-                                x: [0, (i % 2 === 0 ? 50 : -50), 0],
-                                opacity: [0, 0.8, 0],
-                                scale: [0.5, 1.5, 0.5],
+                                y: [0, -80, 0],
+                                opacity: [0, isDarkMode ? 0.4 : 0.2, 0],
                             }}
                             transition={{
-                                duration: 6 + (i % 5),
+                                duration: 5 + (i % 3),
                                 repeat: Infinity,
-                                delay: i * 0.5,
+                                delay: i * 0.3,
                                 ease: 'easeInOut',
                             }}
-                            className="absolute w-1.5 h-1.5 rounded-full"
+                            className="absolute w-1 h-1 rounded-full"
                             style={{
-                                background: `radial-gradient(circle, ${i % 2 === 0 ? '#3b82f6' : '#06b6d4'}, transparent)`,
-                                left: `${5 + (i * 4.5)}%`,
+                                background: `radial-gradient(circle, ${isDarkMode ? '#3b82f6' : '#60a5fa'}, transparent)`,
+                                left: `${5 + (i * 8)}%`,
                                 bottom: `${10 + (i % 8) * 12}%`,
                             }}
                         />
                     ))}
                 </div>
 
-                {/* Rotating ring effect */}
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full border border-blue-500/10 -z-10 pointer-events-none"
-                />
-                <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-                    className="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] rounded-full border border-cyan-500/10 -z-10 pointer-events-none"
-                />
-
-                {/* Scan line effect */}
-                <motion.div
-                    animate={{ y: ['-100%', '100vh'] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'linear', delay: 2 }}
-                    className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent -z-10 pointer-events-none"
-                />
-
-                {/* Enhanced grid overlay */}
+                {/* Simplified grid overlay */}
                 <div
-                    className="absolute inset-0 -z-10 opacity-[0.03] pointer-events-none"
+                    className={`absolute inset-0 -z-10 pointer-events-none transition-opacity duration-500 ${
+                        isDarkMode ? 'opacity-[0.02]' : 'opacity-[0.01]'
+                    }`}
                     style={{
                         backgroundImage: `
-                            linear-gradient(rgba(59,130,246,0.5) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(59,130,246,0.5) 1px, transparent 1px)
+                            linear-gradient(${isDarkMode ? 'rgba(59,130,246,0.3)' : 'rgba(37,99,235,0.2)'} 1px, transparent 1px),
+                            linear-gradient(90deg, ${isDarkMode ? 'rgba(59,130,246,0.3)' : 'rgba(37,99,235,0.2)'} 1px, transparent 1px)
                         `,
                         backgroundSize: '60px 60px',
-                        maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 85%)',
-                        WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 85%)',
                     }}
                 />
 
@@ -255,98 +238,122 @@ const Home = () => {
 
                         {/* Left Content */}
                         <motion.div variants={fadeLeft} className="flex flex-col justify-center py-4">
-                            {/* Enhanced Badge with glow */}
+                            {/* Badge with theme */}
                             <motion.div
-                                animate={{ y: [0, -4, 0] }}
+                                animate={{ y: [0, -3, 0] }}
                                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                                className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold tracking-wider mb-6 w-fit shadow-xl group hover:bg-white/15 transition-all duration-300"
+                                className={`relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full backdrop-blur-md border text-xs font-bold tracking-wider mb-6 w-fit shadow-xl group transition-all duration-300 ${
+                                    isDarkMode 
+                                        ? 'bg-white/10 border-white/20 text-white hover:bg-white/15' 
+                                        : 'bg-black/5 border-gray-300/30 text-gray-800 hover:bg-black/10'
+                                }`}
                             >
-                                <span className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-400/20 blur-md group-hover:blur-xl transition-all duration-300" />
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
                                 </span>
-                                <CheckCircle2 size={13} className="text-cyan-300 relative" />
+                                <CheckCircle2 size={13} className={`relative ${isDarkMode ? 'text-cyan-300' : 'text-blue-600'}`} />
                                 <span className="relative">Trusted by the DBU Community</span>
-                                <Sparkles size={12} className="text-yellow-400 relative animate-pulse" />
+                                <Sparkles size={12} className={`relative ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
                             </motion.div>
 
-                            {/* Enhanced Heading with gradient animation */}
+                            {/* Heading with theme */}
                             <motion.h1
                                 variants={fadeUp}
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-5 text-white drop-shadow-2xl"
+                                className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-5 drop-shadow-2xl transition-colors duration-500 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}
                             >
                                 Fast, Transparent
                                 <br />
                                 <span className="relative inline-block">
-                                    <span className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 blur-2xl opacity-50" />
-                                    <span className="relative bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-400 bg-clip-text text-transparent animate-[gradient-x_3s_ease_infinite] bg-[length:200%_auto]">
+                                    <span className={`absolute inset-0 blur-2xl opacity-50 ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400' 
+                                            : 'bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500'
+                                    }`} />
+                                    <span className={`relative bg-gradient-to-r ${
+                                        isDarkMode 
+                                            ? 'from-blue-300 via-cyan-200 to-blue-400' 
+                                            : 'from-blue-600 via-cyan-600 to-blue-600'
+                                    } bg-clip-text text-transparent animate-[gradient-x_3s_ease_infinite] bg-[length:200%_auto]`}>
                                         Campus Maintenance
                                     </span>
                                 </span>
                             </motion.h1>
 
-                            {/* Enhanced Subtitle */}
+                            {/* Subtitle with theme */}
                             <motion.p
                                 variants={fadeUp}
-                                className="text-base md:text-lg text-white/70 leading-relaxed mb-8 max-w-xl backdrop-blur-sm"
+                                className={`text-base md:text-lg leading-relaxed mb-8 max-w-xl transition-colors duration-500 ${
+                                    isDarkMode ? 'text-white/70' : 'text-gray-600'
+                                }`}
                             >
                                 Report issues instantly, track progress in real time, and keep
                                 university facilities running smoothly from one central place.
                             </motion.p>
 
-                            {/* Enhanced CTA Buttons */}
+                            {/* CTA Buttons with theme */}
                             <motion.div
                                 variants={fadeUp}
                                 className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-10"
                             >
                                 <motion.button
-                                    whileHover={{ y: -4, scale: 1.05 }}
+                                    whileHover={{ y: -3, scale: 1.03 }}
                                     whileTap={{ scale: 0.98 }}
-                                    onHoverStart={() => setHoveredCard('report')}
-                                    onHoverEnd={() => setHoveredCard(null)}
                                     onClick={() => navigate('/login')}
-                                    className="relative w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_auto] text-white font-bold text-sm shadow-2xl shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group animate-[gradient-x_3s_ease_infinite]"
+                                    className={`relative w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r text-white font-bold text-sm shadow-2xl transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group animate-[gradient-x_3s_ease_infinite] bg-[length:200%_auto] ${
+                                        isDarkMode 
+                                            ? 'from-blue-600 via-cyan-500 to-blue-600 shadow-blue-500/40' 
+                                            : 'from-blue-500 via-cyan-400 to-blue-500 shadow-blue-400/30'
+                                    }`}
                                 >
                                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                                    <Zap size="18" className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                                    <Zap size="18" className="relative z-10" />
                                     <span className="relative z-10">Report Issue</span>
                                     <ArrowRight size="16" className="relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
                                 </motion.button>
 
                                 <motion.button
-                                    whileHover={{ y: -4, scale: 1.05 }}
+                                    whileHover={{ y: -3, scale: 1.03 }}
                                     whileTap={{ scale: 0.98 }}
-                                    onHoverStart={() => setHoveredCard('track')}
-                                    onHoverEnd={() => setHoveredCard(null)}
                                     onClick={() => navigate('/login')}
-                                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/10 backdrop-blur-lg border border-white/20 text-white font-bold text-sm hover:bg-white/20 hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg group"
+                                    className={`w-full sm:w-auto px-8 py-3.5 rounded-xl backdrop-blur-lg border font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg group ${
+                                        isDarkMode 
+                                            ? 'bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-cyan-400/50' 
+                                            : 'bg-black/5 border-gray-300/30 text-gray-800 hover:bg-black/10 hover:border-blue-400/50'
+                                    }`}
                                 >
-                                    <Activity size="18" className="text-cyan-300 group-hover:rotate-12 transition-transform duration-300" />
+                                    <Activity size="18" className={`${isDarkMode ? 'text-cyan-300' : 'text-blue-600'}`} />
                                     Track Request
                                 </motion.button>
                             </motion.div>
 
-                            {/* Enhanced Stats with 3D effect */}
-                            <div className="flex gap-8 md:gap-12 pt-6 border-t border-white/10">
+                            {/* Stats with theme */}
+                            <div className={`flex gap-8 md:gap-12 pt-6 border-t transition-colors duration-500 ${
+                                isDarkMode ? 'border-white/10' : 'border-gray-200'
+                            }`}>
                                 {[
-                                    { value: '2000+', label: 'Issues Resolved', icon: Award, color: 'from-blue-400 to-cyan-300' },
-                                    { value: '500+', label: 'Active Users', icon: Users, color: 'from-cyan-400 to-blue-300' },
-                                    { value: '24/7', label: 'Available', icon: Clock, color: 'from-indigo-400 to-purple-300' },
+                                    { value: '2000+', label: 'Issues Resolved', icon: Award, color: isDarkMode ? 'from-blue-400 to-cyan-300' : 'from-blue-600 to-cyan-500' },
+                                    { value: '500+', label: 'Active Users', icon: Users, color: isDarkMode ? 'from-cyan-400 to-blue-300' : 'from-cyan-600 to-blue-500' },
+                                    { value: '24/7', label: 'Available', icon: Clock, color: isDarkMode ? 'from-indigo-400 to-purple-300' : 'from-indigo-600 to-purple-500' },
                                 ].map((stat, i) => (
                                     <motion.div
                                         key={stat.label}
                                         custom={i}
                                         variants={statVariant}
-                                        whileHover={{ scale: 1.1, y: -4 }}
+                                        whileHover={{ scale: 1.08, y: -2 }}
                                         className="flex flex-col cursor-default group relative"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                        <stat.icon size="20" className={`text-transparent bg-gradient-to-r ${stat.color} bg-clip-text mb-1 opacity-70 group-hover:opacity-100 transition-opacity duration-300`} />
+                                        <stat.icon size="20" className={`text-transparent bg-gradient-to-r ${stat.color} bg-clip-text mb-1`} />
                                         <span className={`text-xl md:text-2xl font-extrabold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent leading-tight`}>
                                             {stat.value}
                                         </span>
-                                        <span className="text-[10px] md:text-xs text-white/50 mt-0.5 tracking-wide uppercase group-hover:text-white/70 transition-colors duration-300">
+                                        <span className={`text-[10px] md:text-xs mt-0.5 tracking-wide uppercase transition-colors duration-300 ${
+                                            isDarkMode 
+                                                ? 'text-white/50 group-hover:text-white/70' 
+                                                : 'text-gray-500 group-hover:text-gray-700'
+                                        }`}>
                                             {stat.label}
                                         </span>
                                     </motion.div>
@@ -354,39 +361,37 @@ const Home = () => {
                             </div>
                         </motion.div>
 
-                        {/* Right Visual with enhanced 3D effect */}
+                        {/* Right Visual with theme */}
                         <motion.div
                             variants={fadeRight}
                             className="hidden lg:flex items-center justify-center"
                         >
                             <motion.div
-                                whileHover={{ scale: 1.02, rotateY: 5, rotateX: -3 }}
+                                whileHover={{ scale: 1.02 }}
                                 transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                                 className="relative w-full h-[480px] group"
-                                style={{ perspective: '1200px' }}
-                                onHoverStart={() => setHoveredCard('image')}
-                                onHoverEnd={() => setHoveredCard(null)}
+                                style={{ perspective: '1000px' }}
                             >
-                                {/* Outer glow ring with animation */}
+                                {/* Outer glow ring with theme */}
                                 <motion.div
                                     animate={{ 
-                                        opacity: [0.3, 0.8, 0.3], 
-                                        scale: [1, 1.05, 1],
-                                        rotate: [0, 360]
+                                        opacity: [0.3, 0.6, 0.3], 
+                                        scale: [1, 1.03, 1],
                                     }}
-                                    transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-                                    className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-blue-500/30 via-cyan-400/20 to-indigo-500/30 blur-2xl"
-                                />
-                                
-                                {/* Rotating border ring */}
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-                                    className="absolute -inset-3 rounded-3xl border-2 border-dashed border-blue-500/30"
+                                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                                    className={`absolute -inset-4 rounded-3xl blur-2xl ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-br from-blue-500/30 via-cyan-400/20 to-indigo-500/30' 
+                                            : 'bg-gradient-to-br from-blue-400/25 via-cyan-400/15 to-indigo-400/25'
+                                    }`}
                                 />
 
                                 {/* Main image container */}
-                                <div className="relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-black/60 border border-white/10 group-hover:border-cyan-400/40 transition-all duration-500">
+                                <div className={`relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl border transition-all duration-500 ${
+                                    isDarkMode 
+                                        ? 'shadow-black/60 border-white/10 group-hover:border-cyan-400/40' 
+                                        : 'shadow-gray-400/30 border-gray-200/50 group-hover:border-blue-400/40'
+                                }`}>
                                     <img
                                         src={HeroImg}
                                         alt="Campus Maintenance"
@@ -394,66 +399,83 @@ const Home = () => {
                                     />
                                     
                                     {/* Image overlay gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                                    <div className={`absolute inset-0 bg-gradient-to-t ${
+                                        isDarkMode 
+                                            ? 'from-black/60 via-black/20 to-transparent' 
+                                            : 'from-gray-900/30 via-gray-900/10 to-transparent'
+                                    }`} />
                                 </div>
 
-                                {/* Top-left floating card */}
+                                {/* Floating cards with theme */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: [0, -8, 0] }}
-                                    transition={{ delay: 0.8, duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4, duration: 0.5 }}
                                     whileHover={{ scale: 1.05 }}
-                                    className="absolute top-5 left-5 z-20 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 shadow-xl cursor-pointer group/card"
+                                    className={`absolute top-5 left-5 z-20 flex items-center gap-3 px-4 py-2.5 rounded-xl backdrop-blur-md border shadow-xl cursor-pointer transition-all duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-black/70 border-white/15' 
+                                            : 'bg-white/80 border-gray-200/50 shadow-gray-300/30'
+                                    }`}
                                 >
                                     <span className="relative flex h-2.5 w-2.5">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-400" />
                                     </span>
-                                    <span className="text-white text-xs font-semibold">System Live</span>
-                                    <div className="w-px h-4 bg-white/20 mx-1" />
-                                    <span className="text-cyan-300 text-xs font-mono">98.5%</span>
+                                    <span className={`text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>System Live</span>
+                                    <div className={`w-px h-4 mx-1 ${isDarkMode ? 'bg-white/20' : 'bg-gray-300'}`} />
+                                    <span className={`text-xs font-mono ${isDarkMode ? 'text-cyan-300' : 'text-blue-600'}`}>98.5%</span>
                                 </motion.div>
 
-                                {/* Bottom-right floating stat card */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: [0, -6, 0] }}
-                                    transition={{ delay: 1.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.6, duration: 0.5 }}
                                     whileHover={{ scale: 1.05 }}
-                                    className="absolute bottom-5 right-5 z-20 px-5 py-3 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 shadow-xl cursor-pointer group/card"
+                                    className={`absolute bottom-5 right-5 z-20 px-5 py-3 rounded-xl backdrop-blur-md border shadow-xl cursor-pointer transition-all duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-black/70 border-white/15' 
+                                            : 'bg-white/80 border-gray-200/50 shadow-gray-300/30'
+                                    }`}
                                 >
                                     <div className="flex items-center gap-2 mb-1">
                                         <TrendingUp size="14" className="text-green-400" />
-                                        <span className="text-cyan-300 text-lg font-extrabold leading-tight">12 Fixed</span>
+                                        <span className={`text-lg font-extrabold leading-tight ${isDarkMode ? 'text-cyan-300' : 'text-blue-600'}`}>12 Fixed</span>
                                     </div>
-                                    <div className="text-white/50 text-[10px] uppercase tracking-wide">Today</div>
+                                    <div className={`text-[10px] uppercase tracking-wide ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>Today</div>
                                 </motion.div>
 
-                                {/* Bottom-left floating card */}
                                 <motion.div
                                     initial={{ opacity: 0, x: -15 }}
-                                    animate={{ opacity: 1, x: [0, 6, 0] }}
-                                    transition={{ delay: 1.6, duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.8, duration: 0.5 }}
                                     whileHover={{ scale: 1.05 }}
-                                    className="absolute bottom-5 left-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 shadow-xl cursor-pointer group/card"
+                                    className={`absolute bottom-5 left-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl backdrop-blur-md border shadow-xl cursor-pointer transition-all duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-black/70 border-white/15' 
+                                            : 'bg-white/80 border-gray-200/50 shadow-gray-300/30'
+                                    }`}
                                 >
-                                    <Activity size="14" className="text-cyan-300" />
-                                    <span className="text-white text-xs font-semibold">4 Active Reports</span>
-                                    <div className="w-px h-4 bg-white/20 mx-1" />
+                                    <Activity size="14" className={isDarkMode ? 'text-cyan-300' : 'text-blue-600'} />
+                                    <span className={`text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>4 Active Reports</span>
+                                    <div className={`w-px h-4 mx-1 ${isDarkMode ? 'bg-white/20' : 'bg-gray-300'}`} />
                                     <span className="text-yellow-400 text-xs">+2</span>
                                 </motion.div>
 
-                                {/* Top-right rating card */}
                                 <motion.div
                                     initial={{ opacity: 0, x: 15 }}
-                                    animate={{ opacity: 1, x: [0, -6, 0] }}
-                                    transition={{ delay: 2, duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 1.0, duration: 0.5 }}
                                     whileHover={{ scale: 1.05 }}
-                                    className="absolute top-5 right-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 shadow-xl cursor-pointer group/card"
+                                    className={`absolute top-5 right-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl backdrop-blur-md border shadow-xl cursor-pointer transition-all duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-black/70 border-white/15' 
+                                            : 'bg-white/80 border-gray-200/50 shadow-gray-300/30'
+                                    }`}
                                 >
                                     <Star size="14" className="text-yellow-400 fill-yellow-400" />
-                                    <span className="text-white text-xs font-semibold">4.9</span>
-                                    <span className="text-white/50 text-xs">(248 reviews)</span>
+                                    <span className={`text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>4.9</span>
+                                    <span className={`text-xs ${isDarkMode ? 'text-white/50' : 'text-gray-500'}`}>(248 reviews)</span>
                                 </motion.div>
                             </motion.div>
                         </motion.div>
@@ -461,33 +483,48 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Enhanced Scroll hint */}
+                {/* Scroll hint with theme */}
                 <motion.div
-                    animate={{ y: [0, 10, 0], opacity: [0.4, 1, 0.4] }}
+                    animate={{ y: [0, 8, 0], opacity: [0.4, 0.8, 0.4] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                     className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 cursor-pointer group"
                     onClick={() => scrollToSection('about-us')}
                 >
-                    <span className="text-white/40 text-[10px] uppercase tracking-widest group-hover:text-white/60 transition-colors duration-300">Scroll to explore</span>
-                    <div className="relative w-6 h-10 rounded-full border border-white/20 flex items-start justify-center pt-2 group-hover:border-cyan-400/50 transition-colors duration-300">
+                    <span className={`text-[10px] uppercase tracking-widest transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'text-white/40 group-hover:text-white/60' 
+                            : 'text-gray-500 group-hover:text-gray-700'
+                    }`}>Scroll to explore</span>
+                    <div className={`relative w-6 h-10 rounded-full border flex items-start justify-center pt-2 transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'border-white/20 group-hover:border-cyan-400/50' 
+                            : 'border-gray-400/30 group-hover:border-blue-400/50'
+                    }`}>
                         <motion.div
                             animate={{ y: [0, 12, 0] }}
                             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                            className="w-1 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400"
+                            className={`w-1 h-2 rounded-full bg-gradient-to-r ${
+                                isDarkMode ? 'from-cyan-400 to-blue-400' : 'from-blue-500 to-cyan-500'
+                            }`}
                         />
-                        <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-lg group-hover:bg-cyan-400/20 transition-all duration-300" />
                     </div>
-                    <ChevronDown size="16" className="text-white/30 group-hover:text-white/50 transition-colors duration-300" />
+                    <ChevronDown size="16" className={`transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'text-white/30 group-hover:text-white/50' 
+                            : 'text-gray-400 group-hover:text-gray-600'
+                    }`} />
                 </motion.div>
             </motion.section>
 
             {/* Other Sections */}
-            <AboutUs />
-            <Services />
-            <Features />
-            <Contacts />
+            <div className="transition-colors duration-500">
+                <AboutUs />
+                <Services />
+                <Features />
+                <Contacts />
+            </div>
 
-            {/* Add custom Tailwind animations */}
+            {/* Add custom animations */}
             <style>{`
                 @keyframes gradient-x {
                     0%, 100% {
@@ -495,6 +532,28 @@ const Home = () => {
                     }
                     50% {
                         background-position: 100% 50%;
+                    }
+                }
+                
+                /* Smooth theme transition */
+                * {
+                    transition-property: background-color, border-color, color, fill, stroke;
+                    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-duration: 300ms;
+                }
+                
+                /* Optimize scrolling performance */
+                html {
+                    scroll-behavior: smooth;
+                }
+                
+                /* Reduce motion for better performance */
+                @media (prefers-reduced-motion: reduce) {
+                    * {
+                        animation-duration: 0.01ms !important;
+                        animation-iteration-count: 1 !important;
+                        transition-duration: 0.01ms !important;
+                        scroll-behavior: auto !important;
                     }
                 }
             `}</style>
