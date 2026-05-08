@@ -295,11 +295,11 @@ const AdminOverview = () => {
     };
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-6"
+            className="p-3 md:p-5"
         >
             <DashboardHeader
                 title="Admin Dashboard"
@@ -309,7 +309,7 @@ const AdminOverview = () => {
                 onLogout={logout}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-4">
                 {[
                     {
                         label: 'Total Requests',
@@ -355,7 +355,7 @@ const AdminOverview = () => {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4 mb-4">
                 <div className="xl:col-span-2 glass-card p-6">
                     <div className="flex justify-between items-start mb-6">
                         <div>
