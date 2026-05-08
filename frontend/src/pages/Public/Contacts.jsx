@@ -20,24 +20,24 @@ const Contacts = () => {
             <div className="section-glow-bg" />
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <motion.div variants={fadeUp} className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-textPrimary">
+                <motion.div variants={fadeUp} className="text-center mb-8">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight mb-2 text-textPrimary">
                         Get In Touch
                     </h2>
-                    <p className="text-lg md:text-xl text-textSecondary max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-sm md:text-base text-textSecondary max-w-2xl mx-auto leading-relaxed">
                         Have questions? Contact the DBU maintenance office or submit your inquiry below.
                     </p>
                 </motion.div>
 
-                <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+                <div className="grid lg:grid-cols-2 gap-4 items-stretch">
                     {/* Map */}
-                    <motion.div variants={fadeUp} className="premium-card overflow-hidden min-h-[450px] lg:min-h-auto transition-transform duration-500 hover:-translate-y-1">
+                    <motion.div variants={fadeUp} className="premium-card overflow-hidden min-h-[300px] lg:min-h-auto transition-transform duration-500 hover:-translate-y-1">
                         <iframe
                             title="DBU Location"
                             src="https://maps.google.com/maps?q=Debre%20Berhan%20University&t=&z=16&ie=UTF8&iwloc=&output=embed"
                             width="100%"
                             height="100%"
-                            style={{ border: 0, minHeight: '450px' }}
+                            style={{ border: 0, minHeight: '300px' }}
                             allowFullScreen=""
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
@@ -45,16 +45,16 @@ const Contacts = () => {
                     </motion.div>
 
                     {/* Contact Info */}
-                    <div className="flex flex-col space-y-6">
+                    <div className="flex flex-col space-y-3">
                         {/* Location Card */}
-                        <motion.div variants={fadeUp} className="glass-card p-8 hover:shadow-2xl transition-all duration-300 group">
-                            <div className="flex items-start gap-4">
-                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
-                                    <MapPin size={24} className="text-primary" />
+                        <motion.div variants={fadeUp} className="glass-card p-3 md:p-4 hover:shadow-2xl transition-all duration-300 group">
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+                                    <MapPin size={16} className="text-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-xl md:text-2xl font-bold text-textPrimary mb-2 group-hover:text-primary transition-colors">Location</h4>
-                                    <p className="text-textSecondary text-base leading-relaxed">
+                                    <h4 className="text-sm md:text-base font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">Location</h4>
+                                    <p className="text-textSecondary text-xs leading-relaxed">
                                         Debre Berhan University<br />
                                         Main Campus, Building 4<br />
                                         Debre Berhan, Ethiopia
@@ -64,31 +64,31 @@ const Contacts = () => {
                         </motion.div>
 
                         {/* Phone Card */}
-                        <motion.div variants={fadeUp} className="glass-card p-8 hover:shadow-2xl transition-all duration-300 group">
-                            <div className="flex items-start gap-4">
-                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
-                                    <Phone size={24} className="text-primary" />
+                        <motion.div variants={fadeUp} className="glass-card p-3 md:p-4 hover:shadow-2xl transition-all duration-300 group">
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+                                    <Phone size={16} className="text-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-xl md:text-2xl font-bold text-textPrimary mb-2 group-hover:text-primary transition-colors">Phone</h4>
-                                    <p className="text-textSecondary text-base leading-relaxed">
+                                    <h4 className="text-sm md:text-base font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">Phone</h4>
+                                    <p className="text-textSecondary text-xs leading-relaxed">
                                         <a href="tel:+251116815440" className="hover:text-primary transition-colors">+251 11 681 5440</a><br />
                                         <a href="tel:+251911234567" className="hover:text-primary transition-colors">+251 91 123 4567</a><br />
-                                        <span className="text-sm text-textSecondary/70">(Emergency)</span>
+                                        <span className="text-xs text-textSecondary/70">(Emergency)</span>
                                     </p>
                                 </div>
                             </div>
                         </motion.div>
 
                         {/* Email Card */}
-                        <motion.div variants={fadeUp} className="glass-card p-8 hover:shadow-2xl transition-all duration-300 group">
-                            <div className="flex items-start gap-4">
-                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
-                                    <Mail size={24} className="text-primary" />
+                        <motion.div variants={fadeUp} className="glass-card p-3 md:p-4 hover:shadow-2xl transition-all duration-300 group">
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+                                    <Mail size={16} className="text-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-xl md:text-2xl font-bold text-textPrimary mb-2 group-hover:text-primary transition-colors">Email</h4>
-                                    <p className="text-textSecondary text-base leading-relaxed">
+                                    <h4 className="text-sm md:text-base font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">Email</h4>
+                                    <p className="text-textSecondary text-xs leading-relaxed">
                                         <a href="mailto:maintenance@dbu.edu.et" className="hover:text-primary transition-colors">maintenance@dbu.edu.et</a><br />
                                         <a href="mailto:support@dbu.edu.et" className="hover:text-primary transition-colors">support@dbu.edu.et</a>
                                     </p>
@@ -99,9 +99,9 @@ const Contacts = () => {
                         {/* CTA Button */}
                         <motion.button
                             variants={fadeUp}
-                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 text-base"
+                            className="w-full py-2 md:py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 text-xs md:text-sm"
                         >
-                            <Send size={18} />
+                            <Send size={14} />
                             Send a Message
                         </motion.button>
                     </div>
