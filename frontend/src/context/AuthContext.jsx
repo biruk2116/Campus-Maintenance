@@ -7,19 +7,6 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        const saved = localStorage.getItem('theme');
-        if (saved) return saved === 'dark';
-        return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    });
-
-    const toggleDarkMode = () => {
-        setIsDarkMode((prev) => {
-            const nextValue = !prev;
-            localStorage.setItem('theme', nextValue ? 'dark' : 'light');
-            return nextValue;
-        });
-    };
 
     const checkSession = async () => {
         try {
@@ -82,9 +69,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await axios.post('index.php?action=logout');
         } finally {
-            Object.keys(localStorage).forEach((key) => {
-                if (key !== 'theme') localStorage.removeItem(key);
-            });
+            localStorage.clear();
             setUser(null);
             window.location.href = '/';
         }
@@ -96,15 +81,6 @@ export const AuthProvider = ({ children }) => {
         })();
     }, []);
 
-    useEffect(() => {
-        const root = window.document.documentElement;
-        if (isDarkMode) {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
-    }, [isDarkMode]);
-
     return (
         <AuthContext.Provider
             value={{
@@ -114,8 +90,6 @@ export const AuthProvider = ({ children }) => {
                 logout,
                 updatePassword,
                 loading,
-                isDarkMode,
-                toggleDarkMode,
                 checkSession
             }}
         >
