@@ -4,6 +4,9 @@ import { useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import 'animate.css';
 
+// Components
+import Navbar from './components/Navbar';
+
 // Pages
 import Home from './pages/Public/Home';
 import LoginPage from './pages/Public/LoginPage';
@@ -84,8 +87,11 @@ function App() {
     return (
         <ThemeProvider>
             <Router>
-                <ScrollToTop />
-                <AnimatedRoutes />
+                <Navbar />
+                <div className="pt-16">
+                    <ScrollToTop />
+                    <AnimatedRoutes />
+                </div>
             </Router>
         </ThemeProvider>
     );
