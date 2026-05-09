@@ -88,7 +88,7 @@ const Home = () => {
                 style={{
                     backgroundImage: `url(${HeroImg})`,
                     backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'cover',
+                    backgroundSize: '150% auto',
                     backgroundPosition: 'center',
                 }}
                 initial="hidden"
@@ -195,7 +195,7 @@ const Home = () => {
                             {/* Heading */}
                             <motion.h1
                                 variants={fadeUp}
-                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white drop-shadow-2xl"
+                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]"
                             >
                                 Fast, Transparent
                                 <br />
@@ -207,7 +207,7 @@ const Home = () => {
                             {/* Subtitle */}
                             <motion.p
                                 variants={fadeUp}
-                                className="text-sm md:text-base text-gray-100 leading-relaxed mb-6 max-w-xl drop-shadow-lg"
+                                className="text-sm md:text-base text-gray-100 leading-relaxed mb-6 max-w-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                             >
                                 Report issues instantly, track progress in real time, and keep
                                 university facilities running smoothly from one central place.
