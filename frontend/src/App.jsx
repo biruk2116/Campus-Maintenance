@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import 'animate.css';
 
 // Pages
@@ -81,10 +82,12 @@ function AnimatedRoutes() {
 
 function App() {
     return (
-        <Router>
-            <ScrollToTop />
-            <AnimatedRoutes />
-        </Router>
+        <ThemeProvider>
+            <Router>
+                <ScrollToTop />
+                <AnimatedRoutes />
+            </Router>
+        </ThemeProvider>
     );
 }
 
