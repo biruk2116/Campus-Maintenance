@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import DBULogo from '../assets/images/dbu-logo.png';
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 const sectionLinks = [
-    { to: '/home', label: 'Home' },
+    { to: '/', label: 'Home' },
     { to: '/about-us', label: 'About Us' },
     { to: '/services', label: 'Services' },
     { to: '/features', label: 'Features' },
@@ -21,9 +21,38 @@ const sectionLinks = [
 const Navbar = () => {
     const { user } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState('home');
+
+    const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            const navbarHeight = 65;
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({
+                top: elementPosition - navbarHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const handleNavClick = (link) => {
+        const sectionId = link.to === '/' ? 'home' : link.to.substring(1);
+        
+        if (location.pathname === link.to) {
+            // Already on the same route, just scroll to section
+            scrollToSection(sectionId);
+        } else {
+            // Navigate to the route first
+            navigate(link.to);
+            // Scroll after navigation
+            setTimeout(() => scrollToSection(sectionId), 100);
+        }
+        
+        setIsMobileMenuOpen(false);
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -33,12 +62,15 @@ const Navbar = () => {
             // Update active section based on scroll position
             const sections = ['home', 'about-us', 'services', 'features', 'contacts'];
             let currentSection = 'home';
+            const navbarHeight = 65;
 
             sections.forEach(section => {
                 const element = document.getElementById(section);
                 if (element) {
                     const rect = element.getBoundingClientRect();
-                    if (rect.top <= 100 && rect.bottom >= 100) {
+                    const elementTop = rect.top;
+                    
+                    if (elementTop <= navbarHeight + 100) {
                         currentSection = section;
                     }
                 }
@@ -55,7 +87,7 @@ const Navbar = () => {
         <>
             {/* DESKTOP & MOBILE NAVBAR */}
             <nav
-                className={`static w-full px-4 md:px-6 transition-all duration-500 relative overflow-hidden ${
+                className={`fixed top-0 left-0 right-0 z-50 w-full px-4 md:px-6 transition-all duration-500 relative overflow-hidden ${
                     isScrolled
                         ? 'py-2 bg-gradient-to-r from-white/95 via-blue-50/80 via-cyan-50/60 to-white/95 dark:from-slate-900/95 dark:via-blue-900/80 dark:via-cyan-900/60 dark:to-slate-900/95 backdrop-blur-xl shadow-2xl shadow-blue-500/10 dark:shadow-cyan-500/10 border-b border-blue-200/30 dark:border-cyan-700/30'
                         : 'py-4 bg-gradient-to-r from-white/90 via-blue-50/40 via-cyan-50/30 to-white/90 dark:from-slate-900/90 dark:via-blue-900/40 dark:via-cyan-900/30 dark:to-slate-900/90 backdrop-blur-md border-b border-transparent'
@@ -69,7 +101,7 @@ const Navbar = () => {
                 </div>
                 <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
                     {/* Logo */}
-                    <Link to="/home" className="flex items-center gap-3 group">
+                    <Link to="/" className="flex items-center gap-3 group">
                         <img
                             src={DBULogo}
                             alt="DBU Logo"
@@ -85,11 +117,11 @@ const Navbar = () => {
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex items-center gap-1">
                             {sectionLinks.map((link) => (
-                                <Link
+                                <button
                                     key={link.to}
-                                    to={link.to}
-                                    className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 relative overflow-hidden ${
-                                        activeSection === link.to.substring(1) || (link.to === '/home' && activeSection === 'home')
+                                    onClick={() => handleNavClick(link)}
+                                    className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 relative overflow-hidden cursor-pointer border-0 bg-transparent ${
+                                        activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home')
                                             ? 'text-blue-600 dark:text-blue-400 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/40 dark:to-cyan-900/40 border border-blue-200 dark:border-blue-800 shadow-md'
                                             : 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 dark:hover:from-slate-800/60 dark:hover:to-slate-700/60 hover:shadow-lg hover:scale-105'
                                     }`}
@@ -98,7 +130,7 @@ const Navbar = () => {
                                     {/* Dynamic hover glow effect */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-cyan-400/30 to-blue-400/20 opacity-0 hover:opacity-100 transition-all duration-500 rounded-lg animate-pulse" />
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700 rounded-lg" />
-                                </Link>
+                                </button>
                             ))}
                         </div>
 
@@ -136,12 +168,11 @@ const Navbar = () => {
                             </div>
                             
                             {sectionLinks.map((link) => (
-                                <Link
+                                <button
                                     key={link.to}
-                                    to={link.to}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-300 relative overflow-hidden ${
-                                        activeSection === link.to.substring(1) || (link.to === '/home' && activeSection === 'home')
+                                    onClick={() => handleNavClick(link)}
+                                    className={`w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-300 relative overflow-hidden cursor-pointer border-0 bg-transparent ${
+                                        activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home')
                                             ? 'text-blue-600 dark:text-blue-400 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/40 dark:to-cyan-900/40 border border-blue-200 dark:border-blue-800 shadow-md'
                                             : 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 dark:hover:from-slate-800/60 dark:hover:to-slate-700/60 hover:shadow-lg hover:scale-105'
                                     }`}
@@ -150,7 +181,7 @@ const Navbar = () => {
                                     {/* Dynamic hover glow effect */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-cyan-400/30 to-blue-400/20 opacity-0 hover:opacity-100 transition-all duration-500 rounded-lg animate-pulse" />
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700 rounded-lg" />
-                                </Link>
+                                </button>
                             ))}
                             {user ? (
                                 <Link to={`/${user.role.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg">
