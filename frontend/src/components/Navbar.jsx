@@ -3,8 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     GraduationCap,
-    Sun,
-    Moon,
     Menu,
     X,
     Activity,
@@ -20,7 +18,7 @@ const sectionLinks = [
 ];
 
 const Navbar = () => {
-    const { user, isDarkMode, toggleDarkMode } = useAuth();
+    const { user } = useAuth();
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -74,14 +72,6 @@ const Navbar = () => {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={toggleDarkMode}
-                                className={`p-2.5 rounded-lg transition-all duration-300 border border-transparent hover:border-primary/20 ${(isScrolled || location.pathname === '/') ? 'text-slate-300 hover:text-white hover:bg-white/10' : 'text-textSecondary hover:text-primary hover:bg-primary/10'}`}
-                                aria-label="Toggle dark mode"
-                            >
-                                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                            </button>
-                            
                             {user ? (
                                 <Link to={`/${user.role.toLowerCase()}`} className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all">
                                     <Activity size={16} /> Dashboard
