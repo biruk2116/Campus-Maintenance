@@ -88,7 +88,7 @@ const Home = () => {
                 style={{
                     backgroundImage: `url(${HeroImg})`,
                     backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'cover',
+                    backgroundSize: 'contain',
                     backgroundPosition: 'center',
                 }}
                 initial="hidden"
@@ -175,13 +175,13 @@ const Home = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
                         {/* ─── Left Content ─── */}
-                        <motion.div variants={fadeLeft} className="flex flex-col justify-center py-4 text-slate-900 dark:text-white">
+                        <motion.div variants={fadeLeft} className="flex flex-col justify-center py-4 text-white">
 
                             {/* Badge */}
                             <motion.div
                                 animate={{ y: [0, -4, 0] }}
                                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/25 text-slate-900 dark:text-white text-xs font-bold tracking-widest mb-5 w-fit backdrop-blur-md shadow-lg shadow-black/20 dark:shadow-black/40"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 border border-white/40 text-white text-xs font-bold tracking-widest mb-5 w-fit backdrop-blur-md shadow-lg"
                             >
                                 {/* Animated green dot */}
                                 <span className="relative flex h-2 w-2">
@@ -195,11 +195,11 @@ const Home = () => {
                             {/* Heading */}
                             <motion.h1
                                 variants={fadeUp}
-                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-slate-900 dark:text-white drop-shadow-lg"
+                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white drop-shadow-2xl"
                             >
                                 Fast, Transparent
                                 <br />
-                                <span className="bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-400 bg-clip-text text-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_auto]">
+                                <span className="bg-gradient-to-r from-cyan-200 via-blue-200 to-cyan-300 bg-clip-text text-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_auto] drop-shadow-lg">
                                     Campus Maintenance
                                 </span>
                             </motion.h1>
@@ -207,7 +207,7 @@ const Home = () => {
                             {/* Subtitle */}
                             <motion.p
                                 variants={fadeUp}
-                                className="text-sm md:text-base text-slate-700 dark:text-white/75 leading-relaxed mb-6 max-w-xl"
+                                className="text-sm md:text-base text-gray-100 leading-relaxed mb-6 max-w-xl drop-shadow-lg"
                             >
                                 Report issues instantly, track progress in real time, and keep
                                 university facilities running smoothly from one central place.
@@ -222,7 +222,7 @@ const Home = () => {
                                     whileHover={{ y: -3, scale: 1.03, boxShadow: '0 12px 32px rgba(6,182,212,0.45)' }}
                                     whileTap={{ scale: 0.97 }}
                                     onClick={() => navigate('/login')}
-                                    className="relative w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 bg-[length:200%_auto] text-white font-bold text-sm shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group"
+                                    className="relative w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_auto] text-white font-bold text-sm shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group"
                                 >
                                     {/* Shimmer layer */}
                                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -235,7 +235,7 @@ const Home = () => {
                                     whileHover={{ y: -3, scale: 1.03, backgroundColor: 'rgba(255,255,255,0.15)' }}
                                     whileTap={{ scale: 0.97 }}
                                     onClick={() => navigate('/login')}
-                                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-slate-900 dark:text-white font-bold text-sm hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
+                                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-sm hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
                                 >
                                     <Activity size={15} className="text-cyan-300" />
                                     Track Request
@@ -243,7 +243,7 @@ const Home = () => {
                             </motion.div>
 
                             {/* Stats */}
-                            <div className="flex gap-6 md:gap-8 pt-4 border-t border-white/10 dark:border-slate-600/30">
+                            <div className="flex gap-6 md:gap-8 pt-4 border-t border-white/20">
                                 {[
                                     { value: '2000+', label: 'Issues Resolved' },
                                     { value: '500+',  label: 'Active Users' },
@@ -256,10 +256,10 @@ const Home = () => {
                                         whileHover={{ scale: 1.08, y: -2 }}
                                         className="flex flex-col cursor-default"
                                     >
-                                        <span className="text-lg md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 leading-tight">
+                                        <span className="text-lg md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-blue-200 leading-tight drop-shadow-lg">
                                             {stat.value}
                                         </span>
-                                        <span className="text-[10px] md:text-xs text-slate-600 dark:text-white/60 mt-0.5 tracking-wide uppercase">
+                                        <span className="text-[10px] md:text-xs text-gray-200 mt-0.5 tracking-wide uppercase drop-shadow-md">
                                             {stat.label}
                                         </span>
                                     </motion.div>
@@ -293,51 +293,6 @@ const Home = () => {
             <Services />
             <Features />
             <Contacts />
-
-            {/* Theme Showcase Section */}
-            <motion.section
-                id="theme-showcase"
-                className="section-container bg-gradient-to-r from-background via-surface/50 to-background"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                variants={staggerContainer}
-            >
-                <div className="max-w-4xl mx-auto text-center">
-                    <motion.h2
-                        variants={fadeUp}
-                        className="text-2xl md:text-3xl font-extrabold text-textPrimary mb-4"
-                    >
-                        Experience Light & Dark Modes
-                    </motion.h2>
-                    <motion.p
-                        variants={fadeUp}
-                        className="text-textSecondary mb-6"
-                    >
-                        Toggle between light and dark themes using the switch in the navigation bar above.
-                        The entire application adapts seamlessly to your preference.
-                    </motion.p>
-                    <motion.div
-                        variants={fadeUp}
-                        className="flex justify-center"
-                    >
-                        <div className="glass-card p-6 max-w-md">
-                            <div className="flex items-center justify-center gap-4 mb-4">
-                                <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center">
-                                    <span className="text-xs">☀️</span>
-                                </div>
-                                <div className="text-textSecondary">/</div>
-                                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
-                                    <span className="text-xs">🌙</span>
-                                </div>
-                            </div>
-                            <p className="text-sm text-textSecondary">
-                                Choose your preferred theme for comfortable viewing in any lighting condition.
-                            </p>
-                        </div>
-                    </motion.div>
-                </div>
-            </motion.section>
         </PublicLayout>
     );
 };
