@@ -10,17 +10,15 @@ import {
     Activity,
     ClipboardList,
     History,
-    Moon,
     PlusCircle,
     Shield,
-    Sun,
     Target,
     Users,
     Wrench
 } from 'lucide-react';
 
 const Sidebar = () => {
-    const { user, isDarkMode, toggleDarkMode } = useAuth();
+    const { user } = useAuth();
     const [notificationCount, setNotificationCount] = React.useState(0);
 
     const fetchNotifications = React.useCallback(async () => {
@@ -107,16 +105,6 @@ const Sidebar = () => {
                 ))}
             </ul>
 
-            {/* Footer Section */}
-            <div className="mt-6 pt-6 border-t border-overlay/10 space-y-3">
-                <button
-                    onClick={toggleDarkMode}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-textSecondary hover:text-primary hover:bg-overlay/5 border border-transparent hover:border-primary/20 transition-all text-sm font-medium"
-                >
-                    {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                </button>
-            </div>
         </aside>
     );
 };
