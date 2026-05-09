@@ -1,5 +1,4 @@
 import React from 'react';
-import Navbar from '../Navbar';
 import PublicFooter from './PublicFooter';
 
 const PublicLayout = ({ children, mainClassName = '' }) => {
@@ -11,8 +10,6 @@ const PublicLayout = ({ children, mainClassName = '' }) => {
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-400/8 dark:bg-blue-500/15 rounded-full blur-3xl opacity-40 animate-pulse" style={{ animationDuration: '4s' }} />
                 <div className="absolute bottom-32 left-0 w-[800px] h-[500px] bg-cyan-400/6 dark:bg-cyan-500/12 rounded-full blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
             </div>
-
-            <Navbar />
 
             <main className={`relative z-10 w-full flex-1 ${mainClassName}`}>
                 {children}
