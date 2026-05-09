@@ -87,10 +87,10 @@ const Navbar = () => {
         <>
             {/* DESKTOP & MOBILE NAVBAR */}
             <nav
-                className={`fixed top-0 left-0 right-0 z-50 w-full px-4 md:px-6 transition-all duration-500 relative overflow-hidden ${
+                className={`fixed top-0 left-0 right-0 z-50 w-full h-16 px-4 md:px-6 py-3 transition-all duration-500 overflow-hidden ${
                     isScrolled
-                        ? 'py-2 bg-gradient-to-r from-white/95 via-blue-50/80 via-cyan-50/60 to-white/95 dark:from-slate-900/95 dark:via-blue-900/80 dark:via-cyan-900/60 dark:to-slate-900/95 backdrop-blur-xl shadow-2xl shadow-blue-500/10 dark:shadow-cyan-500/10 border-b border-blue-200/30 dark:border-cyan-700/30'
-                        : 'py-4 bg-gradient-to-r from-white/90 via-blue-50/40 via-cyan-50/30 to-white/90 dark:from-slate-900/90 dark:via-blue-900/40 dark:via-cyan-900/30 dark:to-slate-900/90 backdrop-blur-md border-b border-transparent'
+                        ? 'bg-gradient-to-r from-white/95 via-blue-50/80 via-cyan-50/60 to-white/95 dark:from-slate-900/95 dark:via-blue-900/80 dark:via-cyan-900/60 dark:to-slate-900/95 backdrop-blur-xl shadow-2xl shadow-blue-500/10 dark:shadow-cyan-500/10 border-b border-blue-200/30 dark:border-cyan-700/30'
+                        : 'bg-gradient-to-r from-white/90 via-blue-50/40 via-cyan-50/30 to-white/90 dark:from-slate-900/90 dark:via-blue-900/40 dark:via-cyan-900/30 dark:to-slate-900/90 backdrop-blur-md border-b border-transparent'
                 }`}
             >
                 {/* Animated background particles */}
