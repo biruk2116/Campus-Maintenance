@@ -467,35 +467,7 @@ const AdminOverview = () => {
                     </div>
                 </div>
 
-                <div className="xl:col-span-5">
-                    <div className="glass-card p-6 h-full flex flex-col">
-                        <div className="mb-6">
-                            <h4 className="text-lg font-extrabold text-textPrimary mb-1">Queue Status</h4>
-                            <p className="text-xs text-textSecondary font-medium m-0">Overall request status distribution</p>
-                        </div>
-                        <div className="flex-1 flex items-center justify-center min-h-[300px]">
-                            <Doughnut
-                                data={{
-                                    labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
-                                    datasets: [
-                                        {
-                                            data: statusCounts,
-                                            backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#6b7280', '#10b981'],
-                                            borderWidth: 0,
-                                            hoverOffset: 4
-                                        }
-                                    ]
-                                }}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } } },
-                                    cutout: '70%'
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </motion.div>
     );
