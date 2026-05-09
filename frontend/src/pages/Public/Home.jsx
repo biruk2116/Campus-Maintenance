@@ -88,7 +88,7 @@ const Home = () => {
                 style={{
                     backgroundImage: `url(${HeroImg})`,
                     backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'contain',
+                    backgroundSize: 'cover',
                     backgroundPosition: 'center',
                 }}
                 initial="hidden"
