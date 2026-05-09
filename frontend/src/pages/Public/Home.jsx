@@ -84,14 +84,14 @@ const Home = () => {
             {/* HERO SECTION */}
             <motion.section
                 id="home"
-                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden spiral-dot-pattern bg-gradient-to-br from-background via-background to-surface/30 dark:to-surface/20"
+                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden spiral-dot-pattern bg-gradient-to-br from-blue-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.1 }}
                 variants={staggerContainer}
             >
                 {/* ── Dark overlay ── */}
-                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-100 via-slate-200/80 to-slate-300/50 dark:from-black dark:via-black/85 dark:to-black/30" />
+                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-600/10 via-blue-500/5 to-cyan-400/10 dark:from-slate-900 dark:via-black/85 dark:to-slate-800" />
 
                 {/* ── Animated mesh blobs ── */}
                 <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -99,25 +99,25 @@ const Home = () => {
                     <motion.div
                         animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
                         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-                        className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl"
+                        className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-blue-600/20 dark:bg-blue-500/30 blur-3xl"
                     />
                     {/* Bottom-right blob */}
                     <motion.div
                         animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
                         transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-                        className="absolute -bottom-20 -right-10 w-[28rem] h-[28rem] rounded-full bg-cyan-500/15 blur-3xl"
+                        className="absolute -bottom-20 -right-10 w-[28rem] h-[28rem] rounded-full bg-cyan-500/15 dark:bg-cyan-400/25 blur-3xl"
                     />
                     {/* Center accent blob */}
                     <motion.div
                         animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.35, 0.15] }}
                         transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-indigo-500/20 dark:bg-indigo-400/30 blur-3xl"
                     />
                     {/* Top-right small accent */}
                     <motion.div
                         animate={{ y: [-10, 10, -10], opacity: [0.2, 0.5, 0.2] }}
                         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-                        className="absolute top-10 right-1/4 w-40 h-40 rounded-full bg-sky-400/15 blur-2xl"
+                        className="absolute top-10 right-1/4 w-40 h-40 rounded-full bg-sky-400/15 dark:bg-sky-300/25 blur-2xl"
                     />
                 </div>
 
@@ -137,7 +137,7 @@ const Home = () => {
                                 delay: i * 0.6,
                                 ease: 'easeInOut',
                             }}
-                            className="absolute w-1.5 h-1.5 rounded-full bg-cyan-400/60"
+                            className="absolute w-1.5 h-1.5 rounded-full bg-cyan-400/60 dark:bg-cyan-300/80"
                             style={{
                                 left: `${8 + (i * 7.5)}%`,
                                 bottom: `${10 + (i % 5) * 12}%`,
@@ -150,14 +150,14 @@ const Home = () => {
                 <motion.div
                     animate={{ y: ['-100%', '100vh'] }}
                     transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 1 }}
-                    className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent -z-10 pointer-events-none"
+                    className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 dark:via-cyan-300/60 to-transparent -z-10 pointer-events-none"
                 />
 
                 {/* ── Grid overlay ── */}
                 <div
-                    className="absolute inset-0 -z-10 opacity-[0.04] pointer-events-none"
+                    className="absolute inset-0 -z-10 opacity-[0.08] dark:opacity-[0.04] pointer-events-none"
                     style={{
-                        backgroundImage: 'linear-gradient(rgba(99,179,237,1) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,1) 1px, transparent 1px)',
+                        backgroundImage: 'linear-gradient(rgba(59,130,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,1) 1px, transparent 1px)',
                         backgroundSize: '48px 48px',
                         maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%)',
                         WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%)',
