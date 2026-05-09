@@ -126,7 +126,12 @@
 
   /* Modern section backgrounds */
   .section-container {
-    @apply relative w-full py-10 md:py-14 px-4 md:px-6;
+    @apply relative w-full py-8 md:py-10 px-4 md:px-6;
+    scroll-margin-top: 90px;
+  }
+
+  #home {
+    scroll-margin-top: 90px;
   }
 
   .section-glow-bg {
