@@ -84,14 +84,14 @@ const Home = () => {
             {/* HERO SECTION */}
             <motion.section
                 id="home"
-                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden spiral-dot-pattern"
+                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden spiral-dot-pattern bg-gradient-to-br from-background via-background to-surface/30 dark:to-surface/20"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.1 }}
                 variants={staggerContainer}
             >
                 {/* ── Dark overlay ── */}
-                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/85 to-black/30" />
+                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-100 via-slate-200/80 to-slate-300/50 dark:from-black dark:via-black/85 dark:to-black/30" />
 
                 {/* ── Animated mesh blobs ── */}
                 <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -169,13 +169,13 @@ const Home = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
                         {/* ─── Left Content ─── */}
-                        <motion.div variants={fadeLeft} className="flex flex-col justify-center py-4 text-white">
+                        <motion.div variants={fadeLeft} className="flex flex-col justify-center py-4 text-slate-900 dark:text-white">
 
                             {/* Badge */}
                             <motion.div
                                 animate={{ y: [0, -4, 0] }}
                                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/25 text-white text-xs font-bold tracking-widest mb-5 w-fit backdrop-blur-md shadow-lg shadow-black/20"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/25 text-slate-900 dark:text-white text-xs font-bold tracking-widest mb-5 w-fit backdrop-blur-md shadow-lg shadow-black/20 dark:shadow-black/40"
                             >
                                 {/* Animated green dot */}
                                 <span className="relative flex h-2 w-2">
@@ -189,7 +189,7 @@ const Home = () => {
                             {/* Heading */}
                             <motion.h1
                                 variants={fadeUp}
-                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white drop-shadow-lg"
+                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-slate-900 dark:text-white drop-shadow-lg"
                             >
                                 Fast, Transparent
                                 <br />
@@ -201,7 +201,7 @@ const Home = () => {
                             {/* Subtitle */}
                             <motion.p
                                 variants={fadeUp}
-                                className="text-sm md:text-base text-white/75 leading-relaxed mb-6 max-w-xl"
+                                className="text-sm md:text-base text-slate-700 dark:text-white/75 leading-relaxed mb-6 max-w-xl"
                             >
                                 Report issues instantly, track progress in real time, and keep
                                 university facilities running smoothly from one central place.
@@ -229,7 +229,7 @@ const Home = () => {
                                     whileHover={{ y: -3, scale: 1.03, backgroundColor: 'rgba(255,255,255,0.15)' }}
                                     whileTap={{ scale: 0.97 }}
                                     onClick={() => navigate('/login')}
-                                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-sm hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
+                                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-slate-900 dark:text-white font-bold text-sm hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
                                 >
                                     <Activity size={15} className="text-cyan-300" />
                                     Track Request
@@ -237,7 +237,7 @@ const Home = () => {
                             </motion.div>
 
                             {/* Stats */}
-                            <div className="flex gap-6 md:gap-8 pt-4 border-t border-white/10">
+                            <div className="flex gap-6 md:gap-8 pt-4 border-t border-white/10 dark:border-slate-600/30">
                                 {[
                                     { value: '2000+', label: 'Issues Resolved' },
                                     { value: '500+',  label: 'Active Users' },
@@ -253,7 +253,7 @@ const Home = () => {
                                         <span className="text-lg md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 leading-tight">
                                             {stat.value}
                                         </span>
-                                        <span className="text-[10px] md:text-xs text-white/60 mt-0.5 tracking-wide uppercase">
+                                        <span className="text-[10px] md:text-xs text-slate-600 dark:text-white/60 mt-0.5 tracking-wide uppercase">
                                             {stat.label}
                                         </span>
                                     </motion.div>
@@ -291,7 +291,7 @@ const Home = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: [0, -5, 0] }}
                                     transition={{ delay: 0.8, duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                                    className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl"
+                                    className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl bg-black/60 dark:bg-slate-800/80 backdrop-blur-md border border-white/15 shadow-xl"
                                 >
                                     <span className="relative flex h-2 w-2">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
@@ -305,7 +305,7 @@ const Home = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: [0, -4, 0] }}
                                     transition={{ delay: 1.2, duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                                    className="absolute bottom-4 right-4 z-20 px-4 py-2.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl"
+                                    className="absolute bottom-4 right-4 z-20 px-4 py-2.5 rounded-xl bg-black/60 dark:bg-slate-800/80 backdrop-blur-md border border-white/15 shadow-xl"
                                 >
                                     <div className="text-cyan-300 text-base font-extrabold leading-tight">12 Fixed</div>
                                     <div className="text-white/60 text-[10px] uppercase tracking-wide">Today</div>
@@ -316,7 +316,7 @@ const Home = () => {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: [0, 4, 0] }}
                                     transition={{ delay: 1.6, duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                                    className="absolute bottom-4 left-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl"
+                                    className="absolute bottom-4 left-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl bg-black/60 dark:bg-slate-800/80 backdrop-blur-md border border-white/15 shadow-xl"
                                 >
                                     <Activity size={13} className="text-cyan-300" />
                                     <span className="text-white text-xs font-semibold">4 Active Reports</span>
@@ -337,8 +337,8 @@ const Home = () => {
                     className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 cursor-pointer"
                     onClick={() => scrollToSection('about-us')}
                 >
-                    <span className="text-white/40 text-[10px] uppercase tracking-widest">Scroll</span>
-                    <div className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center pt-1.5">
+                    <span className="text-slate-600 dark:text-white/40 text-[10px] uppercase tracking-widest">Scroll</span>
+                    <div className="w-5 h-8 rounded-full border border-slate-400 dark:border-white/20 flex items-start justify-center pt-1.5">
                         <motion.div
                             animate={{ y: [0, 10, 0], opacity: [1, 0, 1] }}
                             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -353,6 +353,51 @@ const Home = () => {
             <Services />
             <Features />
             <Contacts />
+
+            {/* Theme Showcase Section */}
+            <motion.section
+                id="theme-showcase"
+                className="section-container bg-gradient-to-r from-background via-surface/50 to-background"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={staggerContainer}
+            >
+                <div className="max-w-4xl mx-auto text-center">
+                    <motion.h2
+                        variants={fadeUp}
+                        className="text-2xl md:text-3xl font-extrabold text-textPrimary mb-4"
+                    >
+                        Experience Light & Dark Modes
+                    </motion.h2>
+                    <motion.p
+                        variants={fadeUp}
+                        className="text-textSecondary mb-6"
+                    >
+                        Toggle between light and dark themes using the switch in the navigation bar above.
+                        The entire application adapts seamlessly to your preference.
+                    </motion.p>
+                    <motion.div
+                        variants={fadeUp}
+                        className="flex justify-center"
+                    >
+                        <div className="glass-card p-6 max-w-md">
+                            <div className="flex items-center justify-center gap-4 mb-4">
+                                <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center">
+                                    <span className="text-xs">☀️</span>
+                                </div>
+                                <div className="text-textSecondary">/</div>
+                                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
+                                    <span className="text-xs">🌙</span>
+                                </div>
+                            </div>
+                            <p className="text-sm text-textSecondary">
+                                Choose your preferred theme for comfortable viewing in any lighting condition.
+                            </p>
+                        </div>
+                    </motion.div>
+                </div>
+            </motion.section>
         </PublicLayout>
     );
 };
