@@ -15,7 +15,7 @@ import Features from './Features';
 import Contacts from './Contacts';
 import HeroImg from '../../assets/images/maint_hero.png';
 
-const NAVBAR_OFFSET = 65;
+const NAVBAR_OFFSET = 0;
 
 const routeToSection = {
     '/': 'home',
@@ -88,7 +88,7 @@ const Home = () => {
                 style={{
                     backgroundImage: `url(${HeroImg})`,
                     backgroundRepeat: 'no-repeat',
-                    backgroundSize: '150% auto',
+                    backgroundSize: '200% auto',
                     backgroundPosition: 'center',
                 }}
                 initial="hidden"
