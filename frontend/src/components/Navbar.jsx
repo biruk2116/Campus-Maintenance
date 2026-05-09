@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from './ThemeToggle';
 import {
     GraduationCap,
     Menu,
@@ -72,6 +73,8 @@ const Navbar = () => {
                         </div>
 
                         <div className="flex items-center gap-3">
+                            <ThemeToggle />
+                            
                             {user ? (
                                 <Link to={`/${user.role.toLowerCase()}`} className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all">
                                     <Activity size={16} /> Dashboard
@@ -98,6 +101,10 @@ const Navbar = () => {
                 {isMobileMenuOpen && (
                     <div className="md:hidden absolute top-full left-0 right-0 bg-blue-800 dark:bg-blue-900 border-b border-blue-700 dark:border-blue-800 mt-2 mx-4 rounded-xl shadow-xl">
                         <div className="flex flex-col gap-2 p-4">
+                            <div className="flex justify-center mb-2">
+                                <ThemeToggle />
+                            </div>
+                            
                             {sectionLinks.map((link) => (
                                 <Link
                                     key={link.to}
