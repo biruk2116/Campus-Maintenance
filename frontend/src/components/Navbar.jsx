@@ -7,15 +7,17 @@ import {
     Menu,
     X,
     Activity,
-    LogIn
+    LogIn,
+    Sparkles,
+    Zap
 } from 'lucide-react';
 
 const sectionLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/about-us', label: 'About Us' },
-    { to: '/services', label: 'Services' },
-    { to: '/features', label: 'Features' },
-    { to: '/contacts', label: 'Contacts' }
+    { to: '/', label: 'Home', icon: '✨' },
+    { to: '/about-us', label: 'About Us', icon: '🌟' },
+    { to: '/services', label: 'Services', icon: '⚡' },
+    { to: '/features', label: 'Features', icon: '💫' },
+    { to: '/contacts', label: 'Contacts', icon: '📞' }
 ];
 
 const Navbar = () => {
@@ -25,466 +27,297 @@ const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState('home');
-    const [hoveredLink, setHoveredLink] = useState(null);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [hoveredItem, setHoveredItem] = useState(null);
 
     const scrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
             const navbarHeight = 65;
             const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-            window.scrollTo({ top: elementPosition - navbarHeight, behavior: 'smooth' });
+            window.scrollTo({
+                top: elementPosition - navbarHeight,
+                behavior: 'smooth'
+            });
         }
     };
 
     const handleNavClick = (link) => {
         const sectionId = link.to === '/' ? 'home' : link.to.substring(1);
+        
         if (location.pathname === link.to) {
             scrollToSection(sectionId);
         } else {
             navigate(link.to);
             setTimeout(() => scrollToSection(sectionId), 100);
         }
+        
         setIsMobileMenuOpen(false);
     };
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
+            const scrollY = window.scrollY;
+            setIsScrolled(scrollY > 20);
+
             const sections = ['home', 'about-us', 'services', 'features', 'contacts'];
             let currentSection = 'home';
             const navbarHeight = 65;
+
             sections.forEach(section => {
                 const element = document.getElementById(section);
                 if (element) {
                     const rect = element.getBoundingClientRect();
-                    if (rect.top <= navbarHeight + 100) currentSection = section;
+                    const elementTop = rect.top;
+                    
+                    if (elementTop <= navbarHeight + 100) {
+                        currentSection = section;
+                    }
                 }
             });
+
             setActiveSection(currentSection);
         };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
-    const isLinkActive = (link) =>
-        activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home');
+        const handleMouseMove = (e) => {
+            setMousePosition({ x: e.clientX, y: e.clientY });
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
 
     return (
         <>
-            {/* ── Keyframes injected once ── */}
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
-
-                @keyframes navScanLine {
-                    0%   { transform: translateX(-100%); }
-                    100% { transform: translateX(400%);  }
-                }
-                @keyframes navOrb1 {
-                    0%,100% { transform: translate(0,0)   scale(1);    opacity: 0.35; }
-                    33%     { transform: translate(12px,-8px) scale(1.15); opacity: 0.55; }
-                    66%     { transform: translate(-8px,6px)  scale(0.9);  opacity: 0.4;  }
-                }
-                @keyframes navOrb2 {
-                    0%,100% { transform: translate(0,0)    scale(1);    opacity: 0.3;  }
-                    40%     { transform: translate(-14px,8px) scale(1.2);  opacity: 0.5;  }
-                    70%     { transform: translate(10px,-6px) scale(0.85); opacity: 0.35; }
-                }
-                @keyframes navOrb3 {
-                    0%,100% { transform: translate(0,0)   scale(1);    opacity: 0.25; }
-                    50%     { transform: translate(8px,10px) scale(1.3);  opacity: 0.5;  }
-                }
-                @keyframes navShimmer {
-                    0%   { background-position: -200% center; }
-                    100% { background-position:  200% center; }
-                }
-                @keyframes navPulseRing {
-                    0%   { transform: scale(1);   opacity: 0.7; }
-                    100% { transform: scale(2.2); opacity: 0;   }
-                }
-                @keyframes navActiveDot {
-                    0%,100% { opacity: 1; transform: scaleX(1); }
-                    50%     { opacity: 0.6; transform: scaleX(0.6); }
-                }
-                @keyframes mobileSlideIn {
-                    from { opacity: 0; transform: translateY(-12px) scale(0.97); }
-                    to   { opacity: 1; transform: translateY(0)      scale(1);    }
-                }
-                @keyframes navBorderFlow {
-                    0%   { background-position: 0% 50%;   }
-                    50%  { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%;   }
-                }
-
-                .nav-link-btn {
-                    font-family: 'Sora', sans-serif;
-                    position: relative;
-                    overflow: hidden;
-                    cursor: pointer;
-                    border: none;
-                    background: transparent;
-                    padding: 0.45rem 1rem;
-                    border-radius: 0.6rem;
-                    font-size: 0.82rem;
-                    font-weight: 600;
-                    letter-spacing: 0.03em;
-                    transition: color 0.25s, transform 0.2s;
-                }
-                .nav-link-btn:hover { transform: translateY(-1px); }
-                .nav-link-btn:active { transform: translateY(0) scale(0.97); }
-
-                /* Shimmer sweep on hover */
-                .nav-link-btn .sweep {
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%);
-                    transform: translateX(-100%);
-                    transition: none;
-                    pointer-events: none;
-                }
-                .nav-link-btn:hover .sweep {
-                    animation: navScanLine 0.55s ease forwards;
-                }
-
-                /* Glow ring on active */
-                .nav-link-btn .glow-ring {
-                    position: absolute;
-                    inset: -1px;
-                    border-radius: 0.65rem;
-                    opacity: 0;
-                    pointer-events: none;
-                    transition: opacity 0.3s;
-                    background: linear-gradient(135deg, #3B82F6, #06B6D4, #3B82F6);
-                    background-size: 200% 200%;
-                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    padding: 1.5px;
-                }
-                .nav-link-btn.is-active .glow-ring,
-                .nav-link-btn:hover .glow-ring {
-                    opacity: 1;
-                    animation: navBorderFlow 2.5s linear infinite;
-                }
-
-                /* Active indicator dot */
-                .nav-link-btn .active-dot {
-                    position: absolute;
-                    bottom: 3px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 14px;
-                    height: 2.5px;
-                    border-radius: 2px;
-                    background: linear-gradient(90deg, #38BDF8, #6366F1);
-                    opacity: 0;
-                    transition: opacity 0.3s, width 0.3s;
-                }
-                .nav-link-btn.is-active .active-dot {
-                    opacity: 1;
-                    animation: navActiveDot 2s ease-in-out infinite;
-                }
-
-                /* CTA button */
-                .nav-cta-btn {
-                    font-family: 'Sora', sans-serif;
-                    position: relative;
-                    overflow: hidden;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.4rem;
-                    padding: 0.55rem 1.25rem;
-                    font-size: 0.82rem;
-                    font-weight: 700;
-                    letter-spacing: 0.04em;
-                    border-radius: 0.6rem;
-                    color: #fff;
-                    background: linear-gradient(135deg, #2563EB 0%, #0891B2 50%, #6366F1 100%);
-                    background-size: 200% 200%;
-                    border: none;
-                    cursor: pointer;
-                    transition: transform 0.2s, box-shadow 0.3s;
-                    animation: navBorderFlow 4s ease infinite;
-                    box-shadow: 0 4px 18px rgba(6,182,212,0.3), 0 0 0 0 rgba(6,182,212,0);
-                }
-                .nav-cta-btn:hover {
-                    transform: translateY(-2px) scale(1.04);
-                    box-shadow: 0 8px 28px rgba(6,182,212,0.5), 0 0 20px rgba(99,102,241,0.3);
-                }
-                .nav-cta-btn:active { transform: scale(0.97); }
-                .nav-cta-btn .cta-sweep {
-                    position: absolute; inset: 0;
-                    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
-                    transform: translateX(-100%);
-                    pointer-events: none;
-                }
-                .nav-cta-btn:hover .cta-sweep {
-                    animation: navScanLine 0.6s ease forwards;
-                }
-
-                /* Logo */
-                .nav-logo-text {
-                    font-family: 'Sora', sans-serif;
-                    font-weight: 800;
-                    font-size: 1.1rem;
-                    letter-spacing: -0.01em;
-                    background: linear-gradient(135deg, #1E40AF, #0891B2, #6366F1);
-                    background-size: 200% auto;
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    animation: navShimmer 4s linear infinite;
-                }
-                .dark .nav-logo-text {
-                    background-image: linear-gradient(135deg, #60A5FA, #22D3EE, #A5B4FC);
-                }
-                .nav-logo-sub {
-                    font-family: 'Plus Jakarta Sans', sans-serif;
-                    font-size: 0.58rem;
-                    font-weight: 600;
-                    letter-spacing: 0.22em;
-                    text-transform: uppercase;
-                }
-
-                /* Mobile menu */
-                .mobile-menu {
-                    animation: mobileSlideIn 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards;
-                }
-                .mobile-nav-btn {
-                    font-family: 'Sora', sans-serif;
-                    font-size: 0.88rem;
-                    font-weight: 600;
-                    letter-spacing: 0.03em;
-                }
-            `}</style>
-
             <nav
-                className={`fixed top-0 left-0 right-0 z-50 w-full h-16 px-4 md:px-6 py-3 transition-all duration-500 overflow-visible ${
+                className={`fixed top-0 left-0 right-0 z-50 w-full h-16 px-4 md:px-6 py-3 transition-all duration-700 overflow-hidden ${
                     isScrolled
-                        ? 'dark:bg-[#050e1f]/95 bg-white/95 backdrop-blur-2xl shadow-[0_4px_40px_rgba(6,182,212,0.12),0_1px_0_rgba(59,130,246,0.15)] border-b border-cyan-500/10 dark:border-cyan-500/15'
-                        : 'dark:bg-[#050e1f]/80 bg-white/85 backdrop-blur-lg border-b border-transparent'
+                        ? 'bg-gradient-to-r from-indigo-950/95 via-purple-950/90 via-pink-950/80 to-rose-950/95 dark:from-slate-950/95 dark:via-purple-950/90 dark:via-pink-950/80 dark:to-rose-950/95 backdrop-blur-2xl shadow-[0_0_50px_rgba(139,92,246,0.3)] border-b border-purple-500/30'
+                        : 'bg-gradient-to-r from-indigo-950/80 via-purple-950/70 via-pink-950/60 to-rose-950/80 dark:from-slate-950/80 dark:via-purple-950/70 dark:via-pink-950/60 dark:to-rose-950/80 backdrop-blur-xl border-b border-purple-500/20'
                 }`}
             >
-                {/* ── Ambient orbs ── */}
+                {/* Animated Aurora Background */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    {/* Left orb */}
-                    <div
-                        className="absolute top-1/2 -translate-y-1/2 left-[15%] w-32 h-8 rounded-full bg-blue-500/20 dark:bg-blue-400/25 blur-2xl"
-                        style={{ animation: 'navOrb1 7s ease-in-out infinite' }}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-rose-600/10 animate-pulse" />
+                    <div className="absolute top-0 -left-1/2 w-full h-full bg-gradient-to-r from-transparent via-purple-500/5 to-transparent rotate-12 animate-[slide_8s_linear_infinite]" />
+                    <div className="absolute bottom-0 -right-1/2 w-full h-full bg-gradient-to-l from-transparent via-pink-500/5 to-transparent -rotate-12 animate-[slide_10s_linear_infinite_reverse]" />
+                    
+                    {/* Floating Orbs */}
+                    <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl animate-float" />
+                    <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl animate-float-delayed" />
+                    <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl animate-pulse-slow" />
+                    
+                    {/* Sparkle Particles */}
+                    {[...Array(20)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute w-0.5 h-0.5 bg-purple-400/60 rounded-full animate-twinkle"
+                            style={{
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                animationDelay: `${Math.random() * 5}s`,
+                                animationDuration: `${2 + Math.random() * 3}s`
+                            }}
+                        />
+                    ))}
+                    
+                    {/* Mouse Follow Glow */}
+                    <div 
+                        className="absolute w-96 h-96 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-rose-500/20 rounded-full blur-3xl pointer-events-none transition-all duration-300"
+                        style={{
+                            left: mousePosition.x - 192,
+                            top: mousePosition.y - 192,
+                        }}
                     />
-                    {/* Center orb */}
-                    <div
-                        className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-48 h-6 rounded-full bg-cyan-400/15 dark:bg-cyan-400/20 blur-2xl"
-                        style={{ animation: 'navOrb2 9s ease-in-out infinite' }}
-                    />
-                    {/* Right orb */}
-                    <div
-                        className="absolute top-1/2 -translate-y-1/2 right-[15%] w-28 h-8 rounded-full bg-indigo-500/15 dark:bg-indigo-400/20 blur-2xl"
-                        style={{ animation: 'navOrb3 11s ease-in-out infinite' }}
-                    />
-
-                    {/* Scan line across full width */}
-                    <div
-                        className="absolute top-0 left-0 h-full w-[120px] bg-gradient-to-r from-transparent via-cyan-400/8 to-transparent"
-                        style={{ animation: 'navScanLine 8s linear infinite' }}
-                    />
-
-                    {/* Bottom edge glow line */}
-                    <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'}`} />
                 </div>
 
                 <div className="w-full max-w-7xl mx-auto flex items-center justify-between relative z-10">
-
-                    {/* ── Logo ── */}
-                    <Link to="/" className="flex items-center gap-3 group">
-                        {/* Logo glow ring */}
+                    {/* Logo with Magical Effects */}
+                    <Link to="/" className="flex items-center gap-3 group relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <div className="relative">
-                            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                            <div className="absolute -inset-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="w-full h-full rounded-full"
-                                     style={{
-                                         background: 'conic-gradient(from 0deg, #3B82F6, #06B6D4, #6366F1, #3B82F6)',
-                                         animation: 'navBorderFlow 2s linear infinite',
-                                         padding: '1.5px',
-                                         borderRadius: '50%',
-                                     }}
-                                />
-                            </div>
                             <img
                                 src={DBULogo}
                                 alt="DBU Logo"
-                                className="relative w-10 h-10 object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+                                className="w-10 h-10 object-contain group-hover:scale-110 group-hover:rotate-3 transition-all duration-500"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="nav-logo-text group-hover:brightness-110 transition-all">DBU</span>
-                            <span className="nav-logo-sub text-slate-500 dark:text-slate-400 group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors duration-300">
+                        <div>
+                            <span className="font-extrabold text-lg tracking-tight block leading-none bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
+                                DBU
+                            </span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-purple-300/80 group-hover:text-pink-300 transition-colors duration-300">
                                 Maintenance
                             </span>
                         </div>
+                        <Sparkles className="absolute -top-2 -right-4 w-4 h-4 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-sparkle" />
                     </Link>
-
-                    <div className="flex items-center gap-5">
-
-                        {/* ── Desktop Nav Links ── */}
-                        <div className="hidden md:flex items-center gap-0.5">
-                            {sectionLinks.map((link) => {
-                                const active = isLinkActive(link);
-                                return (
-                                    <button
-                                        key={link.to}
-                                        onClick={() => handleNavClick(link)}
-                                        onMouseEnter={() => setHoveredLink(link.to)}
-                                        onMouseLeave={() => setHoveredLink(null)}
-                                        className={`nav-link-btn ${active ? 'is-active' : ''} ${
-                                            active
-                                                ? 'text-blue-600 dark:text-cyan-300 bg-gradient-to-r from-blue-50/80 to-cyan-50/60 dark:from-blue-900/35 dark:to-cyan-900/25'
-                                                : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300'
-                                        }`}
-                                        style={{
-                                            boxShadow: active
-                                                ? '0 2px 16px rgba(6,182,212,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
-                                                : hoveredLink === link.to
-                                                    ? '0 4px 20px rgba(6,182,212,0.15)'
-                                                    : 'none',
-                                            background: active
-                                                ? undefined
-                                                : hoveredLink === link.to
-                                                    ? 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(6,182,212,0.06))'
-                                                    : undefined,
-                                        }}
-                                    >
-                                        {/* Animated border ring */}
-                                        <span className="glow-ring" />
-                                        {/* Hover sweep */}
-                                        <span className="sweep" />
-                                        {/* Label */}
-                                        <span className="relative z-10">{link.label}</span>
-                                        {/* Active underline dot */}
-                                        <span className="active-dot" />
-                                    </button>
-                                );
-                            })}
+                    
+                    <div className="flex items-center gap-6">
+                        {/* Desktop Navigation with Magical Effects */}
+                        <div className="hidden md:flex items-center gap-1">
+                            {sectionLinks.map((link, index) => (
+                                <button
+                                    key={link.to}
+                                    onClick={() => handleNavClick(link)}
+                                    onMouseEnter={() => setHoveredItem(link.to)}
+                                    onMouseLeave={() => setHoveredItem(null)}
+                                    className={`relative px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-500 cursor-pointer border-0 bg-transparent overflow-hidden group ${
+                                        activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home')
+                                            ? 'text-white'
+                                            : 'text-purple-200/80 hover:text-white'
+                                    }`}
+                                >
+                                    {/* Animated Gradient Background */}
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 transition-all duration-500 ${
+                                        activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home')
+                                            ? 'opacity-100'
+                                            : 'opacity-0 group-hover:opacity-100'
+                                    }`} />
+                                    
+                                    {/* Shimmer Effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                                    
+                                    {/* Border Glow */}
+                                    <div className={`absolute inset-0 rounded-xl transition-opacity duration-500 ${
+                                        activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home')
+                                            ? 'opacity-100'
+                                            : 'opacity-0 group-hover:opacity-100'
+                                    }`}
+                                    style={{
+                                        boxShadow: '0 0 20px rgba(139, 92, 246, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.3)'
+                                    }} />
+                                    
+                                    {/* Icon Pop Animation */}
+                                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-base transition-all duration-300 group-hover:scale-125 group-hover:rotate-12">
+                                        {link.icon}
+                                    </span>
+                                    
+                                    <span className="relative z-10 ml-5 transition-all duration-300 group-hover:tracking-wider">
+                                        {link.label}
+                                    </span>
+                                    
+                                    {/* Ripple Effect on Hover */}
+                                    {hoveredItem === link.to && (
+                                        <span className="absolute inset-0 rounded-xl animate-ripple" />
+                                    )}
+                                </button>
+                            ))}
                         </div>
 
-                        {/* ── Right actions ── */}
-                        <div className="flex items-center gap-2.5">
-                            <ThemeToggle />
-
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <ThemeToggle />
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                            
                             {user ? (
-                                <Link
-                                    to={`/${user.role.toLowerCase()}`}
-                                    className="nav-cta-btn hidden md:inline-flex"
+                                <Link 
+                                    to={`/${user.role.toLowerCase()}`} 
+                                    className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:scale-105 group relative overflow-hidden"
                                 >
-                                    <span className="cta-sweep" />
-                                    <Activity size={15} className="relative z-10 shrink-0" />
-                                    <span className="relative z-10">Dashboard</span>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                        style={{ boxShadow: '0 0 30px rgba(139, 92, 246, 0.8)' }} />
+                                    <Zap size={16} className="group-hover:rotate-12 transition-transform duration-300" />
+                                    <span>Dashboard</span>
                                 </Link>
                             ) : (
                                 location.pathname !== '/login' && (
-                                    <Link
-                                        to="/login"
-                                        className="nav-cta-btn hidden md:inline-flex"
+                                    <Link 
+                                        to="/login" 
+                                        className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:scale-105 group relative overflow-hidden"
                                     >
-                                        <span className="cta-sweep" />
-                                        <LogIn size={15} className="relative z-10 shrink-0" />
-                                        <span className="relative z-10">Login</span>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                        <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                            style={{ boxShadow: '0 0 30px rgba(139, 92, 246, 0.8)' }} />
+                                        <LogIn size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+                                        <span>Login</span>
                                     </Link>
                                 )
                             )}
 
-                            {/* Hamburger */}
-                            <button
-                                className={`md:hidden relative p-2.5 rounded-lg transition-all duration-300 border overflow-hidden group
-                                    ${isMobileMenuOpen
-                                        ? 'border-cyan-500/50 bg-cyan-500/10 text-cyan-400 shadow-[0_0_16px_rgba(6,182,212,0.3)]'
-                                        : 'border-slate-300/60 dark:border-slate-600/60 text-slate-600 dark:text-slate-300 hover:border-cyan-400/60 hover:text-cyan-500 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/20 hover:shadow-[0_0_12px_rgba(6,182,212,0.2)]'
-                                    }`}
+                            <button 
+                                className="md:hidden p-2.5 rounded-xl transition-all duration-500 border border-purple-500/30 text-purple-300 hover:text-white hover:border-purple-400 hover:bg-purple-600/20 relative overflow-hidden group"
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             >
-                                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-                                {isMobileMenuOpen ? <X size={22} className="relative z-10" /> : <Menu size={22} className="relative z-10" />}
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                {isMobileMenuOpen ? <X size={24} className="relative z-10" /> : <Menu size={24} className="relative z-10" />}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* ── Mobile Menu ── */}
+                {/* Mobile Menu with Enhanced Effects */}
                 {isMobileMenuOpen && (
-                    <div className="mobile-menu md:hidden absolute top-full left-3 right-3 mt-2 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(6,182,212,0.18),0_4px_20px_rgba(0,0,0,0.2)] border border-cyan-500/15 dark:border-cyan-500/20 z-50">
-                        {/* Glass background */}
-                        <div className="absolute inset-0 bg-white/95 dark:bg-[#060f22]/97 backdrop-blur-2xl" />
-
-                        {/* Top glow edge */}
-                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-                        {/* Bottom glow edge */}
-                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
-
-                        {/* Ambient blobs inside mobile menu */}
-                        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-cyan-400/8 dark:bg-cyan-400/12 blur-2xl pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-28 h-28 rounded-full bg-blue-500/8 dark:bg-blue-500/12 blur-2xl pointer-events-none" />
-
-                        <div className="relative z-10 flex flex-col gap-1.5 p-4">
-                            <div className="flex justify-center mb-1 pb-3 border-b border-slate-200/60 dark:border-slate-700/40">
-                                <ThemeToggle />
+                    <div className="md:hidden absolute top-full left-0 right-0 animate-slideDown">
+                        <div className="bg-gradient-to-b from-indigo-950/95 via-purple-950/90 to-rose-950/95 backdrop-blur-2xl border-t border-purple-500/30 mt-2 mx-4 rounded-2xl shadow-2xl shadow-purple-500/30 overflow-hidden">
+                            {/* Animated Background for Mobile Menu */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-pink-600/10 to-rose-600/10" />
+                                {[...Array(10)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="absolute w-1 h-1 bg-purple-400/40 rounded-full animate-float"
+                                        style={{
+                                            left: `${Math.random() * 100}%`,
+                                            top: `${Math.random() * 100}%`,
+                                            animationDelay: `${Math.random() * 3}s`
+                                        }}
+                                    />
+                                ))}
                             </div>
-
-                            {sectionLinks.map((link, i) => {
-                                const active = isLinkActive(link);
-                                return (
+                            
+                            <div className="relative z-10 flex flex-col gap-2 p-4">
+                                <div className="flex justify-center mb-2 transform transition-all duration-500 hover:scale-105">
+                                    <ThemeToggle />
+                                </div>
+                                
+                                {sectionLinks.map((link) => (
                                     <button
                                         key={link.to}
                                         onClick={() => handleNavClick(link)}
-                                        className={`mobile-nav-btn relative w-full text-left px-4 py-3 rounded-xl overflow-hidden transition-all duration-300 group/mob
-                                            ${active
-                                                ? 'text-blue-600 dark:text-cyan-300 shadow-[0_2px_20px_rgba(6,182,212,0.18)]'
-                                                : 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300'
-                                            }`}
-                                        style={{
-                                            background: active
-                                                ? 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.08))'
-                                                : undefined,
-                                            animationDelay: `${i * 0.06}s`,
-                                        }}
+                                        className={`w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-500 relative overflow-hidden cursor-pointer border-0 bg-transparent group ${
+                                            activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home')
+                                                ? 'text-white bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600'
+                                                : 'text-purple-200/80 hover:text-white hover:bg-purple-600/20'
+                                        }`}
                                     >
-                                        {/* Hover bg */}
-                                        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-50/80 to-cyan-50/60 dark:from-blue-900/30 dark:to-cyan-900/20 opacity-0 group-hover/mob:opacity-100 transition-opacity duration-300" />
-                                        {/* Sweep */}
-                                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/mob:translate-x-full transition-transform duration-600" />
-                                        {/* Left accent bar */}
-                                        {active && (
-                                            <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-gradient-to-b from-blue-500 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                                        )}
-                                        <span className="relative z-10 flex items-center gap-2">
-                                            {active && (
-                                                <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 shadow-[0_0_6px_rgba(6,182,212,0.7)] shrink-0" />
-                                            )}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                                        <span className="relative z-10 flex items-center gap-3">
+                                            <span className="text-lg transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">
+                                                {link.icon}
+                                            </span>
                                             {link.label}
                                         </span>
                                     </button>
-                                );
-                            })}
-
-                            <div className="pt-2 mt-1 border-t border-slate-200/60 dark:border-slate-700/40">
+                                ))}
                                 {user ? (
-                                    <Link
-                                        to={`/${user.role.toLowerCase()}`}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="nav-cta-btn w-full justify-center"
+                                    <Link 
+                                        to={`/${user.role.toLowerCase()}`} 
+                                        onClick={() => setIsMobileMenuOpen(false)} 
+                                        className="flex items-center gap-2 px-4 py-3 text-sm font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-xl transition-all duration-500 hover:scale-105 relative overflow-hidden group"
                                     >
-                                        <span className="cta-sweep" />
-                                        <Activity size={15} className="relative z-10 shrink-0" />
-                                        <span className="relative z-10">Dashboard</span>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                        <Zap size={16} className="group-hover:rotate-12 transition-transform duration-300" />
+                                        <span>Dashboard</span>
                                     </Link>
                                 ) : (
                                     location.pathname !== '/login' && (
-                                        <Link
-                                            to="/login"
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                            className="nav-cta-btn w-full justify-center"
+                                        <Link 
+                                            to="/login" 
+                                            onClick={() => setIsMobileMenuOpen(false)} 
+                                            className="flex items-center gap-2 px-4 py-3 text-sm font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-xl transition-all duration-500 hover:scale-105 relative overflow-hidden group"
                                         >
-                                            <span className="cta-sweep" />
-                                            <LogIn size={15} className="relative z-10 shrink-0" />
-                                            <span className="relative z-10">Login</span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                            <LogIn size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+                                            <span>Login</span>
                                         </Link>
                                     )
                                 )}
@@ -493,6 +326,85 @@ const Navbar = () => {
                     </div>
                 )}
             </nav>
+
+            {/* Add this to your global CSS or component style tag */}
+            <style jsx>{`
+                @keyframes slide {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                }
+                
+                @keyframes float {
+                    0%, 100% { transform: translateY(0px) translateX(0px); }
+                    25% { transform: translateY(-20px) translateX(10px); }
+                    75% { transform: translateY(20px) translateX(-10px); }
+                }
+                
+                @keyframes float-delayed {
+                    0%, 100% { transform: translateY(0px) translateX(0px); }
+                    25% { transform: translateY(20px) translateX(-10px); }
+                    75% { transform: translateY(-20px) translateX(10px); }
+                }
+                
+                @keyframes pulse-slow {
+                    0%, 100% { opacity: 0.1; transform: scale(1); }
+                    50% { opacity: 0.2; transform: scale(1.1); }
+                }
+                
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0; transform: scale(1); }
+                    50% { opacity: 1; transform: scale(1.5); }
+                }
+                
+                @keyframes sparkle {
+                    0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+                    50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+                }
+                
+                @keyframes ripple {
+                    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+                    100% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+                }
+                
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                .animate-float {
+                    animation: float 6s ease-in-out infinite;
+                }
+                
+                .animate-float-delayed {
+                    animation: float-delayed 8s ease-in-out infinite;
+                }
+                
+                .animate-pulse-slow {
+                    animation: pulse-slow 4s ease-in-out infinite;
+                }
+                
+                .animate-twinkle {
+                    animation: twinkle 3s ease-in-out infinite;
+                }
+                
+                .animate-sparkle {
+                    animation: sparkle 2s ease-in-out infinite;
+                }
+                
+                .animate-ripple {
+                    animation: ripple 0.6s ease-out;
+                }
+                
+                .animate-slideDown {
+                    animation: slideDown 0.3s ease-out;
+                }
+            `}</style>
         </>
     );
 };
