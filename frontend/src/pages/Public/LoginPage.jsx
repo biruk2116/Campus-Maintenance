@@ -9,7 +9,8 @@ import {
     LogIn,
     Save,
     Shield,
-    User
+    User,
+    Sparkles
 } from 'lucide-react';
 
 import Navbar from '../../components/Navbar';
@@ -34,7 +35,6 @@ const LoginPage = () => {
 
     useEffect(() => {
         if (user?.role) {
-            // Redirect based on user role
             const roleMap = {
                 'admin': '/admin',
                 'student': '/student',
@@ -54,7 +54,6 @@ const LoginPage = () => {
             const res = await login(credentials.user_code, credentials.password);
             const payload = res.data || {};
 
-            // Check if password change is required
             if (payload.must_change_password === 1 || payload.action === 'change_password') {
                 setPasswordForm({
                     user_code: payload.user_code || credentials.user_code.toUpperCase(),
@@ -65,8 +64,6 @@ const LoginPage = () => {
                 setMode('change-password');
                 return;
             }
-
-            // Login successful - the useEffect will handle redirect based on user state
         } catch (err) {
             setError(err.message || 'Login failed');
         } finally {
@@ -109,39 +106,67 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col relative overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-            {/* BACKGROUND BLOBS */}
+        <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950/40 transition-colors duration-300">
+            
+            {/* Subtle Background Elements - Light Mode */}
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 blur-[120px] dark:bg-indigo-600/20"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] dark:bg-blue-600/20"></div>
+                {/* Soft gradient orbs - Light Mode */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/40 dark:bg-indigo-600/10 blur-[100px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[35%] h-[35%] rounded-full bg-purple-200/40 dark:bg-purple-600/10 blur-[100px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-cyan-200/20 dark:bg-cyan-600/5 blur-[120px]" />
                 
-                {/* Subtle grid pattern overlay */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-5 mix-blend-overlay"></div>
+                {/* Subtle grid pattern */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='none' stroke='%236366f1' stroke-width='0.5' stroke-opacity='0.05' d='M10 0 L10 100 M20 0 L20 100 M30 0 L30 100 M40 0 L40 100 M50 0 L50 100 M60 0 L60 100 M70 0 L70 100 M80 0 L80 100 M90 0 L90 100 M0 10 L100 10 M0 20 L100 20 M0 30 L100 30 M0 40 L100 40 M0 50 L100 50 M0 60 L100 60 M0 70 L100 70 M0 80 L100 80 M0 90 L100 90'/%3E%3C/svg%3E')] opacity-30 dark:opacity-10" />
+                
+                {/* Subtle floating particles - Light/Dark aware */}
+                {[...Array(15)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        className="absolute w-1 h-1 rounded-full bg-indigo-400/30 dark:bg-indigo-400/20"
+                        animate={{
+                            y: [0, -20, 0],
+                            opacity: [0, 0.5, 0],
+                        }}
+                        transition={{
+                            duration: 4 + (i % 3),
+                            repeat: Infinity,
+                            delay: i * 0.2,
+                            ease: "easeInOut"
+                        }}
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                        }}
+                    />
+                ))}
             </div>
 
             <Navbar />
 
             <div className="flex-1 flex items-center justify-center py-20 px-4 relative z-10">
                 <motion.div 
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
                     className="w-full max-w-md"
                 >
-                    <div className="glass-card p-8 md:p-10 shadow-2xl">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-indigo-100/50 dark:border-indigo-800/50 p-8 md:p-10 transition-all duration-300 hover:shadow-2xl">
+                        
                         <div className="text-center mb-8">
                             <motion.div 
-                                initial={{ rotate: -180, scale: 0 }}
-                                animate={{ rotate: 0, scale: 1 }}
-                                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-                                className="inline-flex items-center justify-center p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 text-primary mb-6 shadow-inner border border-primary/20"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
+                                className="inline-flex items-center justify-center p-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 text-indigo-600 dark:text-indigo-400 mb-6"
                             >
-                                {mode === 'change-password' ? <Shield size={36} /> : <KeyRound size={36} />}
+                                {mode === 'change-password' ? <Shield size={32} /> : <KeyRound size={32} />}
                             </motion.div>
-                            <h2 className="text-3xl font-extrabold text-textPrimary tracking-tight mb-3">
+                            
+                            <h2 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight mb-2">
                                 {mode === 'change-password' ? 'Change Password' : 'Welcome Back'}
                             </h2>
-                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest">
+                            
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                                 {mode === 'change-password'
                                     ? 'Set your own secure password'
                                     : 'Sign in to access your dashboard'}
@@ -151,13 +176,13 @@ const LoginPage = () => {
                         <AnimatePresence mode="wait">
                             {error && (
                                 <motion.div 
-                                    initial={{ opacity: 0, height: 0, y: -10 }}
-                                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                    exit={{ opacity: 0, height: 0, y: -10 }}
-                                    className="mb-6 p-4 rounded-xl flex items-center bg-danger/10 text-danger text-sm font-bold border border-danger/20"
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="mb-6 p-3 rounded-lg flex items-center gap-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800"
                                 >
-                                    <AlertCircle size={20} className="mr-3 shrink-0" />
-                                    {error}
+                                    <AlertCircle size={16} />
+                                    <span>{error}</span>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -174,11 +199,11 @@ const LoginPage = () => {
                                     className="flex flex-col gap-5"
                                 >
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
-                                        <div className="relative group">
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">User ID</label>
+                                        <div className="relative">
                                             <input
                                                 type="text"
-                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                                className="w-full py-3 px-4 pl-11 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                                 value={credentials.user_code}
                                                 onChange={(e) =>
                                                     setCredentials((prev) => ({
@@ -189,16 +214,16 @@ const LoginPage = () => {
                                                 placeholder="Enter your ID"
                                                 required
                                             />
-                                            <User size={20} className="absolute top-1/2 -translate-y-1/2 left-4 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                            <User size={18} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 dark:text-slate-500" />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Password</label>
-                                        <div className="relative group">
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Password</label>
+                                        <div className="relative">
                                             <input
                                                 type="password"
-                                                className="w-full py-3 px-4 pl-12 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                                className="w-full py-3 px-4 pl-11 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                                 value={credentials.password}
                                                 onChange={(e) =>
                                                     setCredentials((prev) => ({
@@ -209,7 +234,7 @@ const LoginPage = () => {
                                                 placeholder="••••••••"
                                                 required
                                             />
-                                            <Lock size={20} className="absolute top-1/2 -translate-y-1/2 left-4 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                            <Lock size={18} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 dark:text-slate-500" />
                                         </div>
                                     </div>
 
@@ -217,10 +242,10 @@ const LoginPage = () => {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         type="submit"
-                                        className="btn-primary w-full py-4 mt-2 flex items-center justify-center text-sm font-extrabold tracking-widest uppercase rounded-xl"
+                                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-indigo-500/25"
                                         disabled={loading}
                                     >
-                                        {loading ? <Loader2 size={20} className="mr-3 animate-spin" /> : <LogIn size={20} className="mr-3" />}
+                                        {loading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
                                         {loading ? 'Signing in...' : 'Sign In'}
                                     </motion.button>
                                 </motion.form>
@@ -235,20 +260,20 @@ const LoginPage = () => {
                                     className="flex flex-col gap-5"
                                 >
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">User ID</label>
                                         <input
                                             type="text"
-                                            className="w-full py-3 px-4 bg-surface/30 border border-overlay/5 text-textSecondary rounded-xl font-bold cursor-not-allowed"
+                                            className="w-full py-3 px-4 bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl cursor-not-allowed"
                                             value={passwordForm.user_code}
                                             disabled
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">New Password</label>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Password</label>
                                         <input
                                             type="password"
-                                            className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-3 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                             value={passwordForm.new_password}
                                             onChange={(e) =>
                                                 setPasswordForm((prev) => ({
@@ -261,10 +286,10 @@ const LoginPage = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Confirm New Password</label>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm New Password</label>
                                         <input
                                             type="password"
-                                            className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-3 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                             value={passwordForm.confirm_password}
                                             onChange={(e) =>
                                                 setPasswordForm((prev) => ({
@@ -276,11 +301,11 @@ const LoginPage = () => {
                                         />
                                     </div>
 
-                                    <div className="flex gap-4 mt-2">
+                                    <div className="flex gap-3">
                                         <button
                                             type="button"
                                             onClick={() => setMode('login')}
-                                            className="btn-secondary flex-1 py-4 text-xs font-extrabold tracking-widest uppercase rounded-xl"
+                                            className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
                                         >
                                             Back
                                         </button>
@@ -288,10 +313,10 @@ const LoginPage = () => {
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                             type="submit"
-                                            className="btn-primary flex-1 py-4 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl"
+                                            className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
                                             disabled={loading}
                                         >
-                                            {loading ? <Loader2 size={18} className="mr-2 animate-spin" /> : <Save size={18} className="mr-2" />}
+                                            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                             {loading ? 'Saving...' : 'Update'}
                                         </motion.button>
                                     </div>
@@ -315,13 +340,13 @@ const LoginPage = () => {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: "spring", bounce: 0.5 }}
-                        className="inline-flex p-5 rounded-full bg-success/20 text-success mb-6 shadow-inner border border-success/20"
+                        className="inline-flex p-4 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-4"
                     >
-                        <Shield size={48} />
+                        <Shield size={40} />
                     </motion.div>
-                    <h4 className="text-2xl font-extrabold tracking-tight mb-3 text-textPrimary">Password Changed</h4>
-                    <p className="text-sm text-textSecondary font-medium leading-relaxed max-w-xs mx-auto">
-                        Your password has been successfully updated. You can now sign in with your new credentials.
+                    <h4 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Password Changed Successfully</h4>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Your password has been updated. You can now sign in with your new credentials.
                     </p>
                 </div>
             </PremiumModal>
@@ -330,4 +355,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
