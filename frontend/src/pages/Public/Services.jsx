@@ -7,6 +7,7 @@ import FeatureImg from '../../assets/images/tech_pc.png';
 import FireEmergencyImg from '../../assets/images/fire_emergency.png';
 import LockDetailImg from '../../assets/images/lock_detail.png';
 import SafetyKitImg from '../../assets/images/safety_kit.png';
+import waterMainteanance from '../../assets/images/water-maintenance.jpg';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -45,7 +46,7 @@ const services = [
         desc: 'Comprehensive data reports for administrative oversight and analytics.' 
     },
     { 
-        img: HeroImg, 
+        img: waterMainteanance, 
         icon: <Zap size={24} />,
         title: '24/7 Support', 
         desc: 'Round-the-clock availability for emergency maintenance requests.' 
