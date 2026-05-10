@@ -96,7 +96,7 @@ overflow-hidden
 "
     style={{
         backgroundImage: `url(${HeroImg})`,
-        backgroundSize: "cover",
+        backgroundSize: "90%",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
     }}
