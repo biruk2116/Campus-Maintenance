@@ -96,7 +96,7 @@ overflow-hidden
 "
     style={{
         backgroundImage: `url(${HeroImg})`,
-        backgroundSize: "90%",
+        backgroundSize: "110% auto",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
     }}
@@ -236,84 +236,31 @@ overflow-hidden
                     }}
                 />
 
-                {/* ── Main content grid ── */}
+                ── Main content grid ──
                 <div className="relative z-10 w-full max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
-                        {/* ─── Left Content ─── */}
+                       
                         <motion.div variants={fadeLeft} className="flex flex-col justify-center py-4 text-white">
 
-                            {/* Badge */}
-                            <motion.div
-                                animate={{ y: [0, -4, 0] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 border border-white/40 text-white text-xs font-bold tracking-widest mb-5 w-fit backdrop-blur-md shadow-lg"
-                            >
-                                {/* Animated green dot */}
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
-                                </span>
-                                <CheckCircle2 size={13} className="text-cyan-300" />
-                                Trusted by the DBU Community
+                         
+                            <motion.div >
+                                
+            
+                               
                             </motion.div>
 
-                            {/* Heading */}
-                            <motion.h1
-                                variants={fadeUp}
-                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-                            >
-                                Fast, Transparent
-                                <br />
-                                <span className="bg-gradient-to-r from-cyan-200 via-blue-200 to-cyan-300 bg-clip-text text-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_auto] drop-shadow-lg">
-                                    Campus Maintenance
-                                </span>
-                            </motion.h1>
-
-                            {/* Subtitle */}
-                            <motion.p
-                                variants={fadeUp}
-                                className="text-sm md:text-base text-gray-100 leading-relaxed mb-6 max-w-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                            >
-                                Report issues instantly, track progress in real time, and keep
-                                university facilities running smoothly from one central place.
-                            </motion.p>
-
-                            {/* CTA Buttons */}
+                            
                             <motion.div
                                 variants={fadeUp}
                                 className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-8"
                             >
-                                <motion.button
-                                    whileHover={{ y: -3, scale: 1.03, boxShadow: '0 12px 32px rgba(6,182,212,0.45)' }}
-                                    whileTap={{ scale: 0.97 }}
-                                    onClick={() => navigate('/login')}
-                                    className="relative w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_auto] text-white font-bold text-sm shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group"
-                                >
-                                    {/* Shimmer layer */}
-                                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                                    <Zap size={15} className="relative z-10" />
-                                    <span className="relative z-10">Report Issue</span>
-                                    <ArrowRight size={15} className="relative z-10 group-hover:translate-x-1 transition-transform duration-200" />
-                                </motion.button>
-
-                                <motion.button
-                                    whileHover={{ y: -3, scale: 1.03, backgroundColor: 'rgba(255,255,255,0.15)' }}
-                                    whileTap={{ scale: 0.97 }}
-                                    onClick={() => navigate('/login')}
-                                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-sm hover:border-cyan-400/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
-                                >
-                                    <Activity size={15} className="text-cyan-300" />
-                                    Track Request
-                                </motion.button>
+                                
                             </motion.div>
 
                             {/* Stats */}
                             <div className="flex gap-6 md:gap-8 pt-4 border-t border-white/20">
                                 {[
-                                    { value: '2000+', label: 'Issues Resolved' },
-                                    { value: '500+',  label: 'Active Users' },
-                                    { value: '24/7',  label: 'Available' },
                                 ].map((stat, i) => (
                                     <motion.div
                                         key={stat.label}
@@ -337,21 +284,7 @@ overflow-hidden
                 </div>
 
                 {/* ── Scroll hint ── */}
-                <motion.div
-                    animate={{ y: [0, 8, 0], opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 cursor-pointer"
-                    onClick={() => scrollToSection('about-us')}
-                >
-                    <span className="text-slate-600 dark:text-white/40 text-[10px] uppercase tracking-widest">Scroll</span>
-                    <div className="w-5 h-8 rounded-full border border-slate-400 dark:border-white/20 flex items-start justify-center pt-1.5">
-                        <motion.div
-                            animate={{ y: [0, 10, 0], opacity: [1, 0, 1] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                            className="w-1 h-1.5 rounded-full bg-cyan-400"
-                        />
-                    </div>
-                </motion.div>
+               
             </motion.section>
 
             {/* Other Sections */}
@@ -363,4 +296,4 @@ overflow-hidden
     );
 };
 
-export default Home;
+export default Home
