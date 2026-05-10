@@ -82,20 +82,86 @@ const Home = () => {
     return (
         <PublicLayout>
             {/* HERO SECTION */}
-            <motion.section
-                id="home"
-                className="relative w-full min-h-screen flex items-center justify-center px-4 md:px-8 py-12 md:py-16 overflow-hidden"
-                style={{
-                    backgroundImage: `url(${HeroImg})`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.1 }}
-                variants={staggerContainer}
-            >
+           <motion.section
+    id="home"
+className="
+relative
+w-full
+h-screen
+pt-20
+flex
+items-center
+justify-center
+overflow-hidden
+"
+    style={{
+        backgroundImage: `url(${HeroImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+    }}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.1 }}
+    variants={staggerContainer}
+>
+
+    {/* Dark Overlay */}
+    <div className="absolute inset-0 bg-black/60"></div>
+
+    {/* Gradient Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-black/30 to-cyan-800/30"></div>
+
+    {/* Animated Blur Circles */}
+    <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+
+    <div className="absolute bottom-10 right-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+
+    {/* Content */}
+    <div className="relative z-10 text-center px-6 max-w-4xl">
+
+        <motion.h1
+            className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+        >
+            Smart Campus <br />
+            <span className="text-cyan-400">
+                Maintenance System
+            </span>
+        </motion.h1>
+
+        <motion.p
+            className="text-gray-200 text-lg md:text-xl mb-8 leading-relaxed"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+        >
+            Report maintenance issues instantly, track technician progress,
+            and improve campus infrastructure efficiently.
+        </motion.p>
+
+        {/* Buttons */}
+        <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+        >
+
+            <button className="px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-white rounded-xl font-semibold shadow-lg hover:scale-105 transition duration-300">
+                Get Started
+            </button>
+
+            <button className="px-8 py-4 border border-white/30 backdrop-blur-md bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition duration-300">
+                Learn More
+            </button>
+
+        </motion.div>
+
+    </div>
+
                 {/* ── Dark overlay ── */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-600/10 via-blue-500/5 to-cyan-400/10 dark:from-slate-900 dark:via-black/85 dark:to-slate-800" />
 
