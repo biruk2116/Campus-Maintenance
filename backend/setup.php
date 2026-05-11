@@ -27,10 +27,14 @@ try {
 
     $sqlContent = file_get_contents($sqlFile);
 
+    // Remove SQL comments before splitting statements. Keeping comment lines in place
+    // caused valid CREATE/INSERT statements to be skipped when a comment preceded them.
+    $sqlContent = preg_replace('/^\s*--.*$/m', '', $sqlContent);
+
     // Split SQL statements by semicolon
     $statements = array_filter(
         array_map('trim', preg_split('/;/', $sqlContent)),
-        fn($stmt) => !empty($stmt) && !str_starts_with($stmt, '--')
+        fn($stmt) => !empty($stmt)
     );
 
     $executedCount = 0;
@@ -38,10 +42,6 @@ try {
 
     foreach ($statements as $statement) {
         try {
-            // Remove comments
-            $statement = preg_replace('/--.*$/m', '', $statement);
-            $statement = trim($statement);
-            
             if (!empty($statement)) {
                 $pdo->exec($statement);
                 $executedCount++;
@@ -49,7 +49,10 @@ try {
         } catch (PDOException $e) {
             // Only log non-duplicate key errors
             if (strpos($e->getMessage(), 'Duplicate entry') === false) {
-                $errors[] = $e->getMessage();
+                $errors[] = [
+                    "error" => $e->getMessage(),
+                    "statement" => substr($statement, 0, 180)
+                ];
             }
         }
     }
@@ -60,6 +63,7 @@ try {
         "details" => [
             "statements_executed" => $executedCount,
             "errors_ignored" => count($errors),
+            "errors" => $errors,
             "test_credentials" => [
                 [
                     "role" => "admin",
