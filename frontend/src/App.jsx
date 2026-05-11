@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { getDashboardPathForRole, normalizeRole } from './utils/authRoutes';
 import 'animate.css';
 
 // Components
@@ -36,8 +37,8 @@ const ProtectedRoute = ({ children, role }) => {
     
     if (!user) return <Navigate to="/login" replace />;
     
-    if (role && user.role !== role) {
-        return <Navigate to="/" replace />;
+    if (role && normalizeRole(user.role) !== normalizeRole(role)) {
+        return <Navigate to={getDashboardPathForRole(user.role) || '/'} replace />;
     }
 
     return children;
