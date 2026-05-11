@@ -64,38 +64,55 @@ const Sidebar = () => {
     const links = roleLinks[user?.role] || [];
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-sidebar-width z-40 flex flex-col p-6 bg-gradient-to-b from-surface/80 to-surface/40 backdrop-blur-xl border-r border-overlay/10 shadow-lg overflow-y-auto custom-scrollbar">
+        <aside className="fixed left-0 top-0 bottom-0 w-sidebar-width z-40 flex flex-col px-4 py-6 bg-gradient-to-b from-surface/90 via-surface/70 to-surface/50 backdrop-blur-2xl border-r border-overlay/10 shadow-2xl shadow-black/20 overflow-y-auto custom-scrollbar">
+            
             {/* Header */}
-            <div className="flex items-center mb-8 px-2 pb-4 border-b border-overlay/10">
-                <img src={dbuLogo} alt="DBU" className="h-10 mr-3 rounded-lg" />
-                <div className="flex-1">
-                    <h5 className="font-extrabold m-0 text-textPrimary tracking-tight text-sm">Command OS</h5>
-                    <span className="text-xs text-primary uppercase font-bold tracking-widest">{user?.role} Dashboard</span>
+            <div className="flex items-center mb-8 px-2 pb-5 border-b border-overlay/10">
+                <div className="relative mr-3 shrink-0">
+                    <img
+                        src={dbuLogo}
+                        alt="DBU"
+                        className="h-10 w-10 rounded-xl object-cover ring-2 ring-primary/20 shadow-lg shadow-primary/10"
+                    />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-surface shadow-sm" />
+                </div>
+                <div className="flex-1 min-w-0">
+                    <h5 className="font-extrabold m-0 text-textPrimary tracking-tight text-sm leading-tight truncate">
+                        Command OS
+                    </h5>
+                    <span className="text-[10px] text-primary uppercase font-bold tracking-[0.18em] opacity-80">
+                        {user?.role} Dashboard
+                    </span>
                 </div>
             </div>
 
             {/* Navigation Links */}
-            <ul className="flex-1 flex flex-col gap-2 m-0 p-0 list-none">
-                {links.map((link, idx) => (
+            <ul className="flex-1 flex flex-col gap-1 m-0 p-0 list-none">
+                {links.map((link) => (
                     <li key={link.path}>
                         <NavLink
                             to={link.path}
                             end={link.path === `/${user?.role}`}
                             className={({ isActive }) =>
-                                `flex items-center p-3 rounded-lg transition-all duration-300 no-underline font-medium group relative ${
+                                `flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 no-underline font-medium group relative ${
                                     isActive
-                                        ? 'bg-gradient-to-r from-primary/20 to-secondary/10 text-primary border border-primary/30 shadow-lg shadow-primary/10'
-                                        : 'text-textSecondary hover:text-textPrimary hover:bg-overlay/5 border border-transparent'
+                                        ? 'bg-gradient-to-r from-primary/20 to-secondary/10 text-primary border border-primary/25 shadow-md shadow-primary/10'
+                                        : 'text-textSecondary hover:text-textPrimary hover:bg-overlay/8 border border-transparent hover:border-overlay/10 hover:shadow-sm'
                                 }`
                             }
                         >
-                            <span className="mr-3 transition-transform group-hover:scale-110">{link.icon}</span>
-                            <span className="text-sm flex-1">{link.label}</span>
+                            {/* Active indicator bar */}
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full bg-primary opacity-0 group-[.active]:opacity-100 transition-opacity duration-200" />
+
+                            <span className="mr-3 transition-all duration-200 group-hover:scale-110 group-hover:text-primary shrink-0">
+                                {link.icon}
+                            </span>
+                            <span className="text-sm flex-1 leading-none">{link.label}</span>
                             {link.badge > 0 && (
-                                <Motion.span 
+                                <Motion.span
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="ml-2 bg-danger text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md shadow-danger/40"
+                                    className="ml-2 bg-danger text-white rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center text-[10px] font-bold shadow-md shadow-danger/40 leading-none"
                                 >
                                     {link.badge > 9 ? '9+' : link.badge}
                                 </Motion.span>
