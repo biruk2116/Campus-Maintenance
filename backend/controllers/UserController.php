@@ -8,6 +8,11 @@ function isValidInstitutionId($user_code)
     return preg_match('/^DBU\d{7}$/i', $user_code);
 }
 
+function isValidFullName($name)
+{
+    return preg_match('/^[A-Za-z]+(?:[ .\'-][A-Za-z]+)+$/', $name);
+}
+
 function findUserByCode($pdo, $user_code)
 {
     $stmt = $pdo->prepare("
@@ -29,8 +34,12 @@ function createUser($pdo)
     $phone_number = trim($_POST['phone_number'] ?? '');
     $skills = trim($_POST['skills'] ?? '');
 
-    if (!$name || !$role || !$user_code || !$email || !$phone_number) {
-        response(false, "Name, user ID, role, email, and phone number are required");
+    if (!$name || !$role || !$user_code) {
+        response(false, "Full name, user ID, and role are required");
+    }
+
+    if (strlen($name) < 5 || !isValidFullName($name)) {
+        response(false, "Enter a valid full name using at least first and last name");
     }
 
     if (!in_array($role, ['student', 'technician'], true)) {
