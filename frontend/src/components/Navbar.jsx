@@ -40,14 +40,14 @@ const Navbar = () => {
 
     const handleNavClick = (link) => {
         const sectionId = link.to === '/' ? 'home' : link.to.substring(1);
-        
+
         if (location.pathname === link.to) {
             scrollToSection(sectionId);
         } else {
             navigate(link.to);
             setTimeout(() => scrollToSection(sectionId), 100);
         }
-        
+
         setIsMobileMenuOpen(false);
     };
 
@@ -65,7 +65,7 @@ const Navbar = () => {
                 if (element) {
                     const rect = element.getBoundingClientRect();
                     const elementTop = rect.top;
-                    
+
                     if (elementTop <= navbarHeight + 100) {
                         currentSection = section;
                     }
@@ -82,211 +82,174 @@ const Navbar = () => {
     return (
         <>
             <nav
-                className={`fixed top-0 left-0 right-0 z-50 w-full h-16 px-4 md:px-6 py-3 transition-all duration-500 overflow-hidden ${
+                className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
                     isScrolled
-                        ? 'bg-gradient-to-r from-white/95 via-indigo-50/90 via-purple-50/80 to-white/95 dark:from-slate-900/95 dark:via-indigo-950/90 dark:via-purple-950/80 dark:to-slate-900/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(99,102,241,0.15)] dark:shadow-[0_8px_32px_rgba(139,92,246,0.15)] border-b border-indigo-200/30 dark:border-indigo-800/30'
-                        : 'bg-gradient-to-r from-white/90 via-indigo-50/60 via-purple-50/50 to-white/90 dark:from-slate-900/90 dark:via-indigo-950/60 dark:via-purple-950/50 dark:to-slate-900/90 backdrop-blur-md border-b border-transparent'
+                        ? 'h-14 bg-white/85 dark:bg-slate-950/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-slate-800/60 shadow-[0_1px_24px_0_rgba(0,0,0,0.06)] dark:shadow-[0_1px_24px_0_rgba(0,0,0,0.3)]'
+                        : 'h-16 bg-white/60 dark:bg-slate-950/60 backdrop-blur-md border-b border-transparent'
                 }`}
             >
-                {/* Animated gradient orb background */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-indigo-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-                    <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
-                    
-                    {/* Floating particles */}
-                    <div className="absolute top-1/4 left-1/5 w-1.5 h-1.5 bg-indigo-400/60 rounded-full animate-float" style={{ animationDuration: '6s' }} />
-                    <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-purple-400/50 rounded-full animate-float" style={{ animationDuration: '7s', animationDelay: '1s' }} />
-                    <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-pink-400/40 rounded-full animate-float" style={{ animationDuration: '5s', animationDelay: '2s' }} />
-                    <div className="absolute top-2/3 right-1/5 w-1.5 h-1.5 bg-indigo-300/40 rounded-full animate-float" style={{ animationDuration: '8s', animationDelay: '0.5s' }} />
-                    <div className="absolute bottom-1/3 left-2/3 w-1 h-1 bg-purple-300/50 rounded-full animate-float" style={{ animationDuration: '6.5s', animationDelay: '1.5s' }} />
-                    
-                    {/* Twinkling stars */}
-                    <div className="absolute top-1/5 right-1/6 w-0.5 h-0.5 bg-white/60 rounded-full animate-twinkle" style={{ animationDuration: '3s' }} />
-                    <div className="absolute bottom-1/4 right-1/3 w-0.5 h-0.5 bg-white/50 rounded-full animate-twinkle" style={{ animationDuration: '4s', animationDelay: '1s' }} />
-                    <div className="absolute top-2/3 left-1/4 w-0.5 h-0.5 bg-white/40 rounded-full animate-twinkle" style={{ animationDuration: '3.5s', animationDelay: '0.7s' }} />
-                </div>
+                <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-5 md:px-8 relative">
 
-                <div className="w-full max-w-7xl mx-auto flex items-center justify-between relative z-10">
-                    {/* Logo with magical glow */}
-                    <Link to="/" className="flex items-center gap-3 group relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -inset-2" />
-                        <img
-                            src={DBULogo}
-                            alt="DBU Logo"
-                            className="w-10 h-10 object-contain group-hover:scale-105 transition-all duration-300 filter drop-shadow-[0_2px_8px_rgba(99,102,241,0.3)] group-hover:drop-shadow-[0_4px_12px_rgba(139,92,246,0.5)]"
-                        />
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center gap-3 group shrink-0">
                         <div className="relative">
-                            <span className="font-extrabold text-lg tracking-tight block leading-none bg-gradient-to-r from-slate-700 via-indigo-600 to-slate-700 dark:from-slate-200 dark:via-indigo-400 dark:to-slate-200 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:via-purple-600 group-hover:to-pink-600 dark:group-hover:from-indigo-400 dark:group-hover:via-purple-400 dark:group-hover:to-pink-400 transition-all duration-500 animate-gradient-x bg-[length:200%_auto]">DBU</span>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">Maintenance</span>
+                            <div className="absolute inset-0 bg-blue-500/20 dark:bg-blue-400/20 rounded-xl blur-md scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <img
+                                src={DBULogo}
+                                alt="DBU Logo"
+                                className="relative w-9 h-9 object-contain group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                        <div className="leading-none">
+                            <span className="font-black text-base tracking-tight block text-slate-900 dark:text-slate-50 leading-none">
+                                DBU
+                            </span>
+                            <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 leading-none mt-0.5 block">
+                                Maintenance
+                            </span>
                         </div>
                     </Link>
-                    
-                    <div className="flex items-center gap-6">
-                        {/* Desktop Navigation */}
-                        <div className="hidden md:flex items-center gap-1">
+
+                    {/* Desktop Center Nav */}
+                    <div className="hidden md:flex items-center">
+                        {/* Pill container */}
+                        <div className="flex items-center gap-0.5 bg-slate-100/80 dark:bg-slate-800/60 rounded-full px-1.5 py-1 border border-slate-200/50 dark:border-slate-700/50">
                             {sectionLinks.map((link) => {
                                 const isActive = activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home');
                                 return (
                                     <button
                                         key={link.to}
                                         onClick={() => handleNavClick(link)}
-                                        className={`relative px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 cursor-pointer border-0 bg-transparent overflow-hidden group ${
+                                        className={`relative px-4 py-1.5 text-[13px] font-semibold rounded-full transition-all duration-200 cursor-pointer tracking-wide ${
                                             isActive
-                                                ? 'text-indigo-600 dark:text-indigo-300'
-                                                : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+                                                ? 'text-slate-900 dark:text-slate-50 bg-white dark:bg-slate-700 shadow-sm shadow-black/10 dark:shadow-black/30'
+                                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                                         }`}
                                     >
-                                        {/* Animated gradient background */}
-                                        <div className={`absolute inset-0 rounded-xl transition-all duration-500 ${
-                                            isActive
-                                                ? 'bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950/60 dark:via-purple-950/60 dark:to-pink-950/60 opacity-100'
-                                                : 'bg-gradient-to-r from-indigo-50/0 via-purple-50/0 to-pink-50/0 opacity-0 group-hover:opacity-100 group-hover:from-indigo-50/30 group-hover:via-purple-50/30 group-hover:to-pink-50/30 dark:group-hover:from-indigo-950/40 dark:group-hover:via-purple-950/40 dark:group-hover:to-pink-950/40'
-                                        }`} />
-                                        
-                                        {/* Glowing border on active */}
-                                        {isActive && (
-                                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 opacity-60 blur-sm -z-10 animate-pulse" style={{ animationDuration: '3s' }} />
-                                        )}
-                                        
-                                        {/* Hover shine effect */}
-                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                                        
-                                        <span className="relative z-10">{link.label}</span>
+                                        {link.label}
                                     </button>
                                 );
                             })}
                         </div>
+                    </div>
 
-                        <div className="flex items-center gap-3">
-                            <ThemeToggle />
-                            
-                            {user ? (
-                                <Link to={`/${user.role.toLowerCase()}`} className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl relative overflow-hidden group shadow-[0_4px_14px_rgba(99,102,241,0.4)] hover:shadow-[0_8px_20px_rgba(139,92,246,0.6)] transition-all duration-300 hover:scale-105">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                                    <Activity size={16} className="relative z-10" /> 
-                                    <span className="relative z-10">Dashboard</span>
-                                </Link>
-                            ) : (
-                                location.pathname !== '/login' && (
-                                    <Link to="/login" className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl relative overflow-hidden group shadow-[0_4px_14px_rgba(99,102,241,0.4)] hover:shadow-[0_8px_20px_rgba(139,92,246,0.6)] transition-all duration-300 hover:scale-105">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                                        <LogIn size={16} className="relative z-10" /> 
-                                        <span className="relative z-10">Login</span>
-                                    </Link>
-                                )
-                            )}
+                    {/* Right Actions */}
+                    <div className="flex items-center gap-2.5 shrink-0">
+                        <ThemeToggle />
 
-                            <button 
-                                className="md:hidden p-2.5 rounded-xl transition-all border border-indigo-300/50 dark:border-indigo-600/50 text-slate-700 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 dark:hover:from-indigo-950/30 dark:hover:to-purple-950/30 relative overflow-hidden group"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        {user ? (
+                            <Link
+                                to={`/${user.role.toLowerCase()}`}
+                                className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-[13px] font-semibold bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-full transition-all duration-200 shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-px"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-indigo-400/10 group-hover:via-purple-400/10 group-hover:to-pink-400/10 transition-all duration-500" />
-                                {isMobileMenuOpen ? <X size={24} className="relative z-10" /> : <Menu size={24} className="relative z-10" />}
-                            </button>
-                        </div>
+                                <Activity size={14} strokeWidth={2.5} />
+                                <span>Dashboard</span>
+                            </Link>
+                        ) : (
+                            location.pathname !== '/login' && (
+                                <Link
+                                    to="/login"
+                                    className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-[13px] font-semibold bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-full transition-all duration-200 shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-px"
+                                >
+                                    <LogIn size={14} strokeWidth={2.5} />
+                                    <span>Login</span>
+                                </Link>
+                            )
+                        )}
+
+                        {/* Mobile hamburger */}
+                        <button
+                            className="md:hidden relative w-9 h-9 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            aria-label="Toggle menu"
+                        >
+                            <span className={`absolute transition-all duration-200 ${isMobileMenuOpen ? 'opacity-100 rotate-0' : 'opacity-0 rotate-90'}`}>
+                                <X size={18} strokeWidth={2.5} />
+                            </span>
+                            <span className={`absolute transition-all duration-200 ${isMobileMenuOpen ? 'opacity-0 -rotate-90' : 'opacity-100 rotate-0'}`}>
+                                <Menu size={18} strokeWidth={2.5} />
+                            </span>
+                        </button>
                     </div>
                 </div>
 
-                {/* Mobile Menu - Magical Glass Morphism */}
+                {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-b from-white/95 via-indigo-50/90 via-purple-50/80 to-white/95 dark:from-slate-900/95 dark:via-indigo-950/90 dark:via-purple-950/80 dark:to-slate-900/95 backdrop-blur-xl border-b border-indigo-200/30 dark:border-indigo-800/30 mt-2 mx-4 rounded-2xl shadow-[0_20px_40px_-15px_rgba(99,102,241,0.3)] dark:shadow-[0_20px_40px_-15px_rgba(139,92,246,0.3)] overflow-hidden animate-slideDown">
-                        {/* Decorative gradient orbs in mobile menu */}
-                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-r from-indigo-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-2xl animate-pulse" />
-                        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
-                        
-                        <div className="flex flex-col gap-2 p-4 relative z-10">
-                            <div className="flex justify-center mb-2 pb-2 border-b border-indigo-200/30 dark:border-indigo-700/30">
+                    <div className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/98 dark:bg-slate-900/98 backdrop-blur-2xl rounded-2xl border border-slate-200/70 dark:border-slate-700/60 shadow-xl shadow-black/10 dark:shadow-black/40 overflow-hidden animate-slideDown">
+                        <div className="p-3">
+                            {/* Top divider with theme toggle */}
+                            <div className="flex items-center justify-between px-2 pb-3 mb-1 border-b border-slate-100 dark:border-slate-800">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Navigation</span>
                                 <ThemeToggle />
                             </div>
-                            
-                            {sectionLinks.map((link) => {
-                                const isActive = activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home');
-                                return (
-                                    <button
-                                        key={link.to}
-                                        onClick={() => handleNavClick(link)}
-                                        className={`relative w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 cursor-pointer overflow-hidden group ${
-                                            isActive
-                                                ? 'text-indigo-600 dark:text-indigo-300'
-                                                : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
-                                        }`}
+
+                            <div className="flex flex-col gap-0.5">
+                                {sectionLinks.map((link) => {
+                                    const isActive = activeSection === link.to.substring(1) || (link.to === '/' && activeSection === 'home');
+                                    return (
+                                        <button
+                                            key={link.to}
+                                            onClick={() => handleNavClick(link)}
+                                            className={`w-full text-left px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-150 ${
+                                                isActive
+                                                    ? 'text-slate-900 dark:text-slate-50 bg-slate-100 dark:bg-slate-800'
+                                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                                            }`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                {isActive && (
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                                                )}
+                                                {link.label}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* CTA at bottom */}
+                            <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                {user ? (
+                                    <Link
+                                        to={`/${user.role.toLowerCase()}`}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20"
                                     >
-                                        <div className={`absolute inset-0 rounded-xl transition-all duration-500 ${
-                                            isActive
-                                                ? 'bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950/60 dark:via-purple-950/60 dark:to-pink-950/60'
-                                                : 'bg-gradient-to-r from-indigo-50/0 via-purple-50/0 to-pink-50/0 group-hover:from-indigo-50/30 group-hover:via-purple-50/30 group-hover:to-pink-50/30 dark:group-hover:from-indigo-950/40 dark:group-hover:via-purple-950/40 dark:group-hover:to-pink-950/40'
-                                        }`} />
-                                        
-                                        {isActive && (
-                                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 opacity-60 blur-sm -z-10 animate-pulse" style={{ animationDuration: '3s' }} />
-                                        )}
-                                        
-                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                                        
-                                        <span className="relative z-10">{link.label}</span>
-                                    </button>
-                                );
-                            })}
-                            {user ? (
-                                <Link to={`/${user.role.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 text-sm font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl relative overflow-hidden group shadow-[0_4px_14px_rgba(99,102,241,0.4)]">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                                    <Activity size={16} className="relative z-10" /> 
-                                    <span className="relative z-10">Dashboard</span>
-                                </Link>
-                            ) : (
-                                location.pathname !== '/login' && (
-                                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 text-sm font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl relative overflow-hidden group shadow-[0_4px_14px_rgba(99,102,241,0.4)]">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                                        <LogIn size={16} className="relative z-10" /> 
-                                        <span className="relative z-10">Login</span>
+                                        <Activity size={15} strokeWidth={2.5} />
+                                        <span>Go to Dashboard</span>
                                     </Link>
-                                )
-                            )}
+                                ) : (
+                                    location.pathname !== '/login' && (
+                                        <Link
+                                            to="/login"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20"
+                                        >
+                                            <LogIn size={15} strokeWidth={2.5} />
+                                            <span>Login to your account</span>
+                                        </Link>
+                                    )
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
             </nav>
 
-            {/* Custom keyframes for animations */}
+            {/* Keyframe styles */}
             <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
-                    50% { transform: translateY(-15px) translateX(5px); opacity: 0.8; }
-                }
-                @keyframes twinkle {
-                    0%, 100% { opacity: 0.2; transform: scale(1); }
-                    50% { opacity: 1; transform: scale(1.5); }
-                }
-                @keyframes gradient-x {
-                    0%, 100% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                }
                 @keyframes slideDown {
                     from {
                         opacity: 0;
-                        transform: translateY(-10px) scale(0.98);
+                        transform: translateY(-8px) scale(0.98);
                     }
                     to {
                         opacity: 1;
                         transform: translateY(0) scale(1);
                     }
                 }
-                .animate-float {
-                    animation: float infinite ease-in-out;
-                }
-                .animate-twinkle {
-                    animation: twinkle infinite ease-in-out;
-                }
-                .animate-gradient-x {
-                    animation: gradient-x 3s ease infinite;
-                }
                 .animate-slideDown {
-                    animation: slideDown 0.3s ease-out forwards;
+                    animation: slideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                 }
             `}</style>
         </>
