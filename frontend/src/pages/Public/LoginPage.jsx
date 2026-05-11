@@ -16,6 +16,7 @@ import {
 import Navbar from '../../components/Navbar';
 import PremiumModal from '../../components/PremiumModal';
 import { useAuth } from '../../context/AuthContext';
+import { getDashboardPathForRole } from '../../utils/authRoutes';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -35,13 +36,11 @@ const LoginPage = () => {
 
     useEffect(() => {
         if (user?.role) {
-            const roleMap = {
-                'admin': '/admin',
-                'student': '/student',
-                'technician': '/technician'
-            };
-            const dashboardPath = roleMap[user.role] || `/${user.role}`;
-            navigate(dashboardPath);
+            const dashboardPath = getDashboardPathForRole(user.role);
+
+            if (dashboardPath) {
+                navigate(dashboardPath, { replace: true });
+            }
         }
     }, [user, navigate]);
 
@@ -64,6 +63,13 @@ const LoginPage = () => {
                 setMode('change-password');
                 return;
             }
+
+            const dashboardPath = getDashboardPathForRole(payload.role);
+            if (!dashboardPath) {
+                throw new Error('Your account role is not allowed to access a dashboard');
+            }
+
+            navigate(dashboardPath, { replace: true });
         } catch (err) {
             setError(err.message || 'Login failed');
         } finally {
