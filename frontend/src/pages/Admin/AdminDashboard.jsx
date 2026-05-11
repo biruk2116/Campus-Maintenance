@@ -56,6 +56,9 @@ const REQUEST_CATEGORIES = [
     'Painting / Finishing'
 ];
 
+const isValidFullName = (name) => /^[A-Za-z]+(?:[ .'-][A-Za-z]+)+$/.test(name.trim());
+const isValidUserCode = (userCode) => /^DBU\d{7}$/i.test(userCode.trim());
+
 const statusClassName = (status) => {
     if (status === 'Completed') return 'bg-success/10 text-success border border-success/20';
     if (status === 'Pending') return 'bg-danger/10 text-danger border border-danger/20';
@@ -64,12 +67,12 @@ const statusClassName = (status) => {
 };
 
 const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 mt-2">
+    <div className="flex flex-wrap items-center justify-between gap-3 mb-4 mt-1">
         <div className="flex items-center gap-4">
-            <img src={dbuLogo} alt="DBU" className="hidden md:block h-12" />
+            <img src={dbuLogo} alt="DBU" className="hidden md:block h-10" />
             <div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-textPrimary mb-1">{title}</h2>
-                <p className="text-xs text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
+                <h2 className="text-2xl font-extrabold tracking-tight text-textPrimary mb-0.5">{title}</h2>
+                <p className="text-[11px] text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
             </div>
         </div>
         <div className="flex items-center gap-3">
@@ -77,10 +80,10 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="relative p-3 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
+                className="relative p-2.5 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
                 title="Open active queue"
             >
-                <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
+                <Bell size={19} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
                 {unreadCount > 0 && (
                     <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
                         {unreadCount}
@@ -91,7 +94,7 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onLogout} 
-                className="flex items-center gap-2 px-5 py-2.5 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-xs font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+                className="flex items-center gap-2 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
             >
                 <LogOut size={16} />
                 Logout
@@ -299,7 +302,7 @@ const AdminOverview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-3 md:p-5"
+            className="p-2 md:p-4 text-[0.94rem]"
         >
             <DashboardHeader
                 title="Admin Dashboard"
@@ -309,30 +312,30 @@ const AdminOverview = () => {
                 onLogout={logout}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-4">
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 md:gap-3 mb-3">
                 {[
                     {
                         label: 'Total Requests',
                         value: totalRequests,
-                        icon: <ClipboardList size={24} className="text-primary" />,
+                        icon: <ClipboardList size={20} className="text-primary" />,
                         note: 'All submitted issues'
                     },
                     {
                         label: 'Pending',
                         value: pendingCount,
-                        icon: <Activity size={24} className="text-warning" />,
+                        icon: <Activity size={20} className="text-warning" />,
                         note: 'Need review'
                     },
                     {
                         label: 'In Progress',
                         value: inProgressCount,
-                        icon: <Wrench size={24} className="text-info" />,
+                        icon: <Wrench size={20} className="text-info" />,
                         note: 'Technicians active'
                     },
                     {
                         label: 'Completed',
                         value: completedCount,
-                        icon: <CheckCircle2 size={24} className="text-success" />,
+                        icon: <CheckCircle2 size={20} className="text-success" />,
                         note: 'Closed requests'
                     }
                 ].map((item, idx) => (
@@ -341,23 +344,25 @@ const AdminOverview = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         key={item.label} 
-                        className="glass-card p-6"
+                        whileHover={{ y: -4, scale: 1.01 }}
+                        className="glass-card p-4 relative overflow-hidden"
                     >
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-info to-success opacity-70" />
+                        <div className="flex justify-between items-start mb-2">
                             <div>
-                                <p className="text-xs uppercase tracking-[0.3em] font-semibold text-textSecondary">{item.label}</p>
-                                <h2 className="text-4xl font-extrabold text-textPrimary mt-3 tracking-tight">{item.value}</h2>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-textSecondary">{item.label}</p>
+                                <h2 className="text-3xl font-extrabold text-textPrimary mt-1 tracking-tight">{item.value}</h2>
                             </div>
-                            <div className="p-3 rounded-2xl bg-surface/70 border border-overlay/10 shadow-sm">{item.icon}</div>
+                            <div className="p-2 rounded-xl bg-surface/70 border border-overlay/10 shadow-sm">{item.icon}</div>
                         </div>
-                        <p className="text-sm text-textSecondary">{item.note}</p>
+                        <p className="text-xs text-textSecondary">{item.note}</p>
                     </motion.div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4 mb-4">
-                <div className="xl:col-span-2 glass-card p-6">
-                    <div className="flex justify-between items-start mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-5 gap-2 md:gap-3 mb-3">
+                <div className="xl:col-span-2 glass-card p-4">
+                    <div className="flex justify-between items-start mb-3">
                         <div>
                             <h4 className="text-lg font-extrabold text-textPrimary mb-1">Queue Status</h4>
                             <p className="text-xs text-textSecondary font-medium m-0">Overall request status distribution</p>
@@ -371,7 +376,7 @@ const AdminOverview = () => {
                             <Activity size={20} />
                         </motion.button>
                     </div>
-                    <div className="h-[320px]">
+                    <div className="h-[210px]">
                         <Doughnut
                             data={{
                                 labels: ['Pending', 'Assigned', 'In Progress', 'On Hold', 'Completed'],
@@ -394,38 +399,34 @@ const AdminOverview = () => {
                     </div>
                 </div>
 
-                <div className="glass-card p-6">
-                    <div className="flex items-center justify-between mb-6 gap-4">
+                <div className="glass-card p-4">
+                    <div className="flex items-center justify-between mb-3 gap-4">
                         <div>
                             <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completion</h4>
                             <p className="text-xs text-textSecondary font-medium m-0">Completed {completedCount} of {totalRequests} requests</p>
                         </div>
                         <span className="rounded-full bg-success/10 text-success text-xs font-bold px-3 py-1">{completionRate}%</span>
                     </div>
-                    <div className="w-full h-4 rounded-full bg-overlay/20 overflow-hidden mb-6">
+                    <div className="w-full h-3 rounded-full bg-overlay/20 overflow-hidden mb-3">
                         <div className="h-full rounded-full bg-success" style={{ width: `${completionRate}%` }} />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
-                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Assigned</p>
-                            <span className="text-2xl font-extrabold text-textPrimary">{assignedCount}</span>
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="p-3 rounded-xl bg-surface/50 border border-overlay/10">
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-textSecondary mb-1">Assigned</p>
+                            <span className="text-xl font-extrabold text-textPrimary">{assignedCount}</span>
                         </div>
-                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
-                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">In progress</p>
-                            <span className="text-2xl font-extrabold text-textPrimary">{inProgressCount}</span>
+                        <div className="p-3 rounded-xl bg-surface/50 border border-overlay/10">
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-textSecondary mb-1">Working</p>
+                            <span className="text-xl font-extrabold text-textPrimary">{inProgressCount}</span>
                         </div>
-                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
-                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Completed</p>
-                            <span className="text-2xl font-extrabold text-textPrimary">{completedCount}</span>
+                        <div className="p-3 rounded-xl bg-surface/50 border border-overlay/10">
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-textSecondary mb-1">Done</p>
+                            <span className="text-xl font-extrabold text-textPrimary">{completedCount}</span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                <div className="xl:col-span-7">
-                    <div className="glass-card p-6 h-full flex flex-col">
-                        <div className="flex justify-between items-start mb-6">
+                <div className="xl:col-span-2 glass-card p-4 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
                             <div>
                                 <h4 className="text-lg font-extrabold text-textPrimary mb-1">Requests by Category</h4>
                                 <p className="text-xs text-textSecondary font-medium m-0">Live queue breakdown</p>
@@ -439,7 +440,7 @@ const AdminOverview = () => {
                                 <Activity size={20} />
                             </motion.button>
                         </div>
-                        <div className="flex-1 min-h-[300px]">
+                        <div className="flex-1 min-h-[210px]">
                             <Bar
                                 data={{
                                     labels: REQUEST_CATEGORIES,
@@ -464,10 +465,7 @@ const AdminOverview = () => {
                                 }}
                             />
                         </div>
-                    </div>
                 </div>
-
-
             </div>
         </motion.div>
     );
@@ -894,8 +892,6 @@ const UsersPage = () => {
     const [deletingUserId, setDeletingUserId] = useState(null);
     const [newUser, setNewUser] = useState({
         name: '',
-        email: '',
-        phone_number: '',
         user_code: '',
         role: 'student',
         skills: ''
@@ -924,12 +920,31 @@ const UsersPage = () => {
         setRegisterError('');
         setFeedback(null);
 
+        const name = newUser.name.trim();
+        const userCode = newUser.user_code.trim().toUpperCase();
+
+        if (!isValidFullName(name)) {
+            setRegistering(false);
+            setRegisterError('Enter first and last name using letters only.');
+            return;
+        }
+
+        if (!isValidUserCode(userCode)) {
+            setRegistering(false);
+            setRegisterError('User ID must use the format DBU followed by 7 digits, for example DBU1601069.');
+            return;
+        }
+
+        if (newUser.role === 'technician' && !newUser.skills) {
+            setRegistering(false);
+            setRegisterError('Select the technician ability before registering.');
+            return;
+        }
+
         try {
             const res = await axios.post('index.php?action=createUser', {
-                name: newUser.name,
-                email: newUser.email,
-                phone_number: newUser.phone_number,
-                user_code: newUser.user_code,
+                name,
+                user_code: userCode,
                 role: newUser.role,
                 skills: newUser.role === 'technician' ? newUser.skills : ''
             });
@@ -946,8 +961,6 @@ const UsersPage = () => {
             setShowRegisterModal(false);
             setNewUser({
                 name: '',
-                email: '',
-                phone_number: '',
                 user_code: '',
                 role: 'student',
                 skills: ''
@@ -1018,7 +1031,7 @@ const UsersPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-6"
+            className="p-3 md:p-4"
         >
             <DashboardHeader
                 title="User Management"
@@ -1028,7 +1041,7 @@ const UsersPage = () => {
                 onLogout={logout}
             />
 
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-end mb-4">
                 <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -1043,7 +1056,7 @@ const UsersPage = () => {
                 </motion.button>
             </div>
 
-            <div className="glass-card p-6">
+            <div className="glass-card p-4 md:p-5">
                 <AnimatePresence>
                     {feedback && (
                         <motion.div 
@@ -1063,7 +1076,6 @@ const UsersPage = () => {
                             <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">User</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">ID Code</th>
-                                <th className="pb-4 px-4 whitespace-nowrap">Contact</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Role</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Ability</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Status</th>
@@ -1091,10 +1103,6 @@ const UsersPage = () => {
                                             <div className="text-[10px] text-textSecondary mt-1 font-bold uppercase tracking-wider">{user.role} account</div>
                                         </td>
                                         <td className="py-4 px-4 font-bold text-textPrimary text-sm">{user.user_code}</td>
-                                        <td className="py-4 px-4">
-                                            <div className="font-bold text-textPrimary text-sm whitespace-nowrap">{user.phone_number || '-'}</div>
-                                            <div className="text-xs text-textSecondary mt-1 font-medium whitespace-nowrap">{user.email || 'No email'}</div>
-                                        </td>
                                         <td className="py-4 px-4 capitalize text-sm font-medium text-textSecondary">{user.role}</td>
                                         <td className="py-4 px-4 text-sm font-medium text-textSecondary whitespace-nowrap">{user.skills || '-'}</td>
                                         <td className="py-4 px-4">
@@ -1131,7 +1139,7 @@ const UsersPage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="py-12 text-center text-textSecondary font-medium">
+                                    <td colSpan="6" className="py-12 text-center text-textSecondary font-medium">
                                         No users found yet.
                                     </td>
                                 </tr>
@@ -1146,9 +1154,9 @@ const UsersPage = () => {
                 onClose={() => setShowRegisterModal(false)}
                 title="Register User"
                 showFooter={false}
-                maxWidth="760px"
+                maxWidth="720px"
             >
-                <form onSubmit={registerUser} className="space-y-6">
+                <form onSubmit={registerUser} className="space-y-5">
                     <AnimatePresence>
                         {registerError && (
                             <motion.div 
@@ -1162,16 +1170,33 @@ const UsersPage = () => {
                         )}
                     </AnimatePresence>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-xl bg-surface/80 border border-overlay/10 text-primary">
+                                <UserPlus size={20} />
+                            </div>
+                            <div>
+                                <h4 className="text-base font-extrabold text-textPrimary">Create a campus account</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0">Choose a role first. Technician ability appears only when needed.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Full Name</label>
                             <input
                                 type="text"
                                 className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                placeholder="First Last"
                                 value={newUser.name}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, name: event.target.value }))}
+                                minLength={5}
+                                pattern="[A-Za-z]+([ .'-][A-Za-z]+)+"
+                                title="Use at least first and last name with letters only"
                                 required
                             />
+                            <p className="mt-2 text-[11px] text-textSecondary font-medium">Use at least first and last name.</p>
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
@@ -1181,35 +1206,16 @@ const UsersPage = () => {
                                 placeholder="DBU1601069"
                                 value={newUser.user_code}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, user_code: event.target.value.toUpperCase() }))}
+                                pattern="DBU[0-9]{7}"
+                                title="Use DBU followed by 7 digits"
                                 required
                             />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Phone Number</label>
-                            <input
-                                type="text"
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
-                                placeholder="0911000000"
-                                value={newUser.phone_number}
-                                onChange={(event) => setNewUser((prev) => ({ ...prev, phone_number: event.target.value }))}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Email</label>
-                            <input
-                                type="email"
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
-                                placeholder="user@dbu.edu.et"
-                                value={newUser.email}
-                                onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
-                                required
-                            />
+                            <p className="mt-2 text-[11px] text-textSecondary font-medium">Format: DBU followed by 7 digits.</p>
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Role</label>
                             <select
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 value={newUser.role}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, role: event.target.value, skills: event.target.value === 'technician' ? prev.skills : '' }))}
                             >
@@ -1218,10 +1224,15 @@ const UsersPage = () => {
                             </select>
                         </div>
                         {newUser.role === 'technician' && (
-                            <div>
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                className="rounded-2xl border border-info/20 bg-info/10 p-4"
+                            >
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Technician Ability</label>
                                 <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                     value={newUser.skills}
                                     onChange={(event) => setNewUser((prev) => ({ ...prev, skills: event.target.value }))}
                                     required
@@ -1233,7 +1244,8 @@ const UsersPage = () => {
                                         </option>
                                     ))}
                                 </select>
-                            </div>
+                                <p className="mt-2 text-[11px] text-textSecondary font-medium">This helps admins assign the right maintenance work.</p>
+                            </motion.div>
                         )}
                         
                         <div className="md:col-span-2">
@@ -1454,4 +1466,3 @@ const AdminDashboard = () => (
 );
 
 export default AdminDashboard;
-
