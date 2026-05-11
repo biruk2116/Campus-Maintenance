@@ -7,7 +7,7 @@ function buildUserPayload(array $user)
 {
     return [
         "user_id" => (int)$user['id'],
-        "role" => $user['role'],
+        "role" => strtolower(trim($user['role'])),
         "name" => $user['name'],
         "user_code" => $user['user_code'],
         "phone_number" => $user['phone_number'] ?? null,
@@ -85,15 +85,16 @@ function login($pdo)
         response(true, "Password change required", [
             "action" => "change_password",
             "user_code" => $user['user_code'],
-            "role" => $user['role'],
+            "role" => strtolower(trim($user['role'])),
             "name" => $user['name'],
             "must_change_password" => 1
         ]);
     }
 
+    $role = strtolower(trim($user['role']));
     session_regenerate_id(true);
     $_SESSION['user_id'] = (int)$user['id'];
-    $_SESSION['role'] = $user['role'];
+    $_SESSION['role'] = $role;
     $_SESSION['name'] = $user['name'];
     $_SESSION['user_code'] = $user['user_code'];
 
@@ -136,7 +137,7 @@ function checkSession($pdo)
         response(false, "No active session");
     }
 
-    $_SESSION['role'] = $user['role'];
+    $_SESSION['role'] = strtolower(trim($user['role']));
     $_SESSION['name'] = $user['name'];
     $_SESSION['user_code'] = $user['user_code'];
 
