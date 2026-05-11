@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from '../api/axios';
+import { normalizeAuthUser } from '../utils/authRoutes';
 
 const AuthContext = createContext();
 
@@ -12,7 +13,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const res = await axios.get('index.php?action=checkSession');
             if (res.data.success) {
-                setUser(res.data.data);
+                setUser(normalizeAuthUser(res.data.data));
             } else {
                 setUser(null);
             }
@@ -36,7 +37,7 @@ export const AuthProvider = ({ children }) => {
                 return res.data;
             }
 
-            setUser(res.data.data);
+            setUser(normalizeAuthUser(res.data.data));
             return res.data;
         } catch (error) {
             // Enhanced error handling
