@@ -39,12 +39,12 @@ const statusClassName = (status) => {
 };
 
 const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 mt-2">
+    <div className="flex flex-wrap items-center justify-between gap-3 mb-4 mt-1">
         <div className="flex items-center gap-4">
-            <img src={dbuLogo} alt="DBU" className="hidden md:block h-12" />
+            <img src={dbuLogo} alt="DBU" className="hidden md:block h-10" />
             <div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-textPrimary mb-1">{title}</h2>
-                <p className="text-xs text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
+                <h2 className="text-2xl font-extrabold tracking-tight text-textPrimary mb-0.5">{title}</h2>
+                <p className="text-[11px] text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
             </div>
         </div>
         <div className="flex items-center gap-3">
@@ -52,10 +52,10 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onReadNotifications}
-                className="relative p-3 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
+                className="relative p-2.5 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
                 title="Open assigned work"
             >
-                <Bell size={22} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
+                <Bell size={19} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
                 {unreadCount > 0 && (
                     <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
                         {unreadCount}
@@ -66,7 +66,7 @@ const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, on
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onLogout} 
-                className="flex items-center gap-2 px-5 py-2.5 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-xs font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+                className="flex items-center gap-2 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
             >
                 <LogOut size={16} />
                 Logout
@@ -296,7 +296,7 @@ const TechnicianOverview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-3 md:p-5"
+            className="p-2 md:p-4 text-[0.94rem]"
         >
             <DashboardHeader
                 title="Technician Dashboard"
@@ -314,55 +314,57 @@ const TechnicianOverview = () => {
                 <p className="text-xs text-textSecondary max-w-2xl">A quick snapshot of your assigned maintenance requests, workload status, and completion progress.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-4">
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 md:gap-3 mb-3">
                 {[
                     {
                         label: 'Total Requests',
                         value: totalRequests,
-                        icon: <Activity size={24} className="text-primary" />,
+                        icon: <Activity size={20} className="text-primary" />,
                         note: 'Work assigned to you'
                     },
                     {
                         label: 'Assigned',
                         value: assignedCount,
-                        icon: <Wrench size={24} className="text-warning" />,
+                        icon: <Wrench size={20} className="text-warning" />,
                         note: 'Ready to start'
                     },
                     {
                         label: 'In Progress',
                         value: inProgressCount,
-                        icon: <Activity size={24} className="text-info" />,
+                        icon: <Activity size={20} className="text-info" />,
                         note: 'Currently working'
                     },
                     {
                         label: 'Completed',
                         value: completedRequests.length,
-                        icon: <CheckCircle2 size={24} className="text-success" />,
+                        icon: <CheckCircle2 size={20} className="text-success" />,
                         note: 'Finished jobs'
                     }
                 ].map((card, idx) => (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.1 }}
+                        whileHover={{ y: -4, scale: 1.01 }}
+                        transition={{ delay: idx * 0.06 }}
                         key={card.label}
-                        className="glass-card p-6"
+                        className="glass-card p-4 relative overflow-hidden"
                     >
-                        <div className="flex justify-between items-start gap-4 mb-4">
+                        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-info to-success opacity-70" />
+                        <div className="flex justify-between items-start gap-3 mb-2">
                             <div>
-                                <p className="text-xs uppercase tracking-[0.3em] font-semibold text-textSecondary">{card.label}</p>
-                                <h2 className="text-4xl font-extrabold text-textPrimary mt-3 tracking-tight">{card.value}</h2>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-textSecondary">{card.label}</p>
+                                <h2 className="text-3xl font-extrabold text-textPrimary mt-1 tracking-tight">{card.value}</h2>
                             </div>
-                            <div className="p-3 rounded-2xl bg-surface/70 border border-overlay/10 shadow-sm">{card.icon}</div>
+                            <div className="p-2 rounded-xl bg-surface/70 border border-overlay/10 shadow-sm">{card.icon}</div>
                         </div>
-                        <p className="text-sm text-textSecondary">{card.note}</p>
+                        <p className="text-xs text-textSecondary">{card.note}</p>
                     </motion.div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4 mb-4">
-                <div className="xl:col-span-2 glass-card p-6">
-                    <div className="flex justify-between items-start mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 md:gap-3 mb-3">
+                <div className="xl:col-span-2 glass-card p-4">
+                    <div className="flex justify-between items-start mb-3">
                         <div>
                             <h4 className="text-lg font-extrabold text-textPrimary mb-1">Workload Status</h4>
                             <p className="text-xs text-textSecondary font-medium m-0">Your assigned request distribution</p>
@@ -376,7 +378,7 @@ const TechnicianOverview = () => {
                             <Activity size={20} />
                         </motion.button>
                     </div>
-                    <div className="h-[320px]">
+                    <div className="h-[210px]">
                         <Doughnut
                             data={{
                                 labels: ['Assigned', 'In Progress', 'On Hold', 'Completed'],
@@ -399,36 +401,36 @@ const TechnicianOverview = () => {
                     </div>
                 </div>
 
-                <div className="glass-card p-6">
-                    <div className="flex items-center justify-between mb-6 gap-4">
+                <div className="glass-card p-4">
+                    <div className="flex items-center justify-between mb-3 gap-4">
                         <div>
                             <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completion</h4>
                             <p className="text-xs text-textSecondary font-medium m-0">Completed {completedRequests.length} of {totalRequests} requests</p>
                         </div>
                         <span className="rounded-full bg-success/10 text-success text-xs font-bold px-3 py-1">{completionRate}%</span>
                     </div>
-                    <div className="w-full h-4 rounded-full bg-overlay/20 overflow-hidden mb-6">
+                    <div className="w-full h-3 rounded-full bg-overlay/20 overflow-hidden mb-3">
                         <div className="h-full rounded-full bg-success" style={{ width: `${completionRate}%` }} />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
-                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Assigned</p>
-                            <span className="text-2xl font-extrabold text-textPrimary">{assignedCount}</span>
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="p-3 rounded-xl bg-surface/50 border border-overlay/10">
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-textSecondary mb-1">Assigned</p>
+                            <span className="text-xl font-extrabold text-textPrimary">{assignedCount}</span>
                         </div>
-                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
-                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">In progress</p>
-                            <span className="text-2xl font-extrabold text-textPrimary">{inProgressCount}</span>
+                        <div className="p-3 rounded-xl bg-surface/50 border border-overlay/10">
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-textSecondary mb-1">Working</p>
+                            <span className="text-xl font-extrabold text-textPrimary">{inProgressCount}</span>
                         </div>
-                        <div className="p-4 rounded-3xl bg-surface/50 border border-overlay/10">
-                            <p className="text-xs uppercase tracking-[0.3em] text-textSecondary mb-2">Completed</p>
-                            <span className="text-2xl font-extrabold text-textPrimary">{completedRequests.length}</span>
+                        <div className="p-3 rounded-xl bg-surface/50 border border-overlay/10">
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-textSecondary mb-1">Done</p>
+                            <span className="text-xl font-extrabold text-textPrimary">{completedRequests.length}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="glass-card p-6 h-full flex flex-col">
-                <div className="flex justify-between items-start mb-6">
+            <div className="glass-card p-4 h-full flex flex-col">
+                <div className="flex justify-between items-start mb-3">
                     <div>
                         <h4 className="text-lg font-extrabold text-textPrimary mb-1">Assigned Requests</h4>
                         <p className="text-xs text-textSecondary font-medium m-0">Open requests to send status updates</p>
@@ -672,4 +674,3 @@ const TechnicianDashboard = () => (
 );
 
 export default TechnicianDashboard;
-
