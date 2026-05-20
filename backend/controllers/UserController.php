@@ -39,10 +39,79 @@ function getUserFormOptions($pdo)
         ORDER BY department_name ASC
     ")->fetchAll(PDO::FETCH_ASSOC);
 
+    $specializations = $pdo->query("
+        SELECT specialization_name
+        FROM technician_specializations
+        ORDER BY specialization_name ASC
+    ")->fetchAll(PDO::FETCH_COLUMN);
+
     response(true, "User form options", [
         "departments" => $departments,
         "roles" => ['Student', 'Staff', 'Technician'],
-        "specializations" => ['Electrical', 'Plumbing', 'Network', 'Hardware', 'Civil']
+        "specializations" => $specializations
+    ]);
+}
+
+function createDepartment($pdo)
+{
+    $departmentName = trim($_POST['department_name'] ?? '');
+    $officeLocation = trim($_POST['office_location'] ?? '');
+
+    if (!$departmentName || !$officeLocation) {
+        response(false, "Department name and office location are required");
+    }
+
+    if (strlen($departmentName) < 3) {
+        response(false, "Department name must be at least 3 characters");
+    }
+
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO departments (department_name, office_location)
+            VALUES (?, ?)
+        ");
+        $stmt->execute([$departmentName, $officeLocation]);
+    } catch (PDOException $error) {
+        if ($error->getCode() === '23000') {
+            response(false, "Department already exists");
+        }
+        response(false, "Unable to create department");
+    }
+
+    response(true, "Department created successfully", [
+        "department_id" => (int)$pdo->lastInsertId(),
+        "department_name" => $departmentName,
+        "office_location" => $officeLocation
+    ]);
+}
+
+function createTechnicianSpecialization($pdo)
+{
+    $specializationName = trim($_POST['specialization_name'] ?? '');
+
+    if (!$specializationName) {
+        response(false, "Specialization name is required");
+    }
+
+    if (strlen($specializationName) < 3) {
+        response(false, "Specialization name must be at least 3 characters");
+    }
+
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO technician_specializations (specialization_name)
+            VALUES (?)
+        ");
+        $stmt->execute([$specializationName]);
+    } catch (PDOException $error) {
+        if ($error->getCode() === '23000') {
+            response(false, "Specialization already exists");
+        }
+        response(false, "Unable to create specialization");
+    }
+
+    response(true, "Specialization created successfully", [
+        "specialization_name" => $specializationName
     ]);
 }
 
@@ -97,11 +166,19 @@ function createUser($pdo)
     }
 
     if ($role === 'technician') {
-        $allowedSpecializations = ['Electrical', 'Plumbing', 'Network', 'Hardware', 'Civil'];
         if (!$specialization && $skills) {
             $specialization = technicianSpecializationFromSkills($skills);
         }
-        if (!in_array($specialization, $allowedSpecializations, true)) {
+
+        $specializationStmt = $pdo->prepare("
+            SELECT specialization_name
+            FROM technician_specializations
+            WHERE specialization_name = ?
+            LIMIT 1
+        ");
+        $specializationStmt->execute([$specialization]);
+
+        if (!$specializationStmt->fetchColumn()) {
             response(false, "Technician specialization is required");
         }
         $skills = $skills ?: $specialization;
