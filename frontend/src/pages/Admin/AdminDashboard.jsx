@@ -39,21 +39,20 @@ import techBg from '../../assets/images/tech-bg.png';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 const TECHNICIAN_SKILLS = [
+    'Electrical',
     'Plumbing',
-    'Electrician',
-    'ICT Technician',
-    'HVAC / Cooling',
-    'Carpentry',
-    'Painting / Finishing'
+    'Network',
+    'Hardware',
+    'Civil'
 ];
 
 const REQUEST_CATEGORIES = [
-    'Plumbing',
-    'Electricity',
-    'ICT Technician',
-    'Carpentry',
-    'HVAC / Cooling',
-    'Painting / Finishing'
+    'Network Equipment',
+    'Audio Visual',
+    'HVAC',
+    'Plumbing Equipment',
+    'Computer Hardware',
+    'Workshop Equipment'
 ];
 
 const isValidFullName = (name) => /^[A-Za-z]+(?:[ .'-][A-Za-z]+)+$/.test(name.trim());
@@ -890,11 +889,17 @@ const UsersPage = () => {
     const [feedback, setFeedback] = useState(null);
     const [generatedCredentials, setGeneratedCredentials] = useState(null);
     const [deletingUserId, setDeletingUserId] = useState(null);
+    const [formOptions, setFormOptions] = useState({ departments: [], roles: ['Student', 'Staff', 'Technician'], specializations: TECHNICIAN_SKILLS });
     const [newUser, setNewUser] = useState({
         name: '',
         user_code: '',
+        email: '',
+        phone_number: '',
+        department_id: '',
         role: 'student',
-        skills: ''
+        specialization: '',
+        experience_years: 0,
+        availability_status: 'Available'
     });
 
     const fetchUsers = useCallback(async () => {
@@ -910,6 +915,11 @@ const UsersPage = () => {
 
     useEffect(() => {
         fetchUsers();
+        axios.get('index.php?action=getUserFormOptions').then((res) => {
+            if (res.data.success) {
+                setFormOptions(res.data.data);
+            }
+        }).catch(() => {});
         const interval = setInterval(fetchUsers, 20000);
         return () => clearInterval(interval);
     }, [fetchUsers]);
@@ -935,9 +945,9 @@ const UsersPage = () => {
             return;
         }
 
-        if (newUser.role === 'technician' && !newUser.skills) {
+        if (newUser.role === 'technician' && !newUser.specialization) {
             setRegistering(false);
-            setRegisterError('Select the technician ability before registering.');
+            setRegisterError('Select the technician specialization before registering.');
             return;
         }
 
@@ -945,8 +955,14 @@ const UsersPage = () => {
             const res = await axios.post('index.php?action=createUser', {
                 name,
                 user_code: userCode,
+                email: newUser.email.trim(),
+                phone_number: newUser.phone_number.trim(),
+                department_id: newUser.department_id || null,
                 role: newUser.role,
-                skills: newUser.role === 'technician' ? newUser.skills : ''
+                skills: newUser.role === 'technician' ? newUser.specialization : '',
+                specialization: newUser.role === 'technician' ? newUser.specialization : '',
+                experience_years: newUser.role === 'technician' ? newUser.experience_years : 0,
+                availability_status: newUser.role === 'technician' ? newUser.availability_status : 'Available'
             });
 
             if (!res.data.success) {
@@ -962,8 +978,13 @@ const UsersPage = () => {
             setNewUser({
                 name: '',
                 user_code: '',
+                email: '',
+                phone_number: '',
+                department_id: '',
                 role: 'student',
-                skills: ''
+                specialization: '',
+                experience_years: 0,
+                availability_status: 'Available'
             });
             await fetchUsers();
         } catch (error) {
@@ -1077,7 +1098,8 @@ const UsersPage = () => {
                                 <th className="pb-4 px-4 whitespace-nowrap">User</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">ID Code</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Role</th>
-                                <th className="pb-4 px-4 whitespace-nowrap">Ability</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Department</th>
+                                <th className="pb-4 px-4 whitespace-nowrap">Specialization</th>
                                 <th className="pb-4 px-4 whitespace-nowrap">Status</th>
                                 <th className="pb-4 px-4 text-right whitespace-nowrap">Actions</th>
                             </tr>
@@ -1100,11 +1122,12 @@ const UsersPage = () => {
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{user.name}</div>
-                                            <div className="text-[10px] text-textSecondary mt-1 font-bold uppercase tracking-wider">{user.role} account</div>
+                                            <div className="text-[10px] text-textSecondary mt-1 font-bold uppercase tracking-wider">{user.email || user.phone_number || `${user.role} account`}</div>
                                         </td>
                                         <td className="py-4 px-4 font-bold text-textPrimary text-sm">{user.user_code}</td>
                                         <td className="py-4 px-4 capitalize text-sm font-medium text-textSecondary">{user.role}</td>
-                                        <td className="py-4 px-4 text-sm font-medium text-textSecondary whitespace-nowrap">{user.skills || '-'}</td>
+                                        <td className="py-4 px-4 text-sm font-medium text-textSecondary whitespace-nowrap">{user.department_name || '-'}</td>
+                                        <td className="py-4 px-4 text-sm font-medium text-textSecondary whitespace-nowrap">{user.specialization || user.skills || '-'}</td>
                                         <td className="py-4 px-4">
                                             <div className="flex flex-col gap-2">
                                                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${user.status === 'active' ? 'bg-success/10 text-success border-success/20' : 'bg-textSecondary/10 text-textSecondary border-textSecondary/20'}`}>

@@ -23,12 +23,12 @@ function login($pdo) {
     }
 
     // Check status
-    if ($user['status'] != 'active') {
+    if ($user['status'] != 'Active') {
         response(false, "Account is inactive");
     }
 
     // Verify password
-    if (!verifyPassword($password, $user['password'])) {
+    if (!verifyPassword($password, $user['password_hash'])) {
         response(false, "Invalid password");
     }
 
@@ -36,15 +36,15 @@ function login($pdo) {
     if ($user['must_change_password'] == 1) {
         response(true, "Password change required", [
             "action" => "change_password",
-            "user_id" => $user['id']
+            "user_id" => $user['user_id']
         ]);
     }
 
     // SUCCESS LOGIN
     response(true, "Login successful", [
-        "user_id" => $user['id'],
-        "role" => $user['role'],
-        "name" => $user['name']
+        "user_id" => $user['user_id'],
+        "role" => strtolower($user['role']),
+        "name" => $user['full_name']
     ]);
 }
 

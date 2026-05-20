@@ -36,12 +36,12 @@ import techBg from '../../assets/images/tech-bg.png';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 const REQUEST_CATEGORIES = [
-    'Plumbing',
-    'Electricity',
-    'ICT Technician',
-    'Carpentry',
-    'HVAC / Cooling',
-    'Painting / Finishing'
+    'Network Equipment',
+    'Audio Visual',
+    'HVAC',
+    'Plumbing Equipment',
+    'Computer Hardware',
+    'Workshop Equipment'
 ];
 
 const statusClassName = (status) => {
@@ -148,16 +148,38 @@ const NewRequestForm = () => {
     const { logout } = useAuth();
     const { unreadCount, markNotificationsRead } = useStudentDashboardData();
     const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        category: 'Plumbing',
-        dorm: '',
-        block: '',
-        priority: 'Medium'
+        issue_title: '',
+        issue_description: '',
+        location_id: '',
+        asset_id: '',
+        priority_level: 'Medium'
     });
+    const [options, setOptions] = useState({ locations: [], assets: [], priorities: ['Low', 'Medium', 'High', 'Emergency'] });
+    const [optionsLoading, setOptionsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const res = await axios.get('index.php?action=getRequestOptions');
+                if (res.data.success) {
+                    setOptions(res.data.data);
+                }
+            } catch {
+                setError('Unable to load request form options');
+            } finally {
+                setOptionsLoading(false);
+            }
+        };
+
+        fetchOptions();
+    }, []);
+
+    const availableAssets = useMemo(() => (
+        options.assets || []
+    ).filter((asset) => !formData.location_id || String(asset.location_id) === String(formData.location_id)), [formData.location_id, options.assets]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -165,11 +187,13 @@ const NewRequestForm = () => {
         setError('');
 
         try {
-            const payload = {
-                ...formData,
-                location: `${formData.dorm}, Block ${formData.block}`
-            };
-            const res = await axios.post('index.php?action=createRequest', payload);
+            const res = await axios.post('index.php?action=createRequest', {
+                issue_title: formData.issue_title,
+                issue_description: formData.issue_description,
+                location_id: formData.location_id,
+                asset_id: formData.asset_id || null,
+                priority_level: formData.priority_level
+            });
 
             if (!res.data.success) {
                 throw new Error(res.data.message || 'Unable to submit request');
@@ -177,12 +201,11 @@ const NewRequestForm = () => {
 
             setSuccess(true);
             setFormData({
-                title: '',
-                description: '',
-                category: 'Plumbing',
-                dorm: '',
-                block: '',
-                priority: 'Medium'
+                issue_title: '',
+                issue_description: '',
+                location_id: '',
+                asset_id: '',
+                priority_level: 'Medium'
             });
         } catch (error) {
             setError(error.message || 'Unable to submit request');
@@ -224,27 +247,47 @@ const NewRequestForm = () => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="md:col-span-2">
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Problem Title</label>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Issue Title</label>
                                 <input
                                     type="text"
                                     className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
-                                    value={formData.title}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
-                                    placeholder="Example: Water leakage in Block B"
+                                    value={formData.issue_title}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, issue_title: event.target.value }))}
+                                    placeholder="Example: Projector not displaying"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Category</label>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Location</label>
                                 <select
                                     className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
-                                    value={formData.category}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
+                                    value={formData.location_id}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, location_id: event.target.value, asset_id: '' }))}
+                                    disabled={optionsLoading}
+                                    required
                                 >
-                                    {REQUEST_CATEGORIES.map((category) => (
-                                        <option key={category} value={category} className="bg-surface text-textPrimary">
-                                            {category}
+                                    <option value="" className="bg-surface text-textSecondary">Select location</option>
+                                    {(options.locations || []).map((location) => (
+                                        <option key={location.location_id} value={location.location_id} className="bg-surface text-textPrimary">
+                                            {location.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Asset</label>
+                                <select
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
+                                    value={formData.asset_id}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, asset_id: event.target.value }))}
+                                    disabled={!formData.location_id || optionsLoading}
+                                >
+                                    <option value="" className="bg-surface text-textSecondary">No specific asset</option>
+                                    {availableAssets.map((asset) => (
+                                        <option key={asset.asset_id} value={asset.asset_id} className="bg-surface text-textPrimary">
+                                            {asset.asset_name} - {asset.serial_number}
                                         </option>
                                     ))}
                                 </select>
@@ -253,48 +296,23 @@ const NewRequestForm = () => {
                             <div>
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Priority</label>
                                 <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
-                                    value={formData.priority}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, priority: event.target.value }))}
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    value={formData.priority_level}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, priority_level: event.target.value }))}
                                 >
-                                    <option value="Low" className="bg-surface">Low</option>
-                                    <option value="Medium" className="bg-surface">Medium</option>
-                                    <option value="High" className="bg-surface">High</option>
-                                    <option value="Emergency" className="bg-surface">Emergency</option>
+                                    {(options.priorities || ['Low', 'Medium', 'High', 'Emergency']).map((priority) => (
+                                        <option key={priority} value={priority} className="bg-surface">{priority}</option>
+                                    ))}
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Dorm</label>
-                                <input
-                                    type="text"
-                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
-                                    value={formData.dorm}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, dorm: event.target.value }))}
-                                    placeholder="Example: Dorm A"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Block</label>
-                                <input
-                                    type="text"
-                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
-                                    value={formData.block}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, block: event.target.value }))}
-                                    placeholder="Example: Block B"
-                                    required
-                                />
-                            </div>
-
                             <div className="md:col-span-2">
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Description</label>
+                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Issue Description</label>
                                 <textarea
                                     className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                     rows="5"
-                                    value={formData.description}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
+                                    value={formData.issue_description}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, issue_description: event.target.value }))}
                                     placeholder="Describe the maintenance problem clearly"
                                     required
                                 />
@@ -307,7 +325,7 @@ const NewRequestForm = () => {
                                 whileTap={{ scale: 0.98 }}
                                 type="submit" 
                                 className="btn-primary w-full md:w-auto px-8 py-4 rounded-xl text-sm font-extrabold tracking-widest uppercase flex items-center justify-center gap-2" 
-                                disabled={saving}
+                                disabled={saving || optionsLoading}
                             >
                                 {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                                 {saving ? 'Sending...' : 'Submit Request'}

@@ -1,94 +1,55 @@
 # Database Schema Details
 
-## `users`
-Stores all registered accounts.
+Database name: `campus_maintenance_system`
 
-Main fields:
-- `id`: primary key
-- `user_code`: unique login ID
-- `name`: full name
-- `email`: email address
-- `phone_number`: phone number
-- `password`: hashed password
-- `role`: `admin`, `student`, or `technician`
-- `status`: `active` or `inactive`
-- `skills`: technician ability
-- `must_change_password`: forces password update on next login
-- `created_at`, `updated_at`: audit timestamps
+The schema now contains the normalized campus-maintenance tables requested for assets, locations, work orders, inventory, history, notifications, and preventive schedules. It also preserves the existing application workflow through the `requests`, `maintenance_logs`, `request_attachments`, and `user_files` tables.
 
-## `requests`
-Stores every maintenance request with the current live links and request snapshots.
+## Core Tables
 
-Main fields:
-- `student_id`: live link to the student account
-- `technician_id`: live link to the assigned technician
-- `title`, `description`, `category`
-- `dorm`, `block`, `location`
-- `priority`, `status`, `progress_percentage`
-- `admin_seen`, `tech_seen`, `student_seen`
-- `student_hidden`
+### `departments`
+Stores campus departments.
 
-Student snapshot fields:
-- `student_name_snapshot`
-- `student_code_snapshot`
-- `student_phone_snapshot`
-- `student_email_snapshot`
+Main fields: `department_id`, `department_name`, `office_location`
 
-Technician snapshot fields:
-- `technician_name_snapshot`
-- `technician_code_snapshot`
-- `technician_phone_snapshot`
-- `technician_email_snapshot`
-- `technician_skills_snapshot`
+### `users`
+Stores all people and login accounts.
 
-These snapshot fields preserve history even if a user is later deleted.
+Main fields: `user_id`, `user_code`, `full_name`, `email`, `phone`, `password_hash`, `role`, `department_id`, `status`, `created_at`
 
-## `maintenance_logs`
-Stores the full request timeline.
+Compatibility fields used by the current app: `skills`, `must_change_password`, `updated_at`
 
-Main fields:
-- `request_id`: request being updated
-- `user_id`: live link to the actor when still present
-- `actor_name`, `actor_role`, `actor_code`: preserved actor snapshot
-- `action_taken`
-- `remarks`
-- `progress_percentage`
-- `created_at`
+### `buildings`, `locations`, `assets`
+Normalize where maintenance happens and which physical assets are maintained.
 
-## `request_attachments`
-Stores files that belong to a request directly in the database.
+`assets.serial_number` and `buildings.building_code` are unique.
 
-Main fields:
-- `request_id`: request owner
-- `uploaded_by_user_id`: live uploader link
-- `uploader_name_snapshot`, `uploader_role_snapshot`, `uploader_code_snapshot`
-- `file_name`
-- `file_extension`
-- `mime_type`
-- `file_category`
-- `file_size_bytes`
-- `file_description`
-- `file_data`: binary file content as `LONGBLOB`
-- `created_at`
+### `technicians`
+Stores technician-specific details linked one-to-one to `users`.
 
-## `user_files`
-Stores files that belong to a user directly in the database.
+Main fields: `technician_id`, `user_id`, `specialization`, `experience_years`, `availability_status`
 
-Main fields:
-- `user_id`: live user link
-- `owner_name_snapshot`, `owner_role_snapshot`, `owner_code_snapshot`
-- `file_name`
-- `file_extension`
-- `mime_type`
-- `file_category`
-- `file_size_bytes`
-- `file_description`
-- `file_data`: binary file content as `LONGBLOB`
-- `created_at`
+### `maintenance_requests`
+Stores normalized maintenance reports for asset/location reporting.
 
-## Placement Summary
-- User account details go in `users`
-- Maintenance request details go in `requests`
-- Request progress history goes in `maintenance_logs`
-- Request-related uploaded files go in `request_attachments`
-- User-related files go in `user_files`
+Main fields: `request_id`, `reported_by`, `asset_id`, `location_id`, `issue_title`, `issue_description`, `priority_level`, `request_status`, `assigned_to`
+
+### `requests`
+Stores the live request workflow used by the React/PHP dashboards.
+
+It includes `maintenance_request_id` so new app requests are linked to the normalized `maintenance_requests` table.
+
+### `work_orders`, `inventory`, `maintenance_parts_usage`, `maintenance_history`
+Track technician work, spare parts, costs, and historical maintenance records.
+
+### `notifications`, `preventive_schedules`
+Support user messages and planned asset servicing.
+
+## Setup
+
+Run `backend/setup.php` or import `database/init.sql` in phpMyAdmin.
+
+Default credentials:
+
+- Admin: `ADMIN001` / `admin123`
+- Student: `DBU2024001` / `admin123`
+- Technician: `DBU2024002` / `admin123`

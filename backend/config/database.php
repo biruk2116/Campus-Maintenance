@@ -1,7 +1,7 @@
 <?php
 
 $host = "localhost";
-$db_name = "campus_maintenance";
+$db_name = "campus_maintenance_system";
 $username = "root";
 $password = "";
 $charset = "utf8mb4";
@@ -68,6 +68,7 @@ function safeSchemaExec(PDO $pdo, string $sql, string $description): void
 
 function ensureDatabaseSchema(PDO $pdo): void
 {
+    ensureColumn($pdo, 'requests', 'maintenance_request_id', "ALTER TABLE requests ADD COLUMN maintenance_request_id INT UNIQUE DEFAULT NULL AFTER id");
     ensureColumn($pdo, 'requests', 'dorm', "ALTER TABLE requests ADD COLUMN dorm VARCHAR(120) DEFAULT NULL AFTER category");
     ensureColumn($pdo, 'requests', 'block', "ALTER TABLE requests ADD COLUMN block VARCHAR(120) DEFAULT NULL AFTER dorm");
     ensureColumn($pdo, 'requests', 'student_name_snapshot', "ALTER TABLE requests ADD COLUMN student_name_snapshot VARCHAR(100) DEFAULT NULL AFTER student_hidden");
@@ -101,7 +102,7 @@ function ensureDatabaseSchema(PDO $pdo): void
             file_data LONGBLOB NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT fk_request_attachments_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE,
-            CONSTRAINT fk_request_attachments_user FOREIGN KEY (uploaded_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+            CONSTRAINT fk_request_attachments_user FOREIGN KEY (uploaded_by_user_id) REFERENCES users(user_id) ON DELETE SET NULL
         )
     ", 'request_attachments table');
 
@@ -120,7 +121,7 @@ function ensureDatabaseSchema(PDO $pdo): void
             file_description TEXT DEFAULT NULL,
             file_data LONGBLOB NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT fk_user_files_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            CONSTRAINT fk_user_files_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
         )
     ", 'user_files table');
 
@@ -132,7 +133,7 @@ function ensureDatabaseSchema(PDO $pdo): void
         $studentRequestKey = findForeignKeyName($pdo, 'requests', 'student_id');
         if ($studentRequestKey && foreignKeyDeleteRule($pdo, $studentRequestKey) !== 'SET NULL') {
             safeSchemaExec($pdo, "ALTER TABLE requests DROP FOREIGN KEY `{$studentRequestKey}`", 'requests student foreign key drop');
-            safeSchemaExec($pdo, "ALTER TABLE requests ADD CONSTRAINT fk_requests_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE SET NULL", 'requests student foreign key add');
+            safeSchemaExec($pdo, "ALTER TABLE requests ADD CONSTRAINT fk_requests_student FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE SET NULL", 'requests student foreign key add');
         }
     } catch (PDOException $e) {
         error_log("Schema foreign key check skipped for requests.student_id: " . $e->getMessage());
@@ -142,7 +143,7 @@ function ensureDatabaseSchema(PDO $pdo): void
         $technicianRequestKey = findForeignKeyName($pdo, 'requests', 'technician_id');
         if ($technicianRequestKey && foreignKeyDeleteRule($pdo, $technicianRequestKey) !== 'SET NULL') {
             safeSchemaExec($pdo, "ALTER TABLE requests DROP FOREIGN KEY `{$technicianRequestKey}`", 'requests technician foreign key drop');
-            safeSchemaExec($pdo, "ALTER TABLE requests ADD CONSTRAINT fk_requests_technician FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL", 'requests technician foreign key add');
+            safeSchemaExec($pdo, "ALTER TABLE requests ADD CONSTRAINT fk_requests_technician FOREIGN KEY (technician_id) REFERENCES users(user_id) ON DELETE SET NULL", 'requests technician foreign key add');
         }
     } catch (PDOException $e) {
         error_log("Schema foreign key check skipped for requests.technician_id: " . $e->getMessage());
@@ -152,7 +153,7 @@ function ensureDatabaseSchema(PDO $pdo): void
         $logUserKey = findForeignKeyName($pdo, 'maintenance_logs', 'user_id');
         if ($logUserKey && foreignKeyDeleteRule($pdo, $logUserKey) !== 'SET NULL') {
             safeSchemaExec($pdo, "ALTER TABLE maintenance_logs DROP FOREIGN KEY `{$logUserKey}`", 'maintenance_logs user foreign key drop');
-            safeSchemaExec($pdo, "ALTER TABLE maintenance_logs ADD CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL", 'maintenance_logs user foreign key add');
+            safeSchemaExec($pdo, "ALTER TABLE maintenance_logs ADD CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL", 'maintenance_logs user foreign key add');
         }
     } catch (PDOException $e) {
         error_log("Schema foreign key check skipped for maintenance_logs.user_id: " . $e->getMessage());
@@ -160,25 +161,25 @@ function ensureDatabaseSchema(PDO $pdo): void
 
     safeSchemaExec($pdo, "
         UPDATE requests r
-        LEFT JOIN users s ON r.student_id = s.id
-        LEFT JOIN users t ON r.technician_id = t.id
+        LEFT JOIN users s ON r.student_id = s.user_id
+        LEFT JOIN users t ON r.technician_id = t.user_id
         SET
-            r.student_name_snapshot = COALESCE(r.student_name_snapshot, s.name),
+            r.student_name_snapshot = COALESCE(r.student_name_snapshot, s.full_name),
             r.student_code_snapshot = COALESCE(r.student_code_snapshot, s.user_code),
-            r.student_phone_snapshot = COALESCE(r.student_phone_snapshot, s.phone_number),
+            r.student_phone_snapshot = COALESCE(r.student_phone_snapshot, s.phone),
             r.student_email_snapshot = COALESCE(r.student_email_snapshot, s.email),
-            r.technician_name_snapshot = COALESCE(r.technician_name_snapshot, t.name),
+            r.technician_name_snapshot = COALESCE(r.technician_name_snapshot, t.full_name),
             r.technician_code_snapshot = COALESCE(r.technician_code_snapshot, t.user_code),
-            r.technician_phone_snapshot = COALESCE(r.technician_phone_snapshot, t.phone_number),
+            r.technician_phone_snapshot = COALESCE(r.technician_phone_snapshot, t.phone),
             r.technician_email_snapshot = COALESCE(r.technician_email_snapshot, t.email),
             r.technician_skills_snapshot = COALESCE(r.technician_skills_snapshot, t.skills)
     ", 'request snapshots backfill');
 
     safeSchemaExec($pdo, "
         UPDATE maintenance_logs l
-        LEFT JOIN users u ON l.user_id = u.id
+        LEFT JOIN users u ON l.user_id = u.user_id
         SET
-            l.actor_name = COALESCE(l.actor_name, u.name),
+            l.actor_name = COALESCE(l.actor_name, u.full_name),
             l.actor_role = COALESCE(l.actor_role, u.role),
             l.actor_code = COALESCE(l.actor_code, u.user_code)
     ", 'maintenance log actor backfill');

@@ -8,7 +8,7 @@
 header('Content-Type: application/json; charset=utf-8');
 
 $host = "localhost";
-$db_name = "campus_maintenance";
+$db_name = "campus_maintenance_system";
 $username = "root";
 $password = "";
 $charset = "utf8mb4";
@@ -43,6 +43,9 @@ try {
     foreach ($statements as $statement) {
         try {
             if (!empty($statement)) {
+                if (preg_match('/^SELECT\b/i', $statement)) {
+                    continue;
+                }
                 $pdo->exec($statement);
                 $executedCount++;
             }
@@ -72,12 +75,12 @@ try {
                 ],
                 [
                     "role" => "student",
-                    "user_code" => "DBU-2024-STU",
+                    "user_code" => "DBU2024001",
                     "password" => "admin123"
                 ],
                 [
                     "role" => "technician",
-                    "user_code" => "DBU-2024-TEC",
+                    "user_code" => "DBU2024002",
                     "password" => "admin123"
                 ]
             ]

@@ -17,12 +17,12 @@ function requireActiveUser($pdo)
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT status FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT status FROM users WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user || $user['status'] !== 'active') {
+    if (!$user || $user['status'] !== 'Active') {
         session_destroy(); // 🔴 force logout
         echo json_encode([
             "success" => false,

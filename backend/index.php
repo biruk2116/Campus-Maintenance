@@ -51,10 +51,18 @@ switch ($action) {
 
     case 'createRequest':
         requireAuth();
-        requireRole(['student']);
+        requireRole(['student', 'staff']);
         requireActiveUser($pdo);
         require_once __DIR__ . "/controllers/RequestController.php";
         createRequest($pdo);
+        break;
+
+    case 'getRequestOptions':
+        requireAuth();
+        requireRole(['student', 'staff', 'admin']);
+        requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/RequestController.php";
+        getRequestOptions($pdo);
         break;
 
     case 'getStudentRequests':
@@ -71,6 +79,14 @@ switch ($action) {
         requireActiveUser($pdo);
         require_once __DIR__ . "/controllers/UserController.php";
         createUser($pdo);
+        break;
+
+    case 'getUserFormOptions':
+        requireAuth();
+        requireRole(['admin']);
+        requireActiveUser($pdo);
+        require_once __DIR__ . "/controllers/UserController.php";
+        getUserFormOptions($pdo);
         break;
 
     case 'updateUser':
