@@ -13,10 +13,43 @@ function isValidFullName($name)
     return preg_match('/^[A-Za-z]+(?:[ .\'-][A-Za-z]+)+$/', $name);
 }
 
+function technicianSpecializationFromSkills($skills)
+{
+    $value = strtolower($skills);
+    if (strpos($value, 'electrical') !== false) {
+        return 'Electrical';
+    }
+    if (strpos($value, 'plumbing') !== false) {
+        return 'Plumbing';
+    }
+    if (strpos($value, 'network') !== false) {
+        return 'Network';
+    }
+    if (strpos($value, 'civil') !== false) {
+        return 'Civil';
+    }
+    return 'Hardware';
+}
+
+function getUserFormOptions($pdo)
+{
+    $departments = $pdo->query("
+        SELECT department_id, department_name, office_location
+        FROM departments
+        ORDER BY department_name ASC
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    response(true, "User form options", [
+        "departments" => $departments,
+        "roles" => ['Student', 'Staff', 'Technician'],
+        "specializations" => ['Electrical', 'Plumbing', 'Network', 'Hardware', 'Civil']
+    ]);
+}
+
 function findUserByCode($pdo, $user_code)
 {
     $stmt = $pdo->prepare("
-        SELECT id, user_code, name, role, status, phone_number, skills, must_change_password
+        SELECT user_id AS id, user_code, full_name AS name, LOWER(role) AS role, LOWER(status) AS status, phone AS phone_number, skills, must_change_password
         FROM users
         WHERE user_code = ?
         LIMIT 1
@@ -29,10 +62,14 @@ function createUser($pdo)
 {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
-    $role = $_POST['role'] ?? '';
+    $role = strtolower(trim($_POST['role'] ?? ''));
     $user_code = strtoupper(trim($_POST['user_code'] ?? ''));
     $phone_number = trim($_POST['phone_number'] ?? '');
     $skills = trim($_POST['skills'] ?? '');
+    $departmentId = $_POST['department_id'] ?? null;
+    $specialization = trim($_POST['specialization'] ?? '');
+    $experienceYears = (int)($_POST['experience_years'] ?? 0);
+    $availabilityStatus = $_POST['availability_status'] ?? 'Available';
 
     if (!$name || !$role || !$user_code) {
         response(false, "Full name, user ID, and role are required");
@@ -42,7 +79,7 @@ function createUser($pdo)
         response(false, "Enter a valid full name using at least first and last name");
     }
 
-    if (!in_array($role, ['student', 'technician'], true)) {
+    if (!in_array($role, ['student', 'staff', 'technician'], true)) {
         response(false, "Invalid role selected");
     }
 
@@ -50,8 +87,28 @@ function createUser($pdo)
         response(false, "Invalid ID format. Use DBU followed by 7 digits");
     }
 
-    if ($role === 'technician' && !$skills) {
-        response(false, "Technician ability is required");
+    $departmentId = $departmentId !== null && $departmentId !== '' ? (int)$departmentId : null;
+    if ($departmentId) {
+        $departmentStmt = $pdo->prepare("SELECT department_id FROM departments WHERE department_id = ? LIMIT 1");
+        $departmentStmt->execute([$departmentId]);
+        if (!$departmentStmt->fetchColumn()) {
+            response(false, "Selected department was not found");
+        }
+    }
+
+    if ($role === 'technician') {
+        $allowedSpecializations = ['Electrical', 'Plumbing', 'Network', 'Hardware', 'Civil'];
+        if (!$specialization && $skills) {
+            $specialization = technicianSpecializationFromSkills($skills);
+        }
+        if (!in_array($specialization, $allowedSpecializations, true)) {
+            response(false, "Technician specialization is required");
+        }
+        $skills = $skills ?: $specialization;
+    }
+
+    if ($availabilityStatus && !in_array($availabilityStatus, ['Available', 'Busy', 'Offline'], true)) {
+        $availabilityStatus = 'Available';
     }
 
     if (findUserByCode($pdo, $user_code)) {
@@ -64,15 +121,16 @@ function createUser($pdo)
     $stmt = $pdo->prepare("
         INSERT INTO users (
             user_code,
-            name,
+            full_name,
             email,
-            phone_number,
-            password,
+            phone,
+            password_hash,
             role,
+            department_id,
             status,
             skills,
             must_change_password
-        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 1)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'Active', ?, 1)
     ");
 
     $stmt->execute([
@@ -81,9 +139,19 @@ function createUser($pdo)
         $email ?: null,
         $phone_number ?: null,
         $hashedPassword,
-        $role,
+        ucfirst($role),
+        $departmentId,
         $role === 'technician' ? $skills : null
     ]);
+
+    if ($role === 'technician') {
+        $userId = (int)$pdo->lastInsertId();
+        $techStmt = $pdo->prepare("
+            INSERT INTO technicians (user_id, specialization, experience_years, availability_status)
+            VALUES (?, ?, ?, ?)
+        ");
+        $techStmt->execute([$userId, $specialization, max(0, $experienceYears), $availabilityStatus]);
+    }
 
     response(true, "User created successfully", [
         "name" => $name,
@@ -108,14 +176,14 @@ function updateUser($pdo)
 
     $stmt = $pdo->prepare("
         UPDATE users
-        SET name = ?, email = ?, phone_number = ?, status = ?, skills = ?
-        WHERE id = ? AND role != 'admin'
+        SET full_name = ?, email = ?, phone = ?, status = ?, skills = ?
+        WHERE user_id = ? AND role != 'Admin'
     ");
     $stmt->execute([
         $name,
         $email ?: null,
         $phone_number ?: null,
-        $status,
+        ucfirst($status),
         $skills ?: null,
         $id
     ]);
@@ -131,7 +199,7 @@ function resetPassword($pdo)
         response(false, "User ID is required");
     }
 
-    $stmt = $pdo->prepare("SELECT id, user_code FROM users WHERE id = ? AND role != 'admin' LIMIT 1");
+    $stmt = $pdo->prepare("SELECT user_id AS id, user_code FROM users WHERE user_id = ? AND role != 'Admin' LIMIT 1");
     $stmt->execute([$id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -142,7 +210,7 @@ function resetPassword($pdo)
     $plainPassword = generatePassword(8);
     $hashedPassword = hashPassword($plainPassword);
 
-    $reset = $pdo->prepare("UPDATE users SET password = ?, must_change_password = 1 WHERE id = ?");
+    $reset = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 1 WHERE user_id = ?");
     $reset->execute([$hashedPassword, $user['id']]);
 
     response(true, "Password reset successfully", [
@@ -160,9 +228,9 @@ function deleteUser($pdo)
     }
 
     $stmt = $pdo->prepare("
-        SELECT id, role
+        SELECT user_id AS id, LOWER(role) AS role
         FROM users
-        WHERE id = ? AND role != 'admin'
+        WHERE user_id = ? AND role != 'Admin'
         LIMIT 1
     ");
     $stmt->execute([$user_id]);
@@ -188,7 +256,7 @@ function deleteUser($pdo)
         $logStmt = $pdo->prepare("UPDATE maintenance_logs SET user_id = NULL WHERE user_id = ?");
         $logStmt->execute([$user_id]);
 
-        $delete = $pdo->prepare("DELETE FROM users WHERE id = ?");
+        $delete = $pdo->prepare("DELETE FROM users WHERE user_id = ?");
         $delete->execute([$user_id]);
 
         $pdo->commit();
@@ -203,10 +271,17 @@ function deleteUser($pdo)
 function getTechnicians($pdo)
 {
     $stmt = $pdo->query("
-        SELECT id, user_code, name, phone_number, skills
-        FROM users
-        WHERE role = 'technician' AND status = 'active'
-        ORDER BY name ASC
+        SELECT
+            u.user_id AS id,
+            u.user_code,
+            u.full_name AS name,
+            u.phone AS phone_number,
+            COALESCE(t.specialization, u.skills) AS skills,
+            t.availability_status
+        FROM users u
+        LEFT JOIN technicians t ON u.user_id = t.user_id
+        WHERE u.role = 'Technician' AND u.status = 'Active'
+        ORDER BY full_name ASC
     ");
 
     response(true, "Technicians list", $stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -215,10 +290,27 @@ function getTechnicians($pdo)
 function getAllUsers($pdo)
 {
     $stmt = $pdo->query("
-        SELECT id, user_code, name, email, phone_number, role, status, skills, must_change_password, created_at
-        FROM users
-        WHERE role != 'admin'
-        ORDER BY created_at DESC
+        SELECT
+            u.user_id AS id,
+            u.user_code,
+            u.full_name AS name,
+            u.email,
+            u.phone AS phone_number,
+            LOWER(u.role) AS role,
+            LOWER(u.status) AS status,
+            u.department_id,
+            d.department_name,
+            u.skills,
+            t.specialization,
+            t.experience_years,
+            t.availability_status,
+            u.must_change_password,
+            u.created_at
+        FROM users u
+        LEFT JOIN departments d ON u.department_id = d.department_id
+        LEFT JOIN technicians t ON u.user_id = t.user_id
+        WHERE u.role != 'Admin'
+        ORDER BY u.created_at DESC
     ");
 
     response(true, "Users list", $stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -241,7 +333,7 @@ function resetUserPassword($pdo)
     $plainPassword = generatePassword(8);
     $hashedPassword = hashPassword($plainPassword);
 
-    $stmt = $pdo->prepare("UPDATE users SET password = ?, must_change_password = 1 WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 1 WHERE user_id = ?");
     $stmt->execute([$hashedPassword, $user['id']]);
 
     response(true, "Password reset successfully", [
@@ -259,8 +351,8 @@ function deactivateUser($pdo)
         response(false, "Invalid request");
     }
 
-    $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ? AND role != 'admin'");
-    $stmt->execute([$status, $user_id]);
+    $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE user_id = ? AND role != 'Admin'");
+    $stmt->execute([ucfirst($status), $user_id]);
 
     response(true, "User status updated successfully");
 }
