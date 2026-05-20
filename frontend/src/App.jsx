@@ -37,7 +37,8 @@ const ProtectedRoute = ({ children, role }) => {
     
     if (!user) return <Navigate to="/login" replace />;
     
-    if (role && normalizeRole(user.role) !== normalizeRole(role)) {
+    const allowedRoles = Array.isArray(role) ? role.map(normalizeRole) : [normalizeRole(role)];
+    if (role && !allowedRoles.includes(normalizeRole(user.role))) {
         return <Navigate to={getDashboardPathForRole(user.role) || '/'} replace />;
     }
 
@@ -62,7 +63,7 @@ function AnimatedRoutes() {
             <Route path="/landing" element={<Home />} />
 
             <Route path="/student/*" element={
-                <ProtectedRoute role="student">
+                <ProtectedRoute role={['student', 'staff']}>
                     <StudentDashboard />
                 </ProtectedRoute>
             } />
