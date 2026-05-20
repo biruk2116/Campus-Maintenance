@@ -10,8 +10,10 @@ import {
     LogOut,
     MapPin,
     Phone,
+    Plus,
     RefreshCcw,
     Shield,
+    Sparkles,
     Trash2,
     UserPlus,
     Users,
@@ -141,6 +143,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                             </div>
                             <div className="text-xs text-textSecondary mt-2 font-medium">Priority: <span className="font-bold">{request.priority}</span></div>
                             <div className="text-xs text-textSecondary mt-1 font-medium">Category: <span className="font-bold">{request.category}</span></div>
+                            <div className="text-xs text-textSecondary mt-1 font-medium">Asset: <span className="font-bold">{request.asset_name ? `${request.asset_name} (${request.serial_number})` : 'No specific asset'}</span></div>
                         </div>
                     </div>
 
@@ -605,7 +608,7 @@ const ActiveQueue = () => {
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
-                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.asset_name || request.category}</div>
                                         </td>
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
@@ -658,7 +661,7 @@ const ActiveQueue = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="py-12 text-center text-textSecondary font-medium">
+                                    <td colSpan="7" className="py-12 text-center text-textSecondary font-medium">
                                         No active requests in the queue.
                                     </td>
                                 </tr>
@@ -809,7 +812,7 @@ const AdminHistory = () => {
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
-                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.asset_name || request.category}</div>
                                         </td>
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
@@ -890,6 +893,10 @@ const UsersPage = () => {
     const [generatedCredentials, setGeneratedCredentials] = useState(null);
     const [deletingUserId, setDeletingUserId] = useState(null);
     const [formOptions, setFormOptions] = useState({ departments: [], roles: ['Student', 'Staff', 'Technician'], specializations: TECHNICIAN_SKILLS });
+    const [newDepartment, setNewDepartment] = useState({ department_name: '', office_location: '' });
+    const [newSpecialization, setNewSpecialization] = useState('');
+    const [creatingDepartment, setCreatingDepartment] = useState(false);
+    const [creatingSpecialization, setCreatingSpecialization] = useState(false);
     const [newUser, setNewUser] = useState({
         name: '',
         user_code: '',
@@ -913,16 +920,82 @@ const UsersPage = () => {
         }
     }, []);
 
+    const fetchFormOptions = useCallback(async () => {
+        const res = await axios.get('index.php?action=getUserFormOptions');
+        if (res.data.success) {
+            setFormOptions(res.data.data);
+        }
+    }, []);
+
     useEffect(() => {
         fetchUsers();
-        axios.get('index.php?action=getUserFormOptions').then((res) => {
-            if (res.data.success) {
-                setFormOptions(res.data.data);
-            }
-        }).catch(() => {});
+        fetchFormOptions().catch(() => {});
         const interval = setInterval(fetchUsers, 20000);
         return () => clearInterval(interval);
-    }, [fetchUsers]);
+    }, [fetchFormOptions, fetchUsers]);
+
+    const createDepartment = async () => {
+        const departmentName = newDepartment.department_name.trim();
+        const officeLocation = newDepartment.office_location.trim();
+
+        if (!departmentName || !officeLocation) {
+            setRegisterError('Enter both department name and office location.');
+            return;
+        }
+
+        setCreatingDepartment(true);
+        setRegisterError('');
+
+        try {
+            const res = await axios.post('index.php?action=createDepartment', {
+                department_name: departmentName,
+                office_location: officeLocation
+            });
+
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Unable to create department');
+            }
+
+            await fetchFormOptions();
+            setNewUser((prev) => ({ ...prev, department_id: String(res.data.data.department_id) }));
+            setNewDepartment({ department_name: '', office_location: '' });
+        } catch (error) {
+            setRegisterError(error.message || 'Unable to create department');
+        } finally {
+            setCreatingDepartment(false);
+        }
+    };
+
+    const createSpecialization = async () => {
+        const specializationName = newSpecialization.trim();
+
+        if (!specializationName) {
+            setRegisterError('Enter a specialization name.');
+            return;
+        }
+
+        setCreatingSpecialization(true);
+        setRegisterError('');
+
+        try {
+            const res = await axios.post('index.php?action=createTechnicianSpecialization', {
+                specialization_name: specializationName
+            });
+
+            if (!res.data.success) {
+                throw new Error(res.data.message || 'Unable to create specialization');
+            }
+
+            await fetchFormOptions();
+            setNewUser((prev) => ({ ...prev, specialization: res.data.data.specialization_name }));
+            setNewSpecialization('');
+        } catch (error) {
+            setRegisterError(error.message || 'Unable to create specialization');
+        } finally {
+            setCreatingSpecialization(false);
+        }
+    };
+
 
     const registerUser = async (event) => {
         event.preventDefault();
@@ -1056,7 +1129,7 @@ const UsersPage = () => {
         >
             <DashboardHeader
                 title="User Management"
-                subtitle="Register students and technicians with auto-generated passwords"
+                subtitle="Register staff, students, and technicians with database-linked details"
                 unreadCount={unreadCount}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
@@ -1162,7 +1235,7 @@ const UsersPage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="py-12 text-center text-textSecondary font-medium">
+                                    <td colSpan="7" className="py-12 text-center text-textSecondary font-medium">
                                         No users found yet.
                                     </td>
                                 </tr>
@@ -1193,14 +1266,14 @@ const UsersPage = () => {
                         )}
                     </AnimatePresence>
 
-                    <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-xl bg-surface/80 border border-overlay/10 text-primary">
-                                <UserPlus size={20} />
+                    <div className="rounded-2xl border border-primary/15 bg-gradient-to-r from-primary/15 via-info/10 to-success/10 p-5">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 rounded-xl bg-surface/80 border border-overlay/10 text-primary shadow-sm">
+                                <Sparkles size={22} />
                             </div>
                             <div>
-                                <h4 className="text-base font-extrabold text-textPrimary">Create a campus account</h4>
-                                <p className="text-xs text-textSecondary font-medium m-0">Choose a role first. Technician ability appears only when needed.</p>
+                                <h4 className="text-lg font-extrabold text-textPrimary">Create a campus account</h4>
+                                <p className="text-xs text-textSecondary font-medium m-0 max-w-xl">Register people with the exact database details they need. Staff can be attached to departments, and skilled technicians can use existing or newly added specializations.</p>
                             </div>
                         </div>
                     </div>
@@ -1240,34 +1313,168 @@ const UsersPage = () => {
                             <select
                                 className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
                                 value={newUser.role}
-                                onChange={(event) => setNewUser((prev) => ({ ...prev, role: event.target.value, skills: event.target.value === 'technician' ? prev.skills : '' }))}
+                                onChange={(event) => setNewUser((prev) => ({
+                                    ...prev,
+                                    role: event.target.value,
+                                    department_id: event.target.value === 'staff' ? prev.department_id : '',
+                                    specialization: event.target.value === 'technician' ? prev.specialization : ''
+                                }))}
                             >
                                 <option value="student" className="bg-surface text-textPrimary">Student</option>
+                                <option value="staff" className="bg-surface text-textPrimary">Staff</option>
                                 <option value="technician" className="bg-surface text-textPrimary">Technician</option>
                             </select>
+                        </div>
+                        {newUser.role === 'staff' && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                className="md:col-span-2 rounded-2xl border border-success/20 bg-success/10 p-4"
+                            >
+                                <div className="flex items-center justify-between gap-3 mb-3">
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-1 uppercase tracking-widest">Department</label>
+                                        <p className="text-[11px] text-textSecondary font-medium m-0">Choose an existing department or add a new one without leaving registration.</p>
+                                    </div>
+                                    <div className="hidden md:flex p-2 rounded-xl bg-surface/70 border border-overlay/10 text-success">
+                                        <Users size={18} />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <select
+                                        className="md:col-span-3 w-full py-3 px-4 bg-surface/70 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                        value={newUser.department_id}
+                                        onChange={(event) => setNewUser((prev) => ({ ...prev, department_id: event.target.value }))}
+                                        required
+                                    >
+                                        <option value="" className="bg-surface text-textSecondary">Select department</option>
+                                        {(formOptions.departments || []).map((department) => (
+                                            <option key={department.department_id} value={department.department_id} className="bg-surface text-textPrimary">
+                                                {department.department_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="text"
+                                        className="py-3 px-4 bg-surface/70 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                        placeholder="New department"
+                                        value={newDepartment.department_name}
+                                        onChange={(event) => setNewDepartment((prev) => ({ ...prev, department_name: event.target.value }))}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="py-3 px-4 bg-surface/70 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                        placeholder="Office location"
+                                        value={newDepartment.office_location}
+                                        onChange={(event) => setNewDepartment((prev) => ({ ...prev, office_location: event.target.value }))}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={createDepartment}
+                                        disabled={creatingDepartment}
+                                        className="btn-secondary py-3 px-4 rounded-xl text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2"
+                                    >
+                                        {creatingDepartment ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+                                        Add Dept
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Email</label>
+                            <input
+                                type="email"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                placeholder="name@campus.edu"
+                                value={newUser.email}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Phone</label>
+                            <input
+                                type="tel"
+                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                placeholder="0712345678"
+                                value={newUser.phone_number}
+                                onChange={(event) => setNewUser((prev) => ({ ...prev, phone_number: event.target.value }))}
+                            />
                         </div>
                         {newUser.role === 'technician' && (
                             <motion.div
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -8 }}
-                                className="rounded-2xl border border-info/20 bg-info/10 p-4"
+                                className="md:col-span-2 rounded-2xl border border-info/20 bg-info/10 p-4"
                             >
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Technician Ability</label>
-                                <select
-                                    className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
-                                    value={newUser.skills}
-                                    onChange={(event) => setNewUser((prev) => ({ ...prev, skills: event.target.value }))}
-                                    required
-                                >
-                                    <option value="" className="bg-surface text-textSecondary">Select ability</option>
-                                    {TECHNICIAN_SKILLS.map((skill) => (
-                                        <option key={skill} value={skill} className="bg-surface text-textPrimary">
-                                            {skill}
-                                        </option>
-                                    ))}
-                                </select>
-                                <p className="mt-2 text-[11px] text-textSecondary font-medium">This helps admins assign the right maintenance work.</p>
+                                <div className="flex items-center justify-between gap-3 mb-3">
+                                    <div>
+                                        <h5 className="text-sm font-extrabold text-textPrimary m-0">Skilled Technician Profile</h5>
+                                        <p className="text-[11px] text-textSecondary font-medium m-0">Select a skill area or create a new specialization for this technician.</p>
+                                    </div>
+                                    <div className="hidden md:flex p-2 rounded-xl bg-surface/70 border border-overlay/10 text-info">
+                                        <Wrench size={18} />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Specialization</label>
+                                        <select
+                                            className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            value={newUser.specialization}
+                                            onChange={(event) => setNewUser((prev) => ({ ...prev, specialization: event.target.value }))}
+                                            required
+                                        >
+                                            <option value="" className="bg-surface text-textSecondary">Select specialization</option>
+                                            {(formOptions.specializations || TECHNICIAN_SKILLS).map((skill) => (
+                                                <option key={skill} value={skill} className="bg-surface text-textPrimary">
+                                                    {skill}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Experience Years</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            value={newUser.experience_years}
+                                            onChange={(event) => setNewUser((prev) => ({ ...prev, experience_years: event.target.value }))}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Availability</label>
+                                        <select
+                                            className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            value={newUser.availability_status}
+                                            onChange={(event) => setNewUser((prev) => ({ ...prev, availability_status: event.target.value }))}
+                                        >
+                                            <option value="Available" className="bg-surface">Available</option>
+                                            <option value="Busy" className="bg-surface">Busy</option>
+                                            <option value="Offline" className="bg-surface">Offline</option>
+                                        </select>
+                                    </div>
+                                    <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 pt-1">
+                                        <input
+                                            type="text"
+                                            className="py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            placeholder="Add new specialization, e.g. Solar Systems"
+                                            value={newSpecialization}
+                                            onChange={(event) => setNewSpecialization(event.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={createSpecialization}
+                                            disabled={creatingSpecialization}
+                                            className="btn-secondary py-3 px-4 rounded-xl text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2"
+                                        >
+                                            {creatingSpecialization ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+                                            Add Skill
+                                        </button>
+                                    </div>
+                                </div>
                             </motion.div>
                         )}
                         
