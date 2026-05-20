@@ -68,6 +68,21 @@ function safeSchemaExec(PDO $pdo, string $sql, string $description): void
 
 function ensureDatabaseSchema(PDO $pdo): void
 {
+    safeSchemaExec($pdo, "
+        CREATE TABLE IF NOT EXISTS technician_specializations (
+            specialization_id INT AUTO_INCREMENT PRIMARY KEY,
+            specialization_name VARCHAR(100) NOT NULL UNIQUE,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB
+    ", 'technician_specializations table');
+
+    safeSchemaExec($pdo, "
+        INSERT IGNORE INTO technician_specializations (specialization_name)
+        VALUES ('Electrical'), ('Plumbing'), ('Network'), ('Hardware'), ('Civil')
+    ", 'default technician specializations');
+
+    safeSchemaExec($pdo, "ALTER TABLE technicians MODIFY COLUMN specialization VARCHAR(100) NOT NULL", 'technicians specialization varchar');
+
     ensureColumn($pdo, 'requests', 'maintenance_request_id', "ALTER TABLE requests ADD COLUMN maintenance_request_id INT UNIQUE DEFAULT NULL AFTER id");
     ensureColumn($pdo, 'requests', 'dorm', "ALTER TABLE requests ADD COLUMN dorm VARCHAR(120) DEFAULT NULL AFTER category");
     ensureColumn($pdo, 'requests', 'block', "ALTER TABLE requests ADD COLUMN block VARCHAR(120) DEFAULT NULL AFTER dorm");
