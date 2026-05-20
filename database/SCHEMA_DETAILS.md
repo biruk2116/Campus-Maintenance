@@ -28,6 +28,11 @@ Stores technician-specific details linked one-to-one to `users`.
 
 Main fields: `technician_id`, `user_id`, `specialization`, `experience_years`, `availability_status`
 
+### `technician_specializations`
+Stores the selectable technician skill areas that admins can extend from the user registration screen.
+
+Main fields: `specialization_id`, `specialization_name`, `created_at`
+
 ### `maintenance_requests`
 Stores normalized maintenance reports for asset/location reporting.
 
