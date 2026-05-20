@@ -6,11 +6,11 @@ require_once __DIR__ . "/../utils/Response.php";
 function buildUserPayload(array $user)
 {
     return [
-        "user_id" => (int)$user['id'],
+        "user_id" => (int)$user['user_id'],
         "role" => strtolower(trim($user['role'])),
-        "name" => $user['name'],
+        "name" => $user['full_name'],
         "user_code" => $user['user_code'],
-        "phone_number" => $user['phone_number'] ?? null,
+        "phone_number" => $user['phone'] ?? null,
         "skills" => $user['skills'] ?? null,
         "must_change_password" => (int)$user['must_change_password']
     ];
@@ -20,9 +20,8 @@ function getLegacyDemoCredentials(): array
 {
     return [
         'ADMIN001' => 'admin123',
-        'DBU-2024-ADM' => 'admin123',
-        'DBU-2024-STU' => 'student123',
-        'DBU-2024-TEC' => 'tech123'
+        'DBU2024001' => 'admin123',
+        'DBU2024002' => 'admin123'
     ];
 }
 
@@ -36,10 +35,10 @@ function repairLegacyDemoPassword($pdo, array &$user, string $providedPassword):
     }
 
     $newHash = hashPassword($expectedPassword);
-    $stmt = $pdo->prepare("UPDATE users SET password = ?, must_change_password = 0 WHERE id = ?");
-    $stmt->execute([$newHash, $user['id']]);
+    $stmt = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE user_id = ?");
+    $stmt->execute([$newHash, $user['user_id']]);
 
-    $user['password'] = $newHash;
+    $user['password_hash'] = $newHash;
     $user['must_change_password'] = 0;
     return true;
 }
@@ -58,7 +57,7 @@ function login($pdo)
     }
 
     $stmt = $pdo->prepare("
-        SELECT id, user_code, name, phone_number, skills, password, role, status, must_change_password
+        SELECT user_id, user_code, full_name, phone, skills, password_hash, role, status, must_change_password
         FROM users
         WHERE user_code = ?
         LIMIT 1
@@ -70,11 +69,11 @@ function login($pdo)
         response(false, "User not found");
     }
 
-    if ($user['status'] !== 'active') {
+    if ($user['status'] !== 'Active') {
         response(false, "Account is inactive");
     }
 
-    if (!verifyPassword($password, $user['password']) && !repairLegacyDemoPassword($pdo, $user, $password)) {
+    if (!verifyPassword($password, $user['password_hash']) && !repairLegacyDemoPassword($pdo, $user, $password)) {
         response(false, "Invalid password");
     }
 
@@ -86,16 +85,16 @@ function login($pdo)
             "action" => "change_password",
             "user_code" => $user['user_code'],
             "role" => strtolower(trim($user['role'])),
-            "name" => $user['name'],
+            "name" => $user['full_name'],
             "must_change_password" => 1
         ]);
     }
 
     $role = strtolower(trim($user['role']));
     session_regenerate_id(true);
-    $_SESSION['user_id'] = (int)$user['id'];
+    $_SESSION['user_id'] = (int)$user['user_id'];
     $_SESSION['role'] = $role;
-    $_SESSION['name'] = $user['name'];
+    $_SESSION['name'] = $user['full_name'];
     $_SESSION['user_code'] = $user['user_code'];
 
     response(true, "Login successful", buildUserPayload($user));
@@ -123,22 +122,22 @@ function checkSession($pdo)
     }
 
     $stmt = $pdo->prepare("
-        SELECT id, user_code, name, phone_number, skills, role, status, must_change_password
+        SELECT user_id, user_code, full_name, phone, skills, role, status, must_change_password
         FROM users
-        WHERE id = ?
+        WHERE user_id = ?
         LIMIT 1
     ");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user || $user['status'] !== 'active') {
+    if (!$user || $user['status'] !== 'Active') {
         $_SESSION = [];
         session_destroy();
         response(false, "No active session");
     }
 
     $_SESSION['role'] = strtolower(trim($user['role']));
-    $_SESSION['name'] = $user['name'];
+    $_SESSION['name'] = $user['full_name'];
     $_SESSION['user_code'] = $user['user_code'];
 
     response(true, "Session active", buildUserPayload($user));
@@ -164,15 +163,15 @@ function changePassword($pdo)
 
     if (isset($_SESSION['user_id'])) {
         $stmt = $pdo->prepare("
-            SELECT id, user_code, password, must_change_password
+            SELECT user_id, user_code, password_hash, must_change_password
             FROM users
-            WHERE id = ?
+            WHERE user_id = ?
             LIMIT 1
         ");
         $stmt->execute([$_SESSION['user_id']]);
     } elseif ($user_code) {
         $stmt = $pdo->prepare("
-            SELECT id, user_code, password, must_change_password
+            SELECT user_id, user_code, password_hash, must_change_password
             FROM users
             WHERE user_code = ?
             LIMIT 1
@@ -184,16 +183,16 @@ function changePassword($pdo)
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user || !verifyPassword($old_password, $user['password'])) {
+    if (!$user || !verifyPassword($old_password, $user['password_hash'])) {
         response(false, "Old password incorrect");
     }
 
     $new_hash = hashPassword($new_password);
-    $update = $pdo->prepare("UPDATE users SET password = ?, must_change_password = 0 WHERE id = ?");
-    $update->execute([$new_hash, $user['id']]);
+    $update = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE user_id = ?");
+    $update->execute([$new_hash, $user['user_id']]);
 
     if (isset($_SESSION['user_id'])) {
-        $_SESSION['user_id'] = (int)$user['id'];
+        $_SESSION['user_id'] = (int)$user['user_id'];
         $_SESSION['user_code'] = $user['user_code'];
     }
 
