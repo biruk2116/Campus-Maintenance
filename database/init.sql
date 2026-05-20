@@ -76,10 +76,16 @@ CREATE TABLE IF NOT EXISTS assets (
 ) ENGINE=InnoDB;
 
 -- Technicians: technician-specific profile linked one-to-one to users.
+CREATE TABLE IF NOT EXISTS technician_specializations (
+    specialization_id INT AUTO_INCREMENT PRIMARY KEY,
+    specialization_name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS technicians (
     technician_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
-    specialization ENUM('Electrical', 'Plumbing', 'Network', 'Hardware', 'Civil') NOT NULL,
+    specialization VARCHAR(100) NOT NULL,
     experience_years INT NOT NULL DEFAULT 0,
     availability_status ENUM('Available', 'Busy', 'Offline') NOT NULL DEFAULT 'Available',
     CONSTRAINT fk_technicians_user
@@ -88,6 +94,9 @@ CREATE TABLE IF NOT EXISTS technicians (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+ALTER TABLE technicians
+    MODIFY COLUMN specialization VARCHAR(100) NOT NULL;
 
 -- Maintenance requests: normalized request records for reporting and asset tracking.
 CREATE TABLE IF NOT EXISTS maintenance_requests (
@@ -368,6 +377,13 @@ INSERT IGNORE INTO departments (department_id, department_name, office_location)
 (3, 'Library Services', 'Main Library Office'),
 (4, 'Student Affairs', 'Student Center Room 12'),
 (5, 'Facilities Management', 'Maintenance Yard Office');
+
+INSERT IGNORE INTO technician_specializations (specialization_id, specialization_name) VALUES
+(1, 'Electrical'),
+(2, 'Plumbing'),
+(3, 'Network'),
+(4, 'Hardware'),
+(5, 'Civil');
 
 INSERT IGNORE INTO users (
     user_id, user_code, full_name, email, phone, password_hash, role,
