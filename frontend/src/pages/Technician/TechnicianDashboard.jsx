@@ -474,7 +474,7 @@ const TechnicianOverview = () => {
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
-                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.asset_name || request.category}</div>
                                         </td>
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
@@ -605,7 +605,7 @@ const TechnicianHistory = () => {
                                     >
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm">{request.title}</div>
-                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.category}</div>
+                                            <div className="text-xs text-textSecondary mt-1 font-medium">{request.asset_name || request.category}</div>
                                         </td>
                                         <td className="py-4 px-4">
                                             <div className="font-extrabold text-textPrimary text-sm whitespace-nowrap">{request.student_name}</div>
