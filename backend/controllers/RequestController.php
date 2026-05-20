@@ -278,10 +278,22 @@ function getStudentRequests($pdo)
     $stmt = $pdo->prepare("
         SELECT
             r.*,
+            mr.asset_id,
+            mr.location_id,
+            a.asset_name,
+            a.serial_number,
+            a.condition_status,
+            l.location_type,
+            b.building_name,
+            l.room_number,
             COALESCE(t.full_name, r.technician_name_snapshot) AS technician_name,
             COALESCE(t.skills, r.technician_skills_snapshot) AS technician_skills,
             COALESCE(t.phone, r.technician_phone_snapshot) AS technician_phone
         FROM requests r
+        LEFT JOIN maintenance_requests mr ON r.maintenance_request_id = mr.request_id
+        LEFT JOIN assets a ON mr.asset_id = a.asset_id
+        LEFT JOIN locations l ON mr.location_id = l.location_id
+        LEFT JOIN buildings b ON l.building_id = b.building_id
         LEFT JOIN users t ON r.technician_id = t.user_id
         WHERE r.student_id = ? AND r.student_hidden = 0
         ORDER BY
@@ -306,6 +318,14 @@ function getAllRequests($pdo)
     $stmt = $pdo->query("
         SELECT
             r.*,
+            mr.asset_id,
+            mr.location_id,
+            a.asset_name,
+            a.serial_number,
+            a.condition_status,
+            l.location_type,
+            b.building_name,
+            l.room_number,
             COALESCE(s.full_name, r.student_name_snapshot) AS student_name,
             COALESCE(s.user_code, r.student_code_snapshot) AS student_code,
             COALESCE(s.phone, r.student_phone_snapshot) AS student_phone,
@@ -314,6 +334,10 @@ function getAllRequests($pdo)
             COALESCE(t.phone, r.technician_phone_snapshot) AS technician_phone,
             COALESCE(t.skills, r.technician_skills_snapshot) AS technician_skills
         FROM requests r
+        LEFT JOIN maintenance_requests mr ON r.maintenance_request_id = mr.request_id
+        LEFT JOIN assets a ON mr.asset_id = a.asset_id
+        LEFT JOIN locations l ON mr.location_id = l.location_id
+        LEFT JOIN buildings b ON l.building_id = b.building_id
         LEFT JOIN users s ON r.student_id = s.user_id
         LEFT JOIN users t ON r.technician_id = t.user_id
         ORDER BY
