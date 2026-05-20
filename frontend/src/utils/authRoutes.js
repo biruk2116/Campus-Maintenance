@@ -1,6 +1,7 @@
 export const ROLE_DASHBOARD_PATHS = {
     admin: '/admin',
     student: '/student',
+    staff: '/student',
     technician: '/technician'
 };
 
