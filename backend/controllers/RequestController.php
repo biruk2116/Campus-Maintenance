@@ -132,6 +132,7 @@ function createRequest($pdo)
     $description = trim($_POST['issue_description'] ?? $_POST['description'] ?? '');
     $assetId = $_POST['asset_id'] ?? null;
     $locationId = $_POST['location_id'] ?? null;
+    $locationText = trim($_POST['location'] ?? $_POST['location_text'] ?? '');
     $priority = $_POST['priority_level'] ?? $_POST['priority'] ?? 'Medium';
 
     $student = getUserSnapshotById($pdo, $_SESSION['user_id']);
@@ -147,27 +148,30 @@ function createRequest($pdo)
     $assetId = $assetId !== null && $assetId !== '' ? (int)$assetId : null;
     $locationId = $locationId !== null && $locationId !== '' ? (int)$locationId : null;
 
-    if (!$title || !$description || !$locationId) {
+    if (!$title || !$description || (!$locationId && !$locationText)) {
         response(false, "Issue title, description, and location are required");
     }
 
-    $locationStmt = $pdo->prepare("
-        SELECT
-            l.location_id,
-            l.room_number,
-            l.floor_number,
-            l.location_type,
-            b.building_name
-        FROM locations l
-        JOIN buildings b ON l.building_id = b.building_id
-        WHERE l.location_id = ?
-        LIMIT 1
-    ");
-    $locationStmt->execute([$locationId]);
-    $locationRow = $locationStmt->fetch(PDO::FETCH_ASSOC);
+    $locationRow = null;
+    if ($locationId) {
+        $locationStmt = $pdo->prepare("
+            SELECT
+                l.location_id,
+                l.room_number,
+                l.floor_number,
+                l.location_type,
+                b.building_name
+            FROM locations l
+            JOIN buildings b ON l.building_id = b.building_id
+            WHERE l.location_id = ?
+            LIMIT 1
+        ");
+        $locationStmt->execute([$locationId]);
+        $locationRow = $locationStmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$locationRow) {
-        response(false, "Selected location was not found");
+        if (!$locationRow) {
+            response(false, "Selected location was not found");
+        }
     }
 
     $assetRow = null;
@@ -190,10 +194,12 @@ function createRequest($pdo)
         }
     }
 
-    $category = $assetRow['asset_category'] ?? $locationRow['location_type'];
-    $location = "{$locationRow['building_name']}, {$locationRow['room_number']} (Floor {$locationRow['floor_number']})";
-    $dorm = $locationRow['building_name'];
-    $block = $locationRow['room_number'];
+    $category = $assetRow['asset_category'] ?? ($locationRow['location_type'] ?? 'General Maintenance');
+    $location = $locationRow
+        ? "{$locationRow['building_name']}, {$locationRow['room_number']} (Floor {$locationRow['floor_number']})"
+        : $locationText;
+    $dorm = $locationRow['building_name'] ?? $locationText;
+    $block = $locationRow['room_number'] ?? null;
 
     $pdo->beginTransaction();
 
