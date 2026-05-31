@@ -9,11 +9,9 @@ import {
     LogIn,
     Save,
     Shield,
-    User,
-    Sparkles
+    User
 } from 'lucide-react';
 
-import Navbar from '../../components/Navbar';
 import PremiumModal from '../../components/PremiumModal';
 import { useAuth } from '../../context/AuthContext';
 import { getDashboardPathForRole } from '../../utils/authRoutes';
@@ -112,7 +110,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950/40 transition-colors duration-300">
+        <div className="min-h-[calc(100vh-4rem)] flex flex-col relative overflow-hidden bg-white dark:bg-slate-900 transition-colors duration-300">
             
             {/* Subtle Background Elements - Light Mode */}
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -147,28 +145,26 @@ const LoginPage = () => {
                 ))}
             </div>
 
-            <Navbar />
-
-            <div className="flex-1 flex items-center justify-center py-20 px-4 relative z-10">
+            <div className="flex-1 min-h-[calc(100vh-4rem)] flex items-center justify-center py-4 px-4 relative z-10">
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-sm"
                 >
-                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-indigo-100/50 dark:border-indigo-800/50 p-8 md:p-10 transition-all duration-300 hover:shadow-2xl">
+                    <div className="bg-white dark:bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 transition-all duration-300 hover:shadow-2xl">
                         
-                        <div className="text-center mb-8">
+                        <div className="text-center mb-5">
                             <motion.div 
                                 initial={{ scale: 0.8, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
-                                className="inline-flex items-center justify-center p-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 text-indigo-600 dark:text-indigo-400 mb-6"
+                                className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 text-indigo-600 dark:text-indigo-400 mb-4"
                             >
-                                {mode === 'change-password' ? <Shield size={32} /> : <KeyRound size={32} />}
+                                {mode === 'change-password' ? <Shield size={28} /> : <KeyRound size={28} />}
                             </motion.div>
                             
-                            <h2 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight mb-2">
+                            <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight mb-2">
                                 {mode === 'change-password' ? 'Change Password' : 'Welcome Back'}
                             </h2>
                             
@@ -202,7 +198,7 @@ const LoginPage = () => {
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.3 }}
                                     onSubmit={handleLogin} 
-                                    className="flex flex-col gap-5"
+                                    className="flex flex-col gap-4"
                                 >
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">User ID</label>
@@ -263,7 +259,7 @@ const LoginPage = () => {
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.3 }}
                                     onSubmit={handlePasswordChange} 
-                                    className="flex flex-col gap-5"
+                                    className="flex flex-col gap-4"
                                 >
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">User ID</label>
