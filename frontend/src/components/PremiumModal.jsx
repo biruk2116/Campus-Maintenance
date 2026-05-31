@@ -13,6 +13,8 @@ const PremiumModal = ({
     onConfirm,
     showFooter = true,
     maxWidth = '500px',
+    overlayClassName = '',
+    backdropClassName = '',
     dialogClassName = '',
     bodyClassName = '',
     dialogStyle = {}
@@ -49,14 +51,14 @@ const PremiumModal = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[2000] flex items-start justify-center p-6 overflow-y-auto sm:items-center">
+                <div className={`fixed inset-0 z-[2000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto ${overlayClassName}`}>
                     {/* Backdrop */}
                     <Motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+                        className={`fixed inset-0 bg-black/80 backdrop-blur-sm ${backdropClassName}`}
                     />
 
                     {/* Modal Content */}
