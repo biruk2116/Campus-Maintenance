@@ -8,19 +8,19 @@
    ========================================================================== */
 @layer base {
   :root {
-    --color-background: 226 232 240;
-    --color-surface: 241 245 249;
+    --color-background: 255 255 255;
+    --color-surface: 255 255 255;
     --color-primary: 79 70 229;
     --color-secondary: 124 58 237;
     --color-accent: 2 132 199;
     --color-textPrimary: 15 23 42;
-    --color-textSecondary: 100 116 139;
+    --color-textSecondary: 71 85 105;
     --color-success: 16 185 129;
     --color-warning: 245 158 11;
     --color-danger: 239 68 68;
     --color-overlay: 0 0 0;
-    --page-gradient-start: 219 234 254;
-    --page-gradient-end: 226 232 240;
+    --page-gradient-start: 255 255 255;
+    --page-gradient-end: 248 250 252;
     --page-glow-a: 37 99 235;
     --page-glow-b: 14 165 233;
   }
