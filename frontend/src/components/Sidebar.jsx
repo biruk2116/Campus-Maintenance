@@ -39,7 +39,13 @@ const Sidebar = () => {
             await fetchNotifications();
         })();
         const interval = setInterval(fetchNotifications, 20000);
-        return () => clearInterval(interval);
+        const handleNotificationsRead = () => setNotificationCount(0);
+        window.addEventListener('notifications-read', handleNotificationsRead);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('notifications-read', handleNotificationsRead);
+        };
     }, [fetchNotifications]);
 
     const roleLinks = {
@@ -62,7 +68,9 @@ const Sidebar = () => {
     };
 
     const links = roleLinks[user?.role] || [];
-    const roleLabel = user?.role ? `${user.role.charAt(0).toUpperCase()}${user.role.slice(1)}` : 'User';
+    const roleLabel = user?.role === 'student'
+        ? 'User'
+        : user?.role ? `${user.role.charAt(0).toUpperCase()}${user.role.slice(1)}` : 'User';
 
     return (
         <aside className="fixed left-0 top-16 bottom-0 w-sidebar-width z-40 flex flex-col px-4 pt-5 pb-5 bg-gradient-to-b from-white via-sky-50/95 to-emerald-50/85 dark:from-surface/95 dark:via-slate-900/90 dark:to-slate-950/95 backdrop-blur-2xl border-r border-sky-200/70 dark:border-overlay/10 shadow-2xl shadow-sky-200/60 dark:shadow-black/30 overflow-y-auto custom-scrollbar">
