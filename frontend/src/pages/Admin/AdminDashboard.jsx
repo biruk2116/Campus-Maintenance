@@ -450,9 +450,23 @@ const AdminOverview = () => {
                                         {
                                             label: 'Requests',
                                             data: categoryCounts,
-                                            backgroundColor: '#6366f1',
+                                            backgroundColor: [
+                                                '#06b6d4',
+                                                '#10b981',
+                                                '#84cc16',
+                                                '#f59e0b',
+                                                '#8b5cf6',
+                                                '#ec4899'
+                                            ],
                                             borderRadius: 6,
-                                            hoverBackgroundColor: '#8b5cf6'
+                                            hoverBackgroundColor: [
+                                                '#0891b2',
+                                                '#059669',
+                                                '#65a30d',
+                                                '#d97706',
+                                                '#7c3aed',
+                                                '#db2777'
+                                            ]
                                         }
                                     ]
                                 }}
@@ -1250,9 +1264,13 @@ const UsersPage = () => {
                 onClose={() => setShowRegisterModal(false)}
                 title="Register User"
                 showFooter={false}
-                maxWidth="720px"
+                maxWidth="1080px"
+                overlayClassName="lg:pl-[280px]"
+                backdropClassName="lg:left-[280px] !bg-slate-950/25 dark:!bg-black/55 backdrop-blur-[2px]"
+                dialogClassName="max-h-[calc(100vh-3rem)] my-6 !bg-gradient-to-br !from-white !via-cyan-50/95 !to-emerald-50/90 dark:!from-slate-950/95 dark:!via-slate-900/95 dark:!to-emerald-950/75 text-slate-950 dark:text-textPrimary border border-cyan-200/80 dark:border-emerald-400/20 p-3 sm:p-4 shadow-[0_24px_80px_rgba(6,182,212,0.22)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+                bodyClassName="pr-1 text-[0.78rem] sm:text-[0.82rem]"
             >
-                <form onSubmit={registerUser} className="space-y-5">
+                <form onSubmit={registerUser} className="space-y-2.5">
                     <AnimatePresence>
                         {registerError && (
                             <motion.div 
@@ -1266,24 +1284,25 @@ const UsersPage = () => {
                         )}
                     </AnimatePresence>
 
-                    <div className="rounded-2xl border border-primary/15 bg-gradient-to-r from-primary/15 via-info/10 to-success/10 p-5">
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-xl bg-surface/80 border border-overlay/10 text-primary shadow-sm">
-                                <Sparkles size={22} />
+                    <div className="relative overflow-hidden rounded-xl border border-cyan-200/80 dark:border-emerald-400/20 bg-gradient-to-r from-cyan-50 via-white to-lime-50 dark:from-cyan-500/10 dark:via-emerald-500/10 dark:to-lime-500/10 p-3 shadow-sm">
+                        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-emerald-400 to-lime-400" />
+                        <div className="relative flex items-start gap-3">
+                            <div className="p-2 rounded-lg bg-white dark:bg-surface/90 border border-cyan-200 dark:border-emerald-400/20 text-cyan-600 dark:text-lime-300 shadow-sm">
+                                <Sparkles size={18} />
                             </div>
                             <div>
-                                <h4 className="text-lg font-extrabold text-textPrimary">Create a campus account</h4>
-                                <p className="text-xs text-textSecondary font-medium m-0 max-w-xl">Register people with the exact database details they need. Staff can be attached to departments, and skilled technicians can use existing or newly added specializations.</p>
+                                <h4 className="text-sm font-extrabold text-slate-950 dark:text-textPrimary">Create a campus account</h4>
+                                <p className="text-[10px] text-slate-700 dark:text-textSecondary font-medium m-0 max-w-4xl">Register people with the exact database details they need. Staff can be attached to departments, and skilled technicians can use existing or newly added specializations.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5">
                         <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Full Name</label>
+                            <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Full Name</label>
                             <input
                                 type="text"
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-2 px-3 bg-white/95 dark:bg-surface/50 border border-cyan-200/90 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                 placeholder="First Last"
                                 value={newUser.name}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, name: event.target.value }))}
@@ -1292,13 +1311,13 @@ const UsersPage = () => {
                                 title="Use at least first and last name with letters only"
                                 required
                             />
-                            <p className="mt-2 text-[11px] text-textSecondary font-medium">Use at least first and last name.</p>
+                            <p className="mt-1.5 text-[10px] text-slate-700 dark:text-textSecondary font-medium">Use at least first and last name.</p>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">User ID</label>
+                            <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">User ID</label>
                             <input
                                 type="text"
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner uppercase"
+                                className="w-full py-2 px-3 bg-white/95 dark:bg-surface/50 border border-cyan-200/90 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner uppercase"
                                 placeholder="DBU1601069"
                                 value={newUser.user_code}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, user_code: event.target.value.toUpperCase() }))}
@@ -1306,12 +1325,12 @@ const UsersPage = () => {
                                 title="Use DBU followed by 7 digits"
                                 required
                             />
-                            <p className="mt-2 text-[11px] text-textSecondary font-medium">Format: DBU followed by 7 digits.</p>
+                            <p className="mt-1.5 text-[10px] text-slate-700 dark:text-textSecondary font-medium">Format: DBU followed by 7 digits.</p>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Role</label>
+                            <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Role</label>
                             <select
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-2 px-3 bg-white/95 dark:bg-surface/50 border border-cyan-200/90 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                 value={newUser.role}
                                 onChange={(event) => setNewUser((prev) => ({
                                     ...prev,
@@ -1330,20 +1349,20 @@ const UsersPage = () => {
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -8 }}
-                                className="md:col-span-2 rounded-2xl border border-success/20 bg-success/10 p-4"
+                                className="md:col-span-2 xl:col-span-3 rounded-xl border border-emerald-200 dark:border-success/20 bg-emerald-50/70 dark:bg-success/10 p-3 shadow-sm"
                             >
                                 <div className="flex items-center justify-between gap-3 mb-3">
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-1 uppercase tracking-widest">Department</label>
-                                        <p className="text-[11px] text-textSecondary font-medium m-0">Choose an existing department or add a new one without leaving registration.</p>
+                                        <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1 uppercase tracking-widest">Department</label>
+                                        <p className="text-[10px] text-slate-700 dark:text-textSecondary font-medium m-0">Choose an existing department or add a new one without leaving registration.</p>
                                     </div>
-                                    <div className="hidden md:flex p-2 rounded-xl bg-surface/70 border border-overlay/10 text-success">
+                                    <div className="hidden md:flex p-2 rounded-lg bg-white dark:bg-surface/70 border border-emerald-200 dark:border-overlay/10 text-success">
                                         <Users size={18} />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <select
-                                        className="md:col-span-3 w-full py-3 px-4 bg-surface/70 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                        className="md:col-span-3 w-full py-2 px-3 bg-white dark:bg-surface/70 border border-emerald-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                         value={newUser.department_id}
                                         onChange={(event) => setNewUser((prev) => ({ ...prev, department_id: event.target.value }))}
                                         required
@@ -1357,14 +1376,14 @@ const UsersPage = () => {
                                     </select>
                                     <input
                                         type="text"
-                                        className="py-3 px-4 bg-surface/70 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                        className="py-2 px-3 bg-white dark:bg-surface/70 border border-emerald-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                         placeholder="New department"
                                         value={newDepartment.department_name}
                                         onChange={(event) => setNewDepartment((prev) => ({ ...prev, department_name: event.target.value }))}
                                     />
                                     <input
                                         type="text"
-                                        className="py-3 px-4 bg-surface/70 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                        className="py-2 px-3 bg-white dark:bg-surface/70 border border-emerald-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                         placeholder="Office location"
                                         value={newDepartment.office_location}
                                         onChange={(event) => setNewDepartment((prev) => ({ ...prev, office_location: event.target.value }))}
@@ -1373,7 +1392,7 @@ const UsersPage = () => {
                                         type="button"
                                         onClick={createDepartment}
                                         disabled={creatingDepartment}
-                                        className="btn-secondary py-3 px-4 rounded-xl text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2"
+                                        className="btn-secondary py-2.5 px-3 rounded-lg text-[11px] font-extrabold uppercase tracking-widest flex items-center justify-center gap-2"
                                     >
                                         {creatingDepartment ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
                                         Add Dept
@@ -1382,20 +1401,20 @@ const UsersPage = () => {
                             </motion.div>
                         )}
                         <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Email</label>
+                            <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Email</label>
                             <input
                                 type="email"
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-2 px-3 bg-white/95 dark:bg-surface/50 border border-cyan-200/90 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                 placeholder="name@campus.edu"
                                 value={newUser.email}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Phone</label>
+                            <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Phone</label>
                             <input
                                 type="tel"
-                                className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                className="w-full py-2 px-3 bg-white/95 dark:bg-surface/50 border border-cyan-200/90 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 transition-all shadow-inner"
                                 placeholder="0712345678"
                                 value={newUser.phone_number}
                                 onChange={(event) => setNewUser((prev) => ({ ...prev, phone_number: event.target.value }))}
@@ -1406,22 +1425,22 @@ const UsersPage = () => {
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -8 }}
-                                className="md:col-span-2 rounded-2xl border border-info/20 bg-info/10 p-4"
+                                className="md:col-span-2 xl:col-span-3 rounded-xl border border-sky-200 dark:border-info/20 bg-sky-50/80 dark:bg-info/10 p-3 shadow-sm"
                             >
                                 <div className="flex items-center justify-between gap-3 mb-3">
                                     <div>
-                                        <h5 className="text-sm font-extrabold text-textPrimary m-0">Skilled Technician Profile</h5>
-                                        <p className="text-[11px] text-textSecondary font-medium m-0">Select a skill area or create a new specialization for this technician.</p>
+                                        <h5 className="text-sm font-extrabold text-black dark:text-textPrimary m-0">Skilled Technician Profile</h5>
+                                        <p className="text-[10px] text-slate-700 dark:text-textSecondary font-medium m-0">Select a skill area or create a new specialization for this technician.</p>
                                     </div>
-                                    <div className="hidden md:flex p-2 rounded-xl bg-surface/70 border border-overlay/10 text-info">
+                                    <div className="hidden md:flex p-2 rounded-lg bg-white dark:bg-surface/70 border border-sky-200 dark:border-overlay/10 text-info">
                                         <Wrench size={18} />
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Specialization</label>
+                                        <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Specialization</label>
                                         <select
-                                            className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-2 px-3 bg-white dark:bg-surface/80 border border-sky-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-300 transition-all shadow-inner"
                                             value={newUser.specialization}
                                             onChange={(event) => setNewUser((prev) => ({ ...prev, specialization: event.target.value }))}
                                             required
@@ -1435,19 +1454,19 @@ const UsersPage = () => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Experience Years</label>
+                                        <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Experience Years</label>
                                         <input
                                             type="number"
                                             min="0"
-                                            className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-2 px-3 bg-white dark:bg-surface/80 border border-sky-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-300 transition-all shadow-inner"
                                             value={newUser.experience_years}
                                             onChange={(event) => setNewUser((prev) => ({ ...prev, experience_years: event.target.value }))}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Availability</label>
+                                        <label className="block text-[11px] font-bold text-black dark:text-textSecondary mb-1.5 uppercase tracking-widest">Availability</label>
                                         <select
-                                            className="w-full py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="w-full py-2 px-3 bg-white dark:bg-surface/80 border border-sky-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-300 transition-all shadow-inner"
                                             value={newUser.availability_status}
                                             onChange={(event) => setNewUser((prev) => ({ ...prev, availability_status: event.target.value }))}
                                         >
@@ -1459,7 +1478,7 @@ const UsersPage = () => {
                                     <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 pt-1">
                                         <input
                                             type="text"
-                                            className="py-3 px-4 bg-surface/80 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                            className="py-2 px-3 bg-white dark:bg-surface/80 border border-sky-200 dark:border-overlay/10 text-black dark:text-textPrimary rounded-lg font-bold placeholder-slate-400 dark:placeholder-textSecondary/50 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-300 transition-all shadow-inner"
                                             placeholder="Add new specialization, e.g. Solar Systems"
                                             value={newSpecialization}
                                             onChange={(event) => setNewSpecialization(event.target.value)}
@@ -1468,7 +1487,7 @@ const UsersPage = () => {
                                             type="button"
                                             onClick={createSpecialization}
                                             disabled={creatingSpecialization}
-                                            className="btn-secondary py-3 px-4 rounded-xl text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2"
+                                            className="btn-secondary py-2.5 px-3 rounded-lg text-[11px] font-extrabold uppercase tracking-widest flex items-center justify-center gap-2"
                                         >
                                             {creatingSpecialization ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
                                             Add Skill
@@ -1478,22 +1497,22 @@ const UsersPage = () => {
                             </motion.div>
                         )}
                         
-                        <div className="md:col-span-2">
-                            <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-bold flex items-center gap-3">
-                                <Shield size={18} className="shrink-0" />
+                        <div className="md:col-span-2 xl:col-span-3">
+                            <div className="p-2.5 rounded-lg bg-gradient-to-r from-lime-50 via-white to-cyan-50 dark:from-primary/10 dark:via-emerald-500/10 dark:to-cyan-500/10 border border-emerald-200 dark:border-primary/20 text-slate-950 dark:text-lime-200 text-[11px] font-bold flex items-center gap-3 shadow-sm">
+                                <Shield size={18} className="shrink-0 text-emerald-600 dark:text-lime-300" />
                                 The system will generate a temporary password automatically after registration.
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 flex gap-4 mt-2">
-                            <button type="button" className="btn-secondary flex-1 py-4 text-xs font-extrabold tracking-widest uppercase rounded-xl" onClick={() => setShowRegisterModal(false)}>
+                        <div className="md:col-span-2 xl:col-span-3 flex gap-3 mt-1">
+                            <button type="button" className="btn-secondary flex-1 py-2.5 text-[11px] font-extrabold tracking-widest uppercase rounded-lg" onClick={() => setShowRegisterModal(false)}>
                                 Cancel
                             </button>
                             <motion.button 
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 type="submit" 
-                                className="btn-primary flex-1 py-4 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl" 
+                                className="btn-primary flex-1 py-2.5 flex items-center justify-center text-[11px] font-extrabold tracking-widest uppercase rounded-lg bg-gradient-to-r from-cyan-500 via-emerald-500 to-lime-500 shadow-lg shadow-emerald-500/25" 
                                 disabled={registering}
                             >
                                 {registering ? <Loader2 size={16} className="animate-spin mr-2" /> : 'Register User'}
@@ -1670,13 +1689,13 @@ const SecurityPage = () => {
 };
 
 const AdminDashboard = () => (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-background relative overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-cover bg-center opacity-30 blur-md scale-105" style={{ backgroundImage: `url(${techBg})` }}></div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-background/90 via-background/80 to-surface/90"></div>
-            <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow"></div>
-            <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute inset-0 bg-cover bg-center opacity-0 dark:opacity-30 blur-md scale-105" style={{ backgroundImage: `url(${techBg})` }}></div>
+            <div className="absolute inset-0 bg-white dark:bg-gradient-to-tr dark:from-background/90 dark:via-background/80 dark:to-surface/90"></div>
+            <div className="hidden dark:block absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] animate-pulse-slow"></div>
+            <div className="hidden dark:block absolute bottom-[10%] right-[10%] w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
         </div>
 
         <Sidebar />
