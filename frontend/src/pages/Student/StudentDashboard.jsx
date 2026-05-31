@@ -150,11 +150,10 @@ const NewRequestForm = () => {
     const [formData, setFormData] = useState({
         issue_title: '',
         issue_description: '',
-        location_id: '',
-        asset_id: '',
+        location: '',
         priority_level: 'Medium'
     });
-    const [options, setOptions] = useState({ locations: [], assets: [], priorities: ['Low', 'Medium', 'High', 'Emergency'] });
+    const [options, setOptions] = useState({ priorities: ['Low', 'Medium', 'High', 'Emergency'] });
     const [optionsLoading, setOptionsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -177,10 +176,6 @@ const NewRequestForm = () => {
         fetchOptions();
     }, []);
 
-    const availableAssets = useMemo(() => (
-        options.assets || []
-    ).filter((asset) => !formData.location_id || String(asset.location_id) === String(formData.location_id)), [formData.location_id, options.assets]);
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         setSaving(true);
@@ -190,8 +185,7 @@ const NewRequestForm = () => {
             const res = await axios.post('index.php?action=createRequest', {
                 issue_title: formData.issue_title,
                 issue_description: formData.issue_description,
-                location_id: formData.location_id,
-                asset_id: formData.asset_id || null,
+                location: formData.location,
                 priority_level: formData.priority_level
             });
 
@@ -203,8 +197,7 @@ const NewRequestForm = () => {
             setFormData({
                 issue_title: '',
                 issue_description: '',
-                location_id: '',
-                asset_id: '',
+                location: '',
                 priority_level: 'Medium'
             });
         } catch (error) {
@@ -212,6 +205,11 @@ const NewRequestForm = () => {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleNotificationClick = async () => {
+        await markNotificationsRead();
+        navigate('/student');
     };
 
     return (
@@ -225,7 +223,7 @@ const NewRequestForm = () => {
                 title="New Request"
                 subtitle="Send a maintenance problem to the admin team"
                 unreadCount={unreadCount}
-                onReadNotifications={markNotificationsRead}
+                onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
 
@@ -260,37 +258,14 @@ const NewRequestForm = () => {
 
                             <div>
                                 <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Location</label>
-                                <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
-                                    value={formData.location_id}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, location_id: event.target.value, asset_id: '' }))}
-                                    disabled={optionsLoading}
+                                <input
+                                    type="text"
+                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold placeholder-textSecondary/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner"
+                                    value={formData.location}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, location: event.target.value }))}
+                                    placeholder="Example: Block B, Room 204"
                                     required
-                                >
-                                    <option value="" className="bg-surface text-textSecondary">Select location</option>
-                                    {(options.locations || []).map((location) => (
-                                        <option key={location.location_id} value={location.location_id} className="bg-surface text-textPrimary">
-                                            {location.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Asset</label>
-                                <select
-                                    className="w-full py-3 px-4 bg-surface/50 border border-overlay/10 text-textPrimary rounded-xl font-bold focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner appearance-none"
-                                    value={formData.asset_id}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, asset_id: event.target.value }))}
-                                    disabled={!formData.location_id || optionsLoading}
-                                >
-                                    <option value="" className="bg-surface text-textSecondary">No specific asset</option>
-                                    {availableAssets.map((asset) => (
-                                        <option key={asset.asset_id} value={asset.asset_id} className="bg-surface text-textPrimary">
-                                            {asset.asset_name} - {asset.serial_number}
-                                        </option>
-                                    ))}
-                                </select>
+                                />
                             </div>
 
                             <div>
@@ -380,6 +355,7 @@ const useStudentDashboardData = () => {
     const markNotificationsRead = useCallback(async () => {
         await axios.post('index.php?action=markNotificationsRead');
         await refreshData();
+        window.dispatchEvent(new Event('notifications-read'));
     }, [refreshData]);
 
     useEffect(() => {
@@ -453,10 +429,13 @@ const StudentOverview = () => {
             className="p-2 md:p-4 text-[0.94rem]"
         >
             <DashboardHeader
-                title="Student Dashboard"
+                title="User Dashboard"
                 subtitle="Track the problem you reported and see technician updates"
                 unreadCount={unreadCount}
-                onReadNotifications={markNotificationsRead}
+                onReadNotifications={async () => {
+                    await markNotificationsRead();
+                    navigate('/student');
+                }}
                 onLogout={logout}
             />
 
@@ -749,7 +728,10 @@ const StudentHistory = () => {
                 title="Request History"
                 subtitle="Completed tasks you can review or delete permanently"
                 unreadCount={unreadCount}
-                onReadNotifications={markNotificationsRead}
+                onReadNotifications={async () => {
+                    await markNotificationsRead();
+                    navigate('/student');
+                }}
                 onLogout={logout}
             />
 
