@@ -10,7 +10,7 @@ import Features from './Features';
 import Contacts from './Contacts';
 import HeroImg from '../../assets/images/maint_hero.png';
 
-const NAVBAR_OFFSET = 65;
+const NAVBAR_OFFSET = 64;
 
 const routeToSection = {
     '/': 'home',
@@ -71,7 +71,12 @@ const Home = () => {
             {/* ══════════════════ HERO ══════════════════ */}
             <section
                 id="home"
-                className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-[#060c18]"
+                className="relative w-full min-h-0 shrink-0 flex-none flex items-center justify-center overflow-hidden bg-[#060c18]"
+                style={{
+                    height: 'calc(100svh - 4rem)',
+                    maxHeight: 'calc(100svh - 4rem)',
+                    flexBasis: 'calc(100svh - 4rem)'
+                }}
             >
                 {/* ── Background image with parallax-ish scale ── */}
                 <motion.div
@@ -146,7 +151,7 @@ const Home = () => {
                 />
 
                 {/* ══ CONTENT ══ */}
-                <div className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-10 pt-28 pb-24 flex flex-col items-center text-center">
+                <div className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-10 py-6 md:py-8 flex flex-col items-center text-center">
 
                     {/* Badge row */}
                     <motion.div
@@ -154,7 +159,7 @@ const Home = () => {
                         animate="visible"
                         variants={fadeUp}
                         custom={0}
-                        className="flex flex-wrap items-center justify-center gap-2 mb-8"
+                        className="flex flex-wrap items-center justify-center gap-2 mb-5"
                     >
                         {badges.map((b) => (
                             <span
@@ -173,7 +178,7 @@ const Home = () => {
                         animate="visible"
                         variants={fadeUp}
                         custom={1}
-                        className="text-[clamp(2.4rem,6vw,4.5rem)] font-black leading-[1.08] tracking-tight text-white mb-6"
+                        className="text-[clamp(2.1rem,5.6vw,4.2rem)] font-black leading-[1.05] tracking-tight text-white mb-4"
                     >
                         Smart Campus{' '}
                         <br className="hidden sm:block" />
@@ -188,7 +193,7 @@ const Home = () => {
                         animate="visible"
                         variants={fadeUp}
                         custom={2}
-                        className="max-w-xl text-slate-300/80 text-base md:text-lg leading-relaxed mb-10"
+                        className="max-w-xl text-slate-300/80 text-sm md:text-base leading-relaxed mb-6"
                     >
                         Report issues instantly, track technician progress in real-time,
                         and keep campus infrastructure running at its best.
@@ -200,13 +205,21 @@ const Home = () => {
                         animate="visible"
                         variants={fadeUp}
                         custom={3}
-                        className="flex flex-col sm:flex-row gap-3 justify-center mb-16"
+                        className="flex flex-col sm:flex-row gap-3 justify-center mb-8"
                     >
-                        <button className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-white text-sm font-bold tracking-wide shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/40 hover:-translate-y-0.5 transition-all duration-200">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/login')}
+                            className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-white text-sm font-bold tracking-wide shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/40 hover:-translate-y-0.5 transition-all duration-200"
+                        >
                             Get Started
                             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" />
                         </button>
-                        <button className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/15 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/25 text-sm font-semibold backdrop-blur-sm transition-all duration-200">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/about-us')}
+                            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-white/15 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/25 text-sm font-semibold backdrop-blur-sm transition-all duration-200"
+                        >
                             Learn More
                         </button>
                     </motion.div>
@@ -217,7 +230,7 @@ const Home = () => {
                         animate="visible"
                         variants={fadeUp}
                         custom={4}
-                        className="flex items-center justify-center gap-8 md:gap-14 pt-8 border-t border-white/10 w-full max-w-lg mx-auto"
+                        className="flex items-center justify-center gap-8 md:gap-14 pt-5 border-t border-white/10 w-full max-w-lg mx-auto"
                     >
                         {stats.map((stat, i) => (
                             <div key={stat.label} className="flex flex-col items-center gap-0.5">
