@@ -110,22 +110,24 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
             isOpen={!!request}
             onClose={onClose}
             title={request ? `Request #${request.id}` : 'Request Details'}
-            maxWidth="860px"
+            maxWidth="1120px"
             showFooter={false}
+            dialogClassName="max-h-[calc(100vh-2rem)]"
+            bodyClassName="text-[0.9rem] pr-1"
         >
             {request && (
                 <div>
-                    <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 mb-6">
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-5">
                         <div className="flex flex-wrap justify-between items-start gap-4">
-                            <div>
+                            <div className="min-w-0 flex-1">
                                 <h5 className="text-lg font-extrabold text-textPrimary mb-1">{request.title}</h5>
-                                <p className="text-sm text-textSecondary mb-0 font-medium">{request.description}</p>
+                                <p className="text-sm text-textSecondary mb-0 font-medium whitespace-pre-wrap break-words leading-relaxed">{request.description}</p>
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>{request.status}</span>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Student</label>
                             <div className="font-extrabold text-textPrimary text-sm">{request.student_name}</div>
@@ -137,9 +139,9 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Location</label>
-                            <div className="flex items-center font-extrabold text-textPrimary text-sm">
-                                <MapPin size={16} className="mr-2 text-primary" />
-                                {request.location}
+                            <div className="flex items-start font-extrabold text-textPrimary text-sm">
+                                <MapPin size={16} className="mr-2 mt-0.5 text-primary shrink-0" />
+                                <span className="break-words">{request.location}</span>
                             </div>
                             <div className="text-xs text-textSecondary mt-2 font-medium">Priority: <span className="font-bold">{request.priority}</span></div>
                             <div className="text-xs text-textSecondary mt-1 font-medium">Category: <span className="font-bold">{request.category}</span></div>
@@ -147,7 +149,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                         <div>
                             {request.status !== 'Completed' ? (
                                 <>
@@ -183,7 +185,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
 
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Progress Timeline</label>
-                            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
+                            <div className="flex flex-col gap-3 max-h-[260px] overflow-y-auto custom-scrollbar pr-2">
                                 {loading ? (
                                     <div className="flex justify-center py-8">
                                         <Loader2 size={32} className="animate-spin text-primary" />
@@ -204,7 +206,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                                                 </div>
                                                 <span className="text-[10px] font-bold text-textSecondary">{new Date(log.created_at).toLocaleString()}</span>
                                             </div>
-                                            <div className="text-sm text-textPrimary">{log.remarks}</div>
+                                            <div className="text-sm text-textPrimary whitespace-pre-wrap break-words">{log.remarks}</div>
                                         </motion.div>
                                     ))
                                 ) : (
@@ -232,6 +234,7 @@ const useAdminNotifications = () => {
     const markNotificationsRead = useCallback(async () => {
         await axios.post('index.php?action=markNotificationsRead');
         await refreshNotifications();
+        window.dispatchEvent(new Event('notifications-read'));
     }, [refreshNotifications]);
 
     useEffect(() => {
@@ -566,7 +569,7 @@ const ActiveQueue = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-6"
+            className="p-3 md:p-4 text-[0.9rem]"
         >
             <DashboardHeader
                 title="Active Queue"
@@ -576,20 +579,12 @@ const ActiveQueue = () => {
                 onLogout={logout}
             />
 
-            <div className="glass-card p-6">
+            <div className="glass-card p-5">
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
                         <h4 className="text-lg font-extrabold text-textPrimary mb-1">Active Requests</h4>
                         <p className="text-xs text-textSecondary font-medium m-0">Live updates from all campuses</p>
                     </div>
-                    <motion.button 
-                        whileHover={{ scale: 1.1, rotate: 15 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={refreshData}
-                        className={`p-2 rounded-lg bg-surface border border-overlay/5 text-textSecondary hover:text-primary transition-colors ${loading ? 'animate-spin text-primary' : ''}`}
-                    >
-                        <RefreshCcw size={20} />
-                    </motion.button>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -770,7 +765,7 @@ const AdminHistory = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-6"
+            className="p-3 md:p-4 text-[0.9rem]"
         >
             <DashboardHeader
                 title="Admin History"
@@ -780,7 +775,7 @@ const AdminHistory = () => {
                 onLogout={logout}
             />
 
-            <div className="glass-card p-6">
+            <div className="glass-card p-4 md:p-5">
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
                     <div>
                         <h4 className="text-lg font-extrabold text-textPrimary mb-1">Completed Requests</h4>
@@ -1139,7 +1134,7 @@ const UsersPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-3 md:p-4"
+            className="p-2 md:p-3 text-[0.88rem]"
         >
             <DashboardHeader
                 title="User Management"
@@ -1164,7 +1159,7 @@ const UsersPage = () => {
                 </motion.button>
             </div>
 
-            <div className="glass-card p-4 md:p-5">
+            <div className="glass-card p-3 md:p-4">
                 <AnimatePresence>
                     {feedback && (
                         <motion.div 
@@ -1179,7 +1174,7 @@ const UsersPage = () => {
                 </AnimatePresence>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse text-[0.82rem]">
                         <thead>
                             <tr className="border-b border-overlay/10 text-xs text-textSecondary font-extrabold uppercase tracking-widest">
                                 <th className="pb-4 px-4 whitespace-nowrap">User</th>
