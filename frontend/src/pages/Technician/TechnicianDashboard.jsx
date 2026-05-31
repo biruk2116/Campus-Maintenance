@@ -97,6 +97,7 @@ const useTechnicianData = () => {
     const markNotificationsRead = useCallback(async () => {
         await axios.post('index.php?action=markNotificationsRead');
         await refreshData();
+        window.dispatchEvent(new Event('notifications-read'));
     }, [refreshData]);
 
     useEffect(() => {
@@ -161,20 +162,22 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
             isOpen={!!request}
             onClose={onClose}
             title={request ? `Update Request #${request.id}` : 'Update Request'}
-            maxWidth="760px"
+            maxWidth="980px"
             showFooter={false}
+            dialogClassName="max-h-[calc(100vh-2rem)]"
+            bodyClassName="text-[0.9rem] pr-1"
         >
             {request && (
                 <form onSubmit={saveProgress}>
-                    <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 mb-6">
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-5">
                         <h5 className="text-lg font-extrabold text-textPrimary mb-2">{request.title}</h5>
-                        <div className="flex items-center text-xs text-textSecondary font-medium">
-                            <MapPin size={14} className="mr-2 text-primary" />
-                            {request.location}
+                        <div className="flex items-start text-xs text-textSecondary font-medium">
+                            <MapPin size={14} className="mr-2 mt-0.5 text-primary shrink-0" />
+                            <span className="break-words">{request.location}</span>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Status</label>
                             <select
@@ -215,7 +218,7 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
 
                     <div className="mb-6">
                         <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Previous Updates</label>
-                        <div className="flex flex-col gap-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-2">
+                        <div className="flex flex-col gap-3 max-h-[190px] overflow-y-auto custom-scrollbar pr-2">
                             {loadingHistory ? (
                                 <div className="flex justify-center py-6">
                                     <Loader2 size={24} className="animate-spin text-primary" />
@@ -236,7 +239,7 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                                             </div>
                                             <span className="text-[10px] font-bold text-textSecondary">{new Date(log.created_at).toLocaleString()}</span>
                                         </div>
-                                        <div className="text-sm text-textPrimary">{log.remarks}</div>
+                                        <div className="text-sm text-textPrimary whitespace-pre-wrap break-words">{log.remarks}</div>
                                     </motion.div>
                                 ))
                             ) : (
@@ -245,15 +248,15 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                         </div>
                     </div>
 
-                    <div className="flex gap-4">
-                        <button type="button" className="btn-secondary flex-1 py-4 text-xs font-extrabold tracking-widest uppercase rounded-xl" onClick={onClose}>
+                    <div className="flex gap-3">
+                        <button type="button" className="btn-secondary flex-1 py-3 text-xs font-extrabold tracking-widest uppercase rounded-xl" onClick={onClose}>
                             Cancel
                         </button>
                         <motion.button 
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             type="submit" 
-                            className="btn-primary flex-1 py-4 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl" 
+                            className="btn-primary flex-1 py-3 flex items-center justify-center text-xs font-extrabold tracking-widest uppercase rounded-xl" 
                             disabled={saving}
                         >
                             {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
