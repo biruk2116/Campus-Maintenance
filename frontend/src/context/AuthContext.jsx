@@ -66,14 +66,22 @@ export const AuthProvider = ({ children }) => {
         return res.data;
     };
 
-    const logout = async () => {
-        try {
-            await axios.post('index.php?action=logout');
-        } finally {
-            localStorage.clear();
-            setUser(null);
-            window.location.href = '/';
-        }
+    const logout = () => {
+        localStorage.clear();
+
+        void fetch(`${axios.defaults.baseURL}index.php?action=logout`, {
+            method: 'POST',
+            credentials: 'include',
+            keepalive: true,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).catch((error) => {
+            console.error('Logout error:', error.message);
+        });
+
+        window.location.replace('/');
     };
 
     useEffect(() => {
