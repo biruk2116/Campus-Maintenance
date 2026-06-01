@@ -82,6 +82,50 @@ function getRequestOptions($pdo)
     ]);
 }
 
+function getPublicStats($pdo)
+{
+    $stats = [
+        "active_users" => 0,
+        "open_requests" => 0,
+        "resolved_requests" => 0,
+        "avg_response_minutes" => null
+    ];
+
+    $stats['active_users'] = (int)$pdo->query("
+        SELECT COUNT(*)
+        FROM users
+        WHERE status = 'Active'
+    ")->fetchColumn();
+
+    $requestCounts = $pdo->query("
+        SELECT
+            SUM(CASE WHEN status != 'Completed' THEN 1 ELSE 0 END) AS open_requests,
+            SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) AS resolved_requests
+        FROM requests
+    ")->fetch(PDO::FETCH_ASSOC);
+
+    $stats['open_requests'] = (int)($requestCounts['open_requests'] ?? 0);
+    $stats['resolved_requests'] = (int)($requestCounts['resolved_requests'] ?? 0);
+
+    $avgResponse = $pdo->query("
+        SELECT AVG(TIMESTAMPDIFF(MINUTE, r.created_at, first_assignment.assigned_at))
+        FROM requests r
+        JOIN (
+            SELECT request_id, MIN(created_at) AS assigned_at
+            FROM maintenance_logs
+            WHERE action_taken = 'Technician Assigned'
+            GROUP BY request_id
+        ) first_assignment ON first_assignment.request_id = r.id
+        WHERE first_assignment.assigned_at >= r.created_at
+    ")->fetchColumn();
+
+    if ($avgResponse !== false && $avgResponse !== null) {
+        $stats['avg_response_minutes'] = max(1, (int)round((float)$avgResponse));
+    }
+
+    response(true, "Public live stats", $stats);
+}
+
 function clampProgress($progress)
 {
     $value = (int)$progress;
