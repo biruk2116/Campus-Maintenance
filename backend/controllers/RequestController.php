@@ -22,6 +22,54 @@ function getTechnicianProfileId($pdo, $user_id)
     return $technicianId !== false ? (int)$technicianId : null;
 }
 
+function getPriorityNotificationText($priority, $audience, $title, $location)
+{
+    $prefixes = [
+        'Emergency' => [
+            'admin' => 'Emergency request submitted. Dispatch a technician immediately',
+            'technician' => 'Emergency task assigned. Respond immediately'
+        ],
+        'High' => [
+            'admin' => 'High priority request submitted. Review and assign quickly',
+            'technician' => 'High priority task assigned. Please start as soon as possible'
+        ],
+        'Medium' => [
+            'admin' => 'Medium priority request submitted. Add it to the active queue',
+            'technician' => 'Medium priority task assigned. Check the details and update progress'
+        ],
+        'Low' => [
+            'admin' => 'Low priority request submitted. Schedule when capacity is available',
+            'technician' => 'Low priority task assigned. Handle when higher priority work is clear'
+        ]
+    ];
+
+    $message = $prefixes[$priority][$audience] ?? $prefixes['Medium'][$audience];
+    return "{$message}: {$title} at {$location}.";
+}
+
+function createNotification($pdo, $user_id, $message)
+{
+    $stmt = $pdo->prepare("
+        INSERT INTO notifications (user_id, message, is_read)
+        VALUES (?, ?, FALSE)
+    ");
+    $stmt->execute([$user_id, $message]);
+}
+
+function notifyAdminsForRequest($pdo, $priority, $title, $location)
+{
+    $stmt = $pdo->query("
+        SELECT user_id
+        FROM users
+        WHERE role = 'Admin' AND status = 'Active'
+    ");
+
+    $message = getPriorityNotificationText($priority, 'admin', $title, $location);
+    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $adminId) {
+        createNotification($pdo, $adminId, $message);
+    }
+}
+
 function normalizedRequestStatus($status)
 {
     if ($status === 'Completed') {
@@ -311,6 +359,7 @@ function createRequest($pdo)
 
         $requestId = (int)$pdo->lastInsertId();
         createMaintenanceLog($pdo, $requestId, $_SESSION['user_id'], 'Request Submitted', 'Student submitted a new maintenance request', 0);
+        notifyAdminsForRequest($pdo, $priority, $title, $location);
         $pdo->commit();
     } catch (Throwable $error) {
         $pdo->rollBack();
@@ -472,6 +521,12 @@ function assignTechnician($pdo)
         'Technician Assigned',
         "Assigned to {$technician['name']} ({$technician['skills']})",
         $progress
+    );
+
+    createNotification(
+        $pdo,
+        $technician_id,
+        getPriorityNotificationText($request['priority'], 'technician', $request['title'], $request['location'])
     );
 
     response(true, "Technician assigned successfully");
@@ -643,11 +698,11 @@ function getNotificationCounts($pdo)
 {
     $role = $_SESSION['role'];
     $userId = (int)$_SESSION['user_id'];
-    $count = 0;
+    $legacyCount = 0;
 
     if ($role === 'admin') {
         $stmt = $pdo->query("SELECT COUNT(*) FROM requests WHERE admin_seen = 0");
-        $count = (int)$stmt->fetchColumn();
+        $legacyCount = (int)$stmt->fetchColumn();
     } elseif ($role === 'technician') {
         $stmt = $pdo->prepare("
             SELECT COUNT(*)
@@ -655,7 +710,7 @@ function getNotificationCounts($pdo)
             WHERE technician_id = ? AND tech_seen = 0 AND status != 'Completed'
         ");
         $stmt->execute([$userId]);
-        $count = (int)$stmt->fetchColumn();
+        $legacyCount = (int)$stmt->fetchColumn();
     } elseif ($role === 'student') {
         $stmt = $pdo->prepare("
             SELECT COUNT(*)
@@ -663,10 +718,30 @@ function getNotificationCounts($pdo)
             WHERE student_id = ? AND student_seen = 0 AND student_hidden = 0
         ");
         $stmt->execute([$userId]);
-        $count = (int)$stmt->fetchColumn();
+        $legacyCount = (int)$stmt->fetchColumn();
     }
 
-    response(true, "Notification counts", ["unread" => $count]);
+    $notificationCountStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM notifications
+        WHERE user_id = ? AND is_read = FALSE
+    ");
+    $notificationCountStmt->execute([$userId]);
+    $notificationCount = (int)$notificationCountStmt->fetchColumn();
+
+    $notificationStmt = $pdo->prepare("
+        SELECT notification_id, message, notification_date, is_read
+        FROM notifications
+        WHERE user_id = ?
+        ORDER BY is_read ASC, notification_date DESC, notification_id DESC
+        LIMIT 5
+    ");
+    $notificationStmt->execute([$userId]);
+
+    response(true, "Notification counts", [
+        "unread" => $notificationCount > 0 ? $notificationCount : $legacyCount,
+        "notifications" => $notificationStmt->fetchAll(PDO::FETCH_ASSOC)
+    ]);
 }
 
 function markNotificationsRead($pdo)
@@ -692,6 +767,13 @@ function markNotificationsRead($pdo)
         ");
         $stmt->execute([$userId]);
     }
+
+    $notificationStmt = $pdo->prepare("
+        UPDATE notifications
+        SET is_read = TRUE
+        WHERE user_id = ? AND is_read = FALSE
+    ");
+    $notificationStmt->execute([$userId]);
 
     response(true, "Notifications marked as read");
 }
