@@ -44,6 +44,11 @@ switch ($action) {
         checkSession($pdo);
         break;
 
+    case 'getPublicStats':
+        require_once __DIR__ . "/controllers/RequestController.php";
+        getPublicStats($pdo);
+        break;
+
     case 'changePassword':
         require_once __DIR__ . "/controllers/AuthController.php";
         changePassword($pdo);
