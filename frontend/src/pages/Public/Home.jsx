@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Zap, Activity } from 'lucide-react';
@@ -9,6 +9,7 @@ import Services from './Services';
 import Features from './Features';
 import Contacts from './Contacts';
 import HeroImg from '../../assets/images/maint_hero.png';
+import axios from '../../api/axios';
 
 const NAVBAR_OFFSET = 64;
 
@@ -44,9 +45,42 @@ const fadeUp = {
     }),
 };
 
+const defaultLiveStats = {
+    active_users: 0,
+    open_requests: 0,
+    resolved_requests: 0,
+    avg_response_minutes: null,
+};
+
+const formatCount = (value) => {
+    const number = Number(value) || 0;
+
+    if (number >= 1000) {
+        return `${(number / 1000).toFixed(number >= 10000 ? 0 : 1).replace(/\.0$/, '')}K+`;
+    }
+
+    return number.toLocaleString();
+};
+
+const formatResponseTime = (minutes) => {
+    const number = Number(minutes);
+
+    if (!Number.isFinite(number) || number <= 0) {
+        return 'Live';
+    }
+
+    if (number < 60) {
+        return `${Math.round(number)} min`;
+    }
+
+    const hours = number / 60;
+    return `${hours.toFixed(hours >= 10 ? 0 : 1).replace(/\.0$/, '')} hr`;
+};
+
 const Home = () => {
     const navigate  = useNavigate();
     const location  = useLocation();
+    const [liveStats, setLiveStats] = useState(defaultLiveStats);
 
     useEffect(() => {
         const sectionId = routeToSection[location.pathname] || 'home';
@@ -54,11 +88,35 @@ const Home = () => {
         return () => window.clearTimeout(timer);
     }, [location.pathname]);
 
-    const stats = [
-        { value: '2 min', label: 'Avg. Response' },
-        { value: '99.8%', label: 'Uptime' },
-        { value: '4,200+', label: 'Issues Resolved' },
-    ];
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchStats = async () => {
+            try {
+                const res = await axios.get('index.php?action=getPublicStats');
+                if (isMounted && res.data.success) {
+                    setLiveStats({ ...defaultLiveStats, ...res.data.data });
+                }
+            } catch (error) {
+                console.error('Unable to load public stats:', error);
+            }
+        };
+
+        fetchStats();
+        const interval = window.setInterval(fetchStats, 15000);
+
+        return () => {
+            isMounted = false;
+            window.clearInterval(interval);
+        };
+    }, []);
+
+    const stats = useMemo(() => [
+        { value: formatResponseTime(liveStats.avg_response_minutes), label: 'Avg. Response' },
+        { value: formatCount(liveStats.active_users), label: 'Active Users' },
+        { value: formatCount(liveStats.open_requests), label: 'Open Requests' },
+        { value: formatCount(liveStats.resolved_requests), label: 'Issues Resolved' },
+    ], [liveStats]);
 
     const badges = [
         { icon: <Zap size={13} />,          label: 'Real-time Tracking'  },
@@ -230,9 +288,9 @@ const Home = () => {
                         animate="visible"
                         variants={fadeUp}
                         custom={4}
-                        className="flex items-center justify-center gap-8 md:gap-14 pt-5 border-t border-white/10 w-full max-w-lg mx-auto"
+                        className="grid grid-cols-2 sm:grid-cols-4 gap-5 md:gap-8 pt-5 border-t border-white/10 w-full max-w-2xl mx-auto"
                     >
-                        {stats.map((stat, i) => (
+                        {stats.map((stat) => (
                             <div key={stat.label} className="flex flex-col items-center gap-0.5">
                                 <span className="text-xl md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-cyan-200 to-blue-300 leading-none">
                                     {stat.value}
