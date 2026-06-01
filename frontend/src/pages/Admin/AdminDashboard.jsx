@@ -67,41 +67,54 @@ const statusClassName = (status) => {
     return 'bg-warning/10 text-warning border border-warning/20';
 };
 
-const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="flex flex-wrap items-center justify-between gap-3 mb-4 mt-1">
-        <div className="flex items-center gap-4">
-            <img src={dbuLogo} alt="DBU" className="hidden md:block h-10" />
-            <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-textPrimary mb-0.5">{title}</h2>
-                <p className="text-[11px] text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
+const DashboardHeader = ({ title, subtitle, unreadCount, notifications = [], onReadNotifications, onLogout }) => (
+    <>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 mt-1">
+            <div className="flex items-center gap-4">
+                <img src={dbuLogo} alt="DBU" className="hidden md:block h-10" />
+                <div>
+                    <h2 className="text-2xl font-extrabold tracking-tight text-textPrimary mb-0.5">{title}</h2>
+                    <p className="text-[11px] text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={onReadNotifications}
+                    className="relative p-2.5 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
+                    title="Open active queue"
+                >
+                    <Bell size={19} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
+                    {unreadCount > 0 && (
+                        <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
+                            {unreadCount}
+                        </span>
+                    )}
+                </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={onLogout}
+                    className="flex items-center gap-2 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+                >
+                    <LogOut size={16} />
+                    Logout
+                </motion.button>
             </div>
         </div>
-        <div className="flex items-center gap-3">
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onReadNotifications}
-                className="relative p-2.5 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
-                title="Open active queue"
-            >
-                <Bell size={19} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
-                {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
-                        {unreadCount}
-                    </span>
-                )}
-            </motion.button>
-            <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onLogout} 
-                className="flex items-center gap-2 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
-            >
-                <LogOut size={16} />
-                Logout
-            </motion.button>
-        </div>
-    </div>
+        {notifications.length > 0 && (
+            <div className="mb-4 rounded-xl border border-danger/15 bg-danger/5 px-4 py-3 shadow-sm">
+                <div className="flex items-start gap-3">
+                    <Bell size={16} className="mt-0.5 text-danger shrink-0" />
+                    <div className="min-w-0">
+                        <p className="m-0 text-[10px] font-black uppercase tracking-[0.18em] text-danger">Latest priority alert</p>
+                        <p className="m-0 mt-1 text-sm font-semibold text-textPrimary break-words">{notifications[0].message}</p>
+                    </div>
+                </div>
+            </div>
+        )}
+    </>
 );
 
 const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, onClose }) => {
@@ -225,11 +238,13 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
 
 const useAdminNotifications = () => {
     const [unreadCount, setUnreadCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
 
     const refreshNotifications = useCallback(async () => {
         const res = await axios.get('index.php?action=getNotificationCounts');
         if (res.data.success) {
             setUnreadCount(res.data.data.unread || 0);
+            setNotifications(res.data.data.notifications || []);
         }
     }, []);
 
@@ -247,11 +262,11 @@ const useAdminNotifications = () => {
         return () => clearInterval(interval);
     }, [refreshNotifications]);
 
-    return { unreadCount, refreshNotifications, markNotificationsRead };
+    return { unreadCount, notifications, refreshNotifications, markNotificationsRead };
 };
 
 const AdminOverview = () => {
-    const { unreadCount, refreshNotifications, markNotificationsRead } = useAdminNotifications();
+    const { unreadCount, notifications, refreshNotifications, markNotificationsRead } = useAdminNotifications();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
@@ -315,6 +330,7 @@ const AdminOverview = () => {
                 title="Admin Dashboard"
                 subtitle="Monitor live maintenance requests, users, and technician workload"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
@@ -493,7 +509,7 @@ const AdminOverview = () => {
 };
 
 const ActiveQueue = () => {
-    const { unreadCount, refreshNotifications, markNotificationsRead } = useAdminNotifications();
+    const { unreadCount, notifications, refreshNotifications, markNotificationsRead } = useAdminNotifications();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
@@ -577,6 +593,7 @@ const ActiveQueue = () => {
                 title="Active Queue"
                 subtitle="Review request details and assign the right technician"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
@@ -698,7 +715,7 @@ const ActiveQueue = () => {
 };
 
 const AdminHistory = () => {
-    const { unreadCount, refreshNotifications, markNotificationsRead } = useAdminNotifications();
+    const { unreadCount, notifications, refreshNotifications, markNotificationsRead } = useAdminNotifications();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
@@ -773,6 +790,7 @@ const AdminHistory = () => {
                 title="Admin History"
                 subtitle="Completed work that can stay in history or be deleted"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
@@ -892,7 +910,7 @@ const AdminHistory = () => {
 };
 
 const UsersPage = () => {
-    const { unreadCount, markNotificationsRead } = useAdminNotifications();
+    const { unreadCount, notifications, markNotificationsRead } = useAdminNotifications();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
@@ -1142,6 +1160,7 @@ const UsersPage = () => {
                 title="User Management"
                 subtitle="Register staff, students, and technicians with database-linked details"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
@@ -1548,7 +1567,7 @@ const UsersPage = () => {
 };
 
 const SecurityPage = () => {
-    const { unreadCount, markNotificationsRead } = useAdminNotifications();
+    const { unreadCount, notifications, markNotificationsRead } = useAdminNotifications();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [userCode, setUserCode] = useState('');
@@ -1595,6 +1614,7 @@ const SecurityPage = () => {
                 title="Security Hub"
                 subtitle="Reset user credentials manually"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
