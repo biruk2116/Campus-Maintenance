@@ -162,22 +162,24 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
             isOpen={!!request}
             onClose={onClose}
             title={request ? `Update Request #${request.id}` : 'Update Request'}
-            maxWidth="980px"
+            maxWidth="940px"
             showFooter={false}
-            dialogClassName="max-h-[calc(100vh-2rem)]"
-            bodyClassName="text-[0.9rem] pr-1"
+            overlayClassName="lg:pl-[280px]"
+            backdropClassName="lg:left-[280px]"
+            dialogClassName="max-h-[calc(100vh-1.5rem)] p-4 sm:p-5"
+            bodyClassName="text-[0.86rem] pr-1"
         >
             {request && (
                 <form onSubmit={saveProgress}>
-                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-5">
-                        <h5 className="text-lg font-extrabold text-textPrimary mb-2">{request.title}</h5>
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-4">
+                        <h5 className="text-base font-extrabold text-textPrimary mb-2">{request.title}</h5>
                         <div className="flex items-start text-xs text-textSecondary font-medium">
                             <MapPin size={14} className="mr-2 mt-0.5 text-primary shrink-0" />
                             <span className="break-words">{request.location}</span>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-2 uppercase tracking-widest">Status</label>
                             <select
@@ -216,9 +218,9 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
                         </div>
                     </div>
 
-                    <div className="mb-6">
+                    <div className="mb-4">
                         <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Previous Updates</label>
-                        <div className="flex flex-col gap-3 max-h-[190px] overflow-y-auto custom-scrollbar pr-2">
+                        <div className="flex flex-col gap-3 max-h-[170px] overflow-y-auto custom-scrollbar pr-2">
                             {loadingHistory ? (
                                 <div className="flex justify-center py-6">
                                     <Loader2 size={24} className="animate-spin text-primary" />
