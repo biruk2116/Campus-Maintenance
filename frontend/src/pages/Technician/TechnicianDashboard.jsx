@@ -38,46 +38,60 @@ const statusClassName = (status) => {
     return 'bg-warning/10 text-warning border border-warning/20';
 };
 
-const DashboardHeader = ({ title, subtitle, unreadCount, onReadNotifications, onLogout }) => (
-    <div className="flex flex-wrap items-center justify-between gap-3 mb-4 mt-1">
-        <div className="flex items-center gap-4">
-            <img src={dbuLogo} alt="DBU" className="hidden md:block h-10" />
-            <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-textPrimary mb-0.5">{title}</h2>
-                <p className="text-[11px] text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
+const DashboardHeader = ({ title, subtitle, unreadCount, notifications = [], onReadNotifications, onLogout }) => (
+    <>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 mt-1">
+            <div className="flex items-center gap-4">
+                <img src={dbuLogo} alt="DBU" className="hidden md:block h-10" />
+                <div>
+                    <h2 className="text-2xl font-extrabold tracking-tight text-textPrimary mb-0.5">{title}</h2>
+                    <p className="text-[11px] text-textSecondary uppercase font-extrabold tracking-widest opacity-75 m-0">{subtitle}</p>
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={onReadNotifications}
+                    className="relative p-2.5 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
+                    title="Open assigned work"
+                >
+                    <Bell size={19} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
+                    {unreadCount > 0 && (
+                        <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
+                            {unreadCount}
+                        </span>
+                    )}
+                </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={onLogout}
+                    className="flex items-center gap-2 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
+                >
+                    <LogOut size={16} />
+                    Logout
+                </motion.button>
             </div>
         </div>
-        <div className="flex items-center gap-3">
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onReadNotifications}
-                className="relative p-2.5 rounded-full bg-surface/50 border border-overlay/10 hover:bg-surface transition-colors"
-                title="Open assigned work"
-            >
-                <Bell size={19} className={unreadCount > 0 ? 'text-danger' : 'text-textSecondary'} />
-                {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] font-bold text-white bg-danger rounded-full shadow-md">
-                        {unreadCount}
-                    </span>
-                )}
-            </motion.button>
-            <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onLogout} 
-                className="flex items-center gap-2 px-4 py-2 bg-danger/10 text-danger hover:bg-danger hover:text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-colors border border-danger/20"
-            >
-                <LogOut size={16} />
-                Logout
-            </motion.button>
-        </div>
-    </div>
+        {notifications.length > 0 && (
+            <div className="mb-4 rounded-xl border border-danger/15 bg-danger/5 px-4 py-3 shadow-sm">
+                <div className="flex items-start gap-3">
+                    <Bell size={16} className="mt-0.5 text-danger shrink-0" />
+                    <div className="min-w-0">
+                        <p className="m-0 text-[10px] font-black uppercase tracking-[0.18em] text-danger">Latest priority alert</p>
+                        <p className="m-0 mt-1 text-sm font-semibold text-textPrimary break-words">{notifications[0].message}</p>
+                    </div>
+                </div>
+            </div>
+        )}
+    </>
 );
 
 const useTechnicianData = () => {
     const [requests, setRequests] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const refreshData = useCallback(async () => {
@@ -88,7 +102,10 @@ const useTechnicianData = () => {
             ]);
 
             if (requestRes.data.success) setRequests(requestRes.data.data);
-            if (notificationRes.data.success) setUnreadCount(notificationRes.data.data.unread || 0);
+            if (notificationRes.data.success) {
+                setUnreadCount(notificationRes.data.data.unread || 0);
+                setNotifications(notificationRes.data.data.notifications || []);
+            }
         } finally {
             setLoading(false);
         }
@@ -108,7 +125,7 @@ const useTechnicianData = () => {
         return () => clearInterval(interval);
     }, [refreshData]);
 
-    return { requests, unreadCount, loading, refreshData, markNotificationsRead };
+    return { requests, unreadCount, notifications, loading, refreshData, markNotificationsRead };
 };
 
 const ProgressModal = ({ request, onClose, onSaved }) => {
@@ -272,7 +289,7 @@ const ProgressModal = ({ request, onClose, onSaved }) => {
 };
 
 const TechnicianOverview = () => {
-    const { requests, unreadCount, loading, refreshData, markNotificationsRead } = useTechnicianData();
+    const { requests, unreadCount, notifications, loading, refreshData, markNotificationsRead } = useTechnicianData();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [selectedRequest, setSelectedRequest] = useState(null);
@@ -307,6 +324,7 @@ const TechnicianOverview = () => {
                 title="Technician Dashboard"
                 subtitle="Receive assigned work, update status, and send progress back"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
@@ -533,7 +551,7 @@ const TechnicianOverview = () => {
 };
 
 const TechnicianHistory = () => {
-    const { requests, unreadCount, loading, refreshData, markNotificationsRead } = useTechnicianData();
+    const { requests, unreadCount, notifications, loading, refreshData, markNotificationsRead } = useTechnicianData();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [deletingId, setDeletingId] = useState(null);
@@ -566,6 +584,7 @@ const TechnicianHistory = () => {
                 title="Technician History"
                 subtitle="Completed assignments you can review or remove from history"
                 unreadCount={unreadCount}
+                notifications={notifications}
                 onReadNotifications={handleNotificationClick}
                 onLogout={logout}
             />
