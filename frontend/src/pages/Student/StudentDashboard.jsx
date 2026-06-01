@@ -93,23 +93,27 @@ const RequestTimelineModal = ({ request, logs, loading, onClose }) => (
         isOpen={!!request}
         onClose={onClose}
         title={request ? `Request #${request.id} Timeline` : 'Request Timeline'}
-        maxWidth="760px"
+        maxWidth="940px"
         showFooter={false}
+        overlayClassName="lg:pl-[280px]"
+        backdropClassName="lg:left-[280px]"
+        dialogClassName="max-h-[calc(100vh-1.5rem)] p-4 sm:p-5"
+        bodyClassName="text-[0.86rem] pr-1"
     >
         {request && (
             <div>
-                <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 mb-6">
+                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-4">
                     <div className="flex flex-wrap justify-between items-start gap-4">
-                        <div>
-                            <h5 className="text-lg font-extrabold text-textPrimary mb-1">{request.title}</h5>
+                        <div className="min-w-0 flex-1">
+                            <h5 className="text-base font-extrabold text-textPrimary mb-1">{request.title}</h5>
                             <p className="text-xs text-textSecondary mb-0 font-medium">{request.location}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClassName(request.status)}`}>{request.status}</span>
                     </div>
-                    <p className="text-sm text-textSecondary mt-4 mb-0">{request.description}</p>
+                    <p className="text-[0.82rem] text-textSecondary mt-3 mb-0 whitespace-pre-wrap break-words leading-relaxed">{request.description}</p>
                 </div>
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 size={32} className="animate-spin text-primary" />
@@ -130,7 +134,7 @@ const RequestTimelineModal = ({ request, logs, loading, onClose }) => (
                                     </div>
                                     <span className="text-xs text-textSecondary font-medium">{new Date(log.created_at).toLocaleString()}</span>
                                 </div>
-                                <p className="text-sm text-textPrimary mb-3">{log.remarks}</p>
+                                <p className="text-sm text-textPrimary mb-3 whitespace-pre-wrap break-words">{log.remarks}</p>
                                 <span className="inline-block px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-bold border border-primary/20">Progress: {log.progress_percentage ?? 0}%</span>
                             </motion.div>
                         ))
