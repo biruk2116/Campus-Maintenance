@@ -110,24 +110,26 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
             isOpen={!!request}
             onClose={onClose}
             title={request ? `Request #${request.id}` : 'Request Details'}
-            maxWidth="1120px"
+            maxWidth="1040px"
             showFooter={false}
-            dialogClassName="max-h-[calc(100vh-2rem)]"
-            bodyClassName="text-[0.9rem] pr-1"
+            overlayClassName="lg:pl-[280px]"
+            backdropClassName="lg:left-[280px]"
+            dialogClassName="max-h-[calc(100vh-1.5rem)] p-4 sm:p-5"
+            bodyClassName="text-[0.86rem] pr-1"
         >
             {request && (
                 <div>
-                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-5">
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-4">
                         <div className="flex flex-wrap justify-between items-start gap-4">
                             <div className="min-w-0 flex-1">
-                                <h5 className="text-lg font-extrabold text-textPrimary mb-1">{request.title}</h5>
-                                <p className="text-sm text-textSecondary mb-0 font-medium whitespace-pre-wrap break-words leading-relaxed">{request.description}</p>
+                                <h5 className="text-base font-extrabold text-textPrimary mb-1">{request.title}</h5>
+                                <p className="text-[0.82rem] text-textSecondary mb-0 font-medium whitespace-pre-wrap break-words leading-relaxed">{request.description}</p>
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusClassName(request.status)}`}>{request.status}</span>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Student</label>
                             <div className="font-extrabold text-textPrimary text-sm">{request.student_name}</div>
@@ -149,7 +151,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
                             {request.status !== 'Completed' ? (
                                 <>
@@ -185,7 +187,7 @@ const RequestDetailsModal = ({ request, logs, loading, technicians, onAssign, on
 
                         <div>
                             <label className="block text-xs font-bold text-textSecondary mb-3 uppercase tracking-widest">Progress Timeline</label>
-                            <div className="flex flex-col gap-3 max-h-[260px] overflow-y-auto custom-scrollbar pr-2">
+                            <div className="flex flex-col gap-3 max-h-[230px] overflow-y-auto custom-scrollbar pr-2">
                                 {loading ? (
                                     <div className="flex justify-center py-8">
                                         <Loader2 size={32} className="animate-spin text-primary" />
